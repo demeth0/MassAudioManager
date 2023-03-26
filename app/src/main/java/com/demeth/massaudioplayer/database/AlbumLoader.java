@@ -78,9 +78,9 @@ public class AlbumLoader {
      * multi-thread version
      * @param entry la track dont on veut l'image d'album
      */
-    public static void getAlbumImage(View v, IdentifiedEntry entry, int size, OnAlbumQueryFinished callback) {
+    public static void getAlbumImage(View v, @NonNull IdentifiedEntry entry, int size, OnAlbumQueryFinished callback) {
         thread.post(()->{
-            if(entry != null && entry.getAlbumCover() != null && size>0) {
+            if(entry.getAlbumCover() != null && size>0) {
                 Size s = new Size(size, size);
                 try {
                     final Bitmap res = v.getContext().getContentResolver().loadThumbnail(entry.getAlbumCover(), s, null);
@@ -102,9 +102,9 @@ public class AlbumLoader {
      * @param size the size
      * @param callback the callback
      */
-    public static void getAlbumImage(Context context, IdentifiedEntry entry, int size, OnAlbumQueryFinished callback) {
+    public static void getAlbumImage(Context context, @NonNull IdentifiedEntry entry, int size, OnAlbumQueryFinished callback) {
         Bitmap res=default_bitmap;
-        if(entry != null && entry.getAlbumCover() != null && size>0) {
+        if(entry.getAlbumCover() != null && size>0) {
             Size s = new Size(size, size);
             try {
                 res = context.getContentResolver().loadThumbnail(entry.getAlbumCover(), s, null);
@@ -136,7 +136,4 @@ public class AlbumLoader {
         thread = null;
     }
 
-    private static void print(Object o){
-        Log.d("ContentProvider",o.toString());
-    }
 }

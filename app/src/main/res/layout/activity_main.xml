@@ -15,20 +15,33 @@
         android:background="@android:color/background_dark">
 
         <AutoCompleteTextView
+            android:id="@+id/search_field"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_margin="2dp"
+
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="6dp"
+            android:layout_marginEnd="6dp"
+
+            android:paddingStart="6dp"
+
             android:background="@drawable/search_field_background"
 
-            android:minHeight="48dp"
+            android:imeOptions="actionDone"
+            android:hint="search"
+            android:inputType="text"
+            android:textAlignment="textStart"
+
+            android:minHeight="36dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/imageButton"
+            app:layout_constraintEnd_toStartOf="@+id/search_button"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="LabelFor,SpeakableTextPresentCheck,VisualLintTextFieldSize" />
 
         <ImageButton
-            android:id="@+id/imageButton"
+            android:id="@+id/search_button"
 
             android:layout_width="0dp"
 
@@ -67,6 +80,7 @@
         android:layout_height="wrap_content">
         <RadioGroup
             android:layout_width="wrap_content"
+            android:paddingVertical="4dp"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:id="@+id/fragment_list">
@@ -75,7 +89,7 @@
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/list_displayer_fragment_container"
-        android:name="com.demeth.massaudioplayer.ui.AudioEntryDisplayer"
+        android:name="com.demeth.massaudioplayer.ui.fragments.AudioEntryDisplayer"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
@@ -83,7 +97,7 @@
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/small_controller_fragment_container"
-        android:name="com.demeth.massaudioplayer.ui.SmallControllerFragment"
+        android:name="com.demeth.massaudioplayer.ui.fragments.SmallControllerFragment"
         tools:layout="@layout/fragment_small_controller"
         android:layout_width="match_parent"
         android:layout_marginBottom="4dp"

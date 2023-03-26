@@ -5,6 +5,8 @@
     android:id="@+id/holder_layout"
     android:background="@drawable/list_entry_background"
 
+    android:animateLayoutChanges="true"
+
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
@@ -14,7 +16,7 @@
         android:id="@+id/checkBox"
 
         android:buttonTint="@color/foreground"
-
+        android:visibility="gone"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -24,20 +26,24 @@
     <com.demeth.massaudioplayer.ui.SquareImageButton
         android:id="@+id/album"
 
-        android:clickable="false"
-        android:focusable="false"
-
-        android:scaleType="fitCenter"
-        android:src="@drawable/no_album"
-        android:background="@color/transparent"
-        android:layout_marginStart="4dp"
         android:layout_width="44dp"
         android:layout_height="44dp"
-        android:layout_marginBottom="4dp"
+
+        android:layout_marginStart="4dp"
         android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp"
+
+        android:paddingVertical="4dp"
+
+        android:background="@color/transparent"
+        android:clickable="false"
+        android:focusable="false"
+        android:scaleType="fitCenter"
+        android:src="@drawable/no_album"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/checkBox"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="SpeakableTextPresentCheck" />
 
     <TextView
         android:id="@+id/title"
@@ -66,15 +72,16 @@
     <com.demeth.massaudioplayer.ui.SquareImageButton
         android:id="@+id/settings"
 
-        android:background="@color/transparent"
-        android:src="@android:drawable/ic_menu_more"
-
-
         android:layout_width="wrap_content"
         android:layout_height="0dp"
+
+
+        android:background="@color/transparent"
         android:minWidth="48dp"
         android:minHeight="48dp"
+        android:src="@android:drawable/ic_menu_more"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="SpeakableTextPresentCheck" />
 </androidx.constraintlayout.widget.ConstraintLayout>

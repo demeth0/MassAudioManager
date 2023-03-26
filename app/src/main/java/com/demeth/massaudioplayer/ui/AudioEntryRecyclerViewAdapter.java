@@ -1,8 +1,5 @@
 package com.demeth.massaudioplayer.ui;
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,49 +8,61 @@ import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.demeth.massaudioplayer.R;
+import com.demeth.massaudioplayer.database.AlbumLoader;
 import com.demeth.massaudioplayer.database.IdentifiedEntry;
 import com.demeth.massaudioplayer.databinding.FragmentAudioEntryDisplayerBinding;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 /**
  * {@link RecyclerView.Adapter} that can display a {@link IdentifiedEntry}.
  */
 public class AudioEntryRecyclerViewAdapter extends RecyclerView.Adapter<AudioEntryRecyclerViewAdapter.ViewHolder> {
 
+    @FunctionalInterface
+    public static interface OnItemClicked {
+        public void oClicked(IdentifiedEntry entry);
+    }
+
     //TODO global uncheck all /check all
 
+    private OnItemClicked onItemClicked;
+
     private final List<IdentifiedEntry> mValues;
-    private final Set<Integer> selected_values = new HashSet<>();
+
+    private IdentifiedEntry highlighted_entry=null;
 
     @SuppressLint("NotifyDataSetChanged")
-    public void select(IdentifiedEntry entry){
-        if(!selected_values.contains(entry.getId())){
-            selected_values.add(entry.getId());
-            if(selected_values.size()==1) this.notifyDataSetChanged();
-        }
-
+    public void setContent(Collection<? extends IdentifiedEntry> mValues){
+        this.mValues.clear();
+        this.mValues.addAll(mValues);
+        notifyDataSetChanged();
     }
 
-    @SuppressLint("NotifyDataSetChanged")
-    public void unselect(IdentifiedEntry entry){
-        if(selected_values.contains(entry.getId())){
-            selected_values.remove(entry.getId());
-
-            if(selected_values.size()<=0) this.notifyDataSetChanged();
-        }
-
+    public void setHighlighted(IdentifiedEntry entry) {
+        IdentifiedEntry temp = highlighted_entry;
+        highlighted_entry = entry;
+        if(temp!=null)notifyItemChanged(mValues.indexOf(temp));
+        notifyItemChanged(mValues.indexOf(highlighted_entry));
     }
 
-    public AudioEntryRecyclerViewAdapter(List<IdentifiedEntry> items) {
-        mValues = items;
+    public AudioEntryRecyclerViewAdapter() {
+        mValues = new ArrayList<>();
+    }
+
+    public void setOnItemClicked(OnItemClicked onItemClicked) {
+        this.onItemClicked = onItemClicked;
     }
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         return new ViewHolder(FragmentAudioEntryDisplayerBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
     }
 
@@ -67,7 +76,7 @@ public class AudioEntryRecyclerViewAdapter extends RecyclerView.Adapter<AudioEnt
         return mValues.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener, View.OnClickListener {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener, View.OnClickListener,Runnable {
         private final TextView title;
         private final CheckBox checkBox;
         private final ImageButton album;
@@ -83,28 +92,39 @@ public class AudioEntryRecyclerViewAdapter extends RecyclerView.Adapter<AudioEnt
             binding.holderLayout.setOnClickListener(ViewHolder.this);
 
             checkBox.setOnCheckedChangeListener((compoundButton, b) -> {
-                if(b) select(mItem);
-                else unselect(mItem);
+                if(b) MainActivity.selection_manager.select(mItem,AudioEntryRecyclerViewAdapter.this);
+                else MainActivity.selection_manager.unselect(mItem,AudioEntryRecyclerViewAdapter.this);
             });
         }
 
         public void setContent(IdentifiedEntry new_entry){
             mItem = new_entry;
+
+            //text box
             title.setText(mItem.getName());
+            if(new_entry.equals(highlighted_entry)) title.setTextColor(title.getContext().getColor(R.color.foreground)); //TODO add shadow
+            else title.setTextColor(title.getContext().getColor(R.color.white));
 
-            checkBox.setChecked(selected_values.contains(mItem.getId()));
+            //album cover
+            this.itemView.removeCallbacks(this);
+            this.itemView.postDelayed(this,300);
 
+            // check box
+            checkBox.setChecked(MainActivity.selection_manager.contains(mItem.getId()));
             /*make a thrust table to understand this (shoud hide when no element and show when elements*/
-            if((selected_values.size()>0) != (checkBox.getVisibility()==View.VISIBLE)){
+            if((MainActivity.selection_manager.size()>0) != (checkBox.getVisibility()==View.VISIBLE)){
                 if(checkBox.getVisibility()==View.VISIBLE){
                     checkBox.setVisibility(View.GONE);
-                    //TODO animate
                 }else{
                     //TODO animate
                     checkBox.setVisibility(View.VISIBLE);
                 }
-
             }
+        }
+
+        @Override
+        public void run() {
+            if(mItem != null) AlbumLoader.getAlbumImage(itemView,  this.mItem,Math.max(48,album.getWidth()), album::setImageBitmap);
         }
 
         @NonNull
@@ -115,13 +135,14 @@ public class AudioEntryRecyclerViewAdapter extends RecyclerView.Adapter<AudioEnt
 
         @Override
         public boolean onLongClick(View view) {
-            select(mItem);
+            MainActivity.selection_manager.select(mItem,AudioEntryRecyclerViewAdapter.this);
             return false;
         }
 
         @Override
         public void onClick(View view) {
             //TODO start the audio
+            onItemClicked.oClicked(mItem);
         }
     }
 }
