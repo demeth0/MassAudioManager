@@ -1,12 +1,21 @@
 package com.demeth.massaudioplayer.ui;
 
 import android.annotation.SuppressLint;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AutoCompleteTextView;
-import android.widget.Filter;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -14,41 +23,78 @@ import android.widget.RadioGroup;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.fragment.app.FragmentContainerView;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.demeth.massaudioplayer.R;
 import com.demeth.massaudioplayer.database.AlbumLoader;
 import com.demeth.massaudioplayer.database.IdentifiedEntry;
+import com.demeth.massaudioplayer.placeholder.PlaceholderContent;
+import com.demeth.massaudioplayer.service.AudioService;
+import com.demeth.massaudioplayer.service.BoundableActivity;
+import com.demeth.massaudioplayer.service.notification.NotificationBuilder;
 import com.demeth.massaudioplayer.ui.fragments.AudioEntryDisplayer;
+import com.demeth.massaudioplayer.ui.fragments.SmallControllerFragment;
 import com.demeth.massaudioplayer.ui.viewmodel.DiffusionViewModel;
 import com.demeth.massaudioplayer.ui.viewmodel.ListViewModel;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.stream.Collectors;
-
 @SuppressLint("SetTextI18n")
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends ServiceBoundActivity {
 
     public static final SelectionManager selection_manager = new SelectionManager();
 
-    private ListViewModel listViewModel;
-    private DiffusionViewModel diffusionViewModel;
+    private RadioGroup group=null;
 
-    RadioGroup group=null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //pre init
-        listViewModel = new ViewModelProvider(this).get(ListViewModel.class);
-        diffusionViewModel = new ViewModelProvider(this).get(DiffusionViewModel.class);
-        AlbumLoader.open(this);
         setContentView(R.layout.activity_main);
+    }
 
+    @Override
+    public void onServiceConnection(){
+        AudioService service = binder.getService(this);
+        //init
+        setupCategorySelector();
+        setupController();
+        setupSearchBar();
+
+        ImageButton play_all = findViewById(R.id.play_all_random_button);
+        play_all.setOnClickListener(view -> {
+            service.getPlayer().setRandom(true);
+            service.getPlayer().setPlaylist(listViewModel.getFilteredList().getValue());
+            service.getPlayer().play();
+        });
+
+        ImageButton remove_all = findViewById(R.id.main_clear_queue);
+        remove_all.setOnClickListener(view -> {
+            service.getPlayer().clearPlaylist();
+        });
+    }
+
+    private void setupController(){
+        Bundle bun = new Bundle();
+        bun.putBinder("service",binder);
+        getSupportFragmentManager().beginTransaction().replace(R.id.small_controller_fragment_container, SmallControllerFragment.class,bun).setReorderingAllowed(true).commit();
+
+        FragmentContainerView controller = findViewById(R.id.small_controller_fragment_container);
+        controller.setVisibility(View.GONE);
+        Observer<IdentifiedEntry> controller_apparition_observer = new Observer<IdentifiedEntry>() {
+            @Override
+            public void onChanged(IdentifiedEntry identifiedEntry) {
+                if(identifiedEntry!=null){
+                    controller.setVisibility(View.VISIBLE);
+
+                    diffusionViewModel.getEntry().removeObserver(this);
+                }
+            }
+        };
+
+        diffusionViewModel.getEntry().observe(this,controller_apparition_observer);
+    }
+
+    private void setupCategorySelector(){
         //init
         group = findViewById(R.id.fragment_list);
 
@@ -57,39 +103,14 @@ public class MainActivity extends AppCompatActivity {
             //listViewModel.setActiveList(Category.valueOf());
             Bundle bun = new Bundle();
             bun.putString("category",rb.getText().toString());
+            bun.putBinder("service",binder);
             getSupportFragmentManager().beginTransaction().replace(R.id.list_displayer_fragment_container,AudioEntryDisplayer.class,bun).setReorderingAllowed(true).commit();
         });
+
 
         addCategory(Category.PLAYLISTS.getName());
         addCategory(Category.PISTES.getName()).setChecked(true);
         addCategory(Category.QUEUE.getName());
-
-
-
-        setupController();
-        setupSearchBar();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        AlbumLoader.close();
-    }
-
-    private void setupController(){
-        FragmentContainerView controller = findViewById(R.id.small_controller_fragment_container);
-        controller.setVisibility(View.GONE);
-        Observer<IdentifiedEntry> controller_apparition_observer = new Observer<IdentifiedEntry>() {
-            @Override
-            public void onChanged(IdentifiedEntry identifiedEntry) {
-                if(identifiedEntry!=null){
-                    controller.setVisibility(View.VISIBLE);
-                    diffusionViewModel.getEntry().removeObserver(this);
-                }
-            }
-        };
-
-        diffusionViewModel.getEntry().observe(this,controller_apparition_observer);
     }
 
     private void setupSearchBar(){

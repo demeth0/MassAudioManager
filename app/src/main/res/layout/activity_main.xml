@@ -110,6 +110,7 @@
         android:layout_height="wrap_content">
         <!--play the audio displayed in the recycler view in random-->
         <ImageButton
+            android:id="@+id/play_all_random_button"
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:paddingVertical="10dp"
@@ -121,6 +122,7 @@
             />
         <!--clear the queue-->
         <ImageButton
+            android:id="@+id/main_clear_queue"
             android:paddingVertical="10dp"
             android:layout_width="0dp"
             android:layout_height="48dp"

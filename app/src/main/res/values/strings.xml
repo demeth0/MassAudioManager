@@ -5,4 +5,6 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="timestamp">%1$02d:%2$02d/%3$02d:%4$02d</string>
     <string name="timestamp_default">00:00/00:00</string>
+    <string name="channel_name">Audio app notifications</string>
+    <string name="channel_description">channel for this app notifications, like the media controller notification</string>
 </resources>

@@ -1,5 +1,6 @@
 package com.demeth.massaudioplayer.placeholder;
 
+import com.demeth.massaudioplayer.database.DataType;
 import com.demeth.massaudioplayer.database.IdentifiedEntry;
 
 import java.util.ArrayList;
@@ -40,7 +41,12 @@ public class PlaceholderContent {
     }
 
     private static IdentifiedEntry createPlaceholderItem(int position) {
-        return new IdentifiedEntry("test "+position,position){};
+        return new IdentifiedEntry("test "+position,position){
+            @Override
+            public DataType getType() {
+                return DataType.LOCAL;
+            }
+        };
     }
 
     private static String makeDetails(int position) {

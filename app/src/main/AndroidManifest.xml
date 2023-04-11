@@ -2,6 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="READ_USER_DICTIONARY"/>
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -20,6 +25,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".ui.ControllerActivity">
+        </activity>
+        <service android:name=".service.AudioService"
+            android:enabled="true"
+            android:exported="false"/>
+        <receiver android:name=".service.notification.ServiceBroadcast"
+            android:enabled="true"
+            android:exported="false"/>
     </application>
 
 </manifest>

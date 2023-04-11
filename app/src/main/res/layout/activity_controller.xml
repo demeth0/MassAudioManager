@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:background="@color/background_deep"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:id="@+id/controller_menu_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/background"
+        android:minHeight="48dp"
+
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/controller_controller_music_title"
+
+        android:layout_width="0dp"
+
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+
+        android:background="@color/background_light"
+        android:clickable="false"
+        android:focusable="false"
+
+        android:padding="8dp"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:ellipsize="marquee"
+        android:scrollHorizontally="true"
+        android:singleLine="true"
+
+        android:textColor="@color/white"
+
+
+        android:textSize="25sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/controller_menu_layout"
+        tools:ignore="HardcodedText" />
+
+    <ImageView
+        android:id="@+id/controller_album_imageview"
+
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+
+        android:clickable="false"
+        android:focusable="false"
+
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toTopOf="@+id/controller_control_layout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/controller_controller_music_title"
+        app:srcCompat="@drawable/no_album"
+        tools:ignore="ContentDescription,ImageContrastCheck" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/controller_control_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/background_light"
+        android:minHeight="48dp"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <!--display the title of  the music currently playing-->
+        <!--display the title of  the music currently playing-->
+
+        <!--display if possible the image associated with the audio-->
+
+        <!--audio progression bar, can set the audio time stamp-->
+        <TextView
+            android:id="@+id/controller_controller_music_timer"
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+
+            android:clickable="false"
+            android:focusable="false"
+            android:text="@string/timestamp_default"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toEndOf="parent"
+
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="HardcodedText,TextContrastCheck" />
+
+        <SeekBar
+            android:id="@+id/controller_song_progression_bar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+
+            android:layout_marginEnd="4dp"
+            android:layout_marginBottom="8dp"
+
+            android:clickable="true"
+
+            android:focusable="false"
+            android:max="1000"
+            android:minHeight="48dp"
+            android:progress="0"
+
+            android:scrollbarSize="8dp"
+            app:layout_constraintBottom_toTopOf="@+id/controller_linearLayout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/controller_controller_music_timer"
+            tools:ignore="SpeakableTextPresentCheck" />
+
+        <!--contain all basic audio controls-->
+        <LinearLayout
+            android:id="@+id/controller_linearLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+
+
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <!--set or unset the loop, two mode single audio loop or queue loop-->
+            <com.demeth.massaudioplayer.ui.SquareImageButton
+                android:id="@+id/controller_control_loop_button"
+                android:layout_width="wrap_content"
+                android:layout_height="60dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="8dp"
+                android:scaleType="fitCenter"
+                app:srcCompat="@drawable/loop_none"
+                tools:ignore="SpeakableTextPresentCheck" />
+
+            <!--start the previous music or restart  the music from the begining-->
+            <com.demeth.massaudioplayer.ui.SquareImageButton
+                android:id="@+id/controller_control_previous_button"
+                android:layout_width="wrap_content"
+                android:layout_height="60dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="8dp"
+                android:scaleType="fitCenter"
+                app:srcCompat="@android:drawable/ic_media_previous"
+                tools:ignore="SpeakableTextPresentCheck" />
+
+            <!--play / pause the audio-->
+            <com.demeth.massaudioplayer.ui.SquareImageButton
+                android:id="@+id/controller_control_play_button"
+                android:layout_width="wrap_content"
+                android:layout_height="60dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="8dp"
+                android:scaleType="fitCenter"
+                app:srcCompat="@android:drawable/ic_media_pause"
+                tools:ignore="SpeakableTextPresentCheck" />
+
+            <!--go to the next music in the queue-->
+            <com.demeth.massaudioplayer.ui.SquareImageButton
+                android:id="@+id/controller_control_next_button"
+                android:layout_width="wrap_content"
+                android:layout_height="60dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="8dp"
+                android:scaleType="fitCenter"
+                app:srcCompat="@android:drawable/ic_media_next"
+                tools:ignore="SpeakableTextPresentCheck" />
+
+            <!--set or unset random mode for a given queue-->
+            <com.demeth.massaudioplayer.ui.SquareImageButton
+                android:id="@+id/controller_control_random_button"
+                android:layout_width="wrap_content"
+                android:layout_height="60dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="8dp"
+                android:scaleType="fitCenter"
+                app:srcCompat="@drawable/random_none"
+                tools:ignore="SpeakableTextPresentCheck" />
+
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -106,8 +106,9 @@ public class AudioEntryRecyclerViewAdapter extends RecyclerView.Adapter<AudioEnt
             else title.setTextColor(title.getContext().getColor(R.color.white));
 
             //album cover
+            album.setImageBitmap(AlbumLoader.getDefaultCover());
             this.itemView.removeCallbacks(this);
-            this.itemView.postDelayed(this,300);
+            this.itemView.postDelayed(this,200);
 
             // check box
             checkBox.setChecked(MainActivity.selection_manager.contains(mItem.getId()));

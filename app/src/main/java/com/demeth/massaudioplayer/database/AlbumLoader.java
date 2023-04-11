@@ -6,7 +6,6 @@ import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.util.Log;
 import android.util.Size;
 import android.view.View;
 
@@ -17,6 +16,8 @@ import com.demeth.massaudioplayer.R;
 import java.io.IOException;
 
 public class AlbumLoader {
+
+    private static Object initiator;
 
     /**
      * provider main thread that will do the heavy loading of ressources and more
@@ -54,6 +55,7 @@ public class AlbumLoader {
          * @param r the runnable to execute
          * @param delayMillis the time to wait in ms
          */
+        @SuppressWarnings("unused")
         public void postDelayed(Runnable r, int delayMillis){
             handler.postDelayed(r,delayMillis);
         }
@@ -78,9 +80,9 @@ public class AlbumLoader {
      * multi-thread version
      * @param entry la track dont on veut l'image d'album
      */
-    public static void getAlbumImage(View v, @NonNull IdentifiedEntry entry, int size, OnAlbumQueryFinished callback) {
+    public static void getAlbumImage(View v,IdentifiedEntry entry, int size, OnAlbumQueryFinished callback) {
         thread.post(()->{
-            if(entry.getAlbumCover() != null && size>0) {
+            if(entry!=null && entry.getAlbumCover() != null && size>0) {
                 Size s = new Size(size, size);
                 try {
                     final Bitmap res = v.getContext().getContentResolver().loadThumbnail(entry.getAlbumCover(), s, null);
@@ -102,9 +104,10 @@ public class AlbumLoader {
      * @param size the size
      * @param callback the callback
      */
-    public static void getAlbumImage(Context context, @NonNull IdentifiedEntry entry, int size, OnAlbumQueryFinished callback) {
+    @SuppressWarnings("unused")
+    public static void getAlbumImage(Context context, IdentifiedEntry entry, int size, OnAlbumQueryFinished callback) {
         Bitmap res=default_bitmap;
-        if(entry.getAlbumCover() != null && size>0) {
+        if(entry!=null && entry.getAlbumCover() != null && size>0) {
             Size s = new Size(size, size);
             try {
                 res = context.getContentResolver().loadThumbnail(entry.getAlbumCover(), s, null);
@@ -113,27 +116,35 @@ public class AlbumLoader {
         callback.onFinish(res);
     }
 
+    public static Bitmap getDefaultCover(){
+        return default_bitmap;
+    }
+
 
 
     /**
      * create the content provider context and start the threads
      * @param appContext the context of the app
      */
-    public static void open(Context appContext){
+    public static void open(Context appContext, Object _initiator){
         if(thread==null){
             default_bitmap = BitmapFactory.decodeResource(appContext.getResources(), R.drawable.no_album);
             //super important sinon après close le thread est consumé et ne peux plus etre démarrer (jusqu'a redémarrage de l'appareil probablement)
             thread = new ProviderThread();
             thread.start();
         }
+        initiator=_initiator;
     }
 
     /**
      * stop the thread and close the IO streams
      */
-    public static void close(){
-        thread.interrupt();
-        thread = null;
+    public static void close(Object _initiator){
+        //TODO need to test if pointers are conserved
+        if(_initiator==initiator){
+            thread.interrupt();
+            thread = null;
+        }
     }
 
 }

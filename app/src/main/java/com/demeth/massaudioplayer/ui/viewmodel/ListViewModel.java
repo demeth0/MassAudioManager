@@ -1,16 +1,12 @@
 package com.demeth.massaudioplayer.ui.viewmodel;
 
-import android.util.Log;
 import android.widget.Filter;
 
-import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.demeth.massaudioplayer.database.IdentifiedEntry;
-import com.demeth.massaudioplayer.ui.Category;
-import com.demeth.massaudioplayer.ui.MainActivity;
 
 import java.util.Collection;
 import java.util.Collections;
