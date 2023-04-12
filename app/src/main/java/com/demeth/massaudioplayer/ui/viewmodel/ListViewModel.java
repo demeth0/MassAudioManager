@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.demeth.massaudioplayer.database.IdentifiedEntry;
+import com.demeth.massaudioplayer.database.playlist.PlaylistManager;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -19,10 +20,7 @@ import java.util.stream.Collectors;
 public class ListViewModel extends ViewModel {
     private final MutableLiveData<Collection<? extends IdentifiedEntry>> list = new MutableLiveData<>(Collections.emptyList());
     private final MutableLiveData<Collection<? extends IdentifiedEntry>> list_filtered = new MutableLiveData<>(Collections.emptyList());
-
     private final MutableLiveData<Collection<? extends IdentifiedEntry>> queue = new MutableLiveData<>(Collections.emptyList());
-
-    private final MutableLiveData<Collection<? extends IdentifiedEntry>> active_list = new MutableLiveData<>(Collections.emptyList());
 
     private String filter_mask = "";
 

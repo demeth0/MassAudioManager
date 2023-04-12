@@ -7,7 +7,7 @@ import com.demeth.massaudioplayer.audio_player.AbstractAudioPlayer;
 import com.demeth.massaudioplayer.audio_player.PlayersManager;
 import com.demeth.massaudioplayer.database.DataType;
 import com.demeth.massaudioplayer.database.IdentifiedEntry;
-import com.demeth.massaudioplayer.database.data_structures.LocalEntry;
+import com.demeth.massaudioplayer.database.data_structure.LocalEntry;
 
 import java.io.IOException;
 

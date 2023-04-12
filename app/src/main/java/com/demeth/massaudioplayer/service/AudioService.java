@@ -1,6 +1,7 @@
 package com.demeth.massaudioplayer.service;
 
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -38,6 +39,9 @@ public class AudioService extends AbstractAudioService implements ViewModelStore
         return player;
     }
 
+    public AudioLibrary getLibrary() {
+        return library;
+    }
 
     /**
      * classe du binder pour étre lié comme il faut a la cclasse AudioService
@@ -73,12 +77,21 @@ public class AudioService extends AbstractAudioService implements ViewModelStore
             switch(intent.getAction()){
                 case ServiceAction.NEXT_AUDIO:
                     Log.d("service","action next");
+                    player.next();
                     break;
                 case ServiceAction.PREV_AUDIO:
                     Log.d("service","action previous");
+                    player.previous();
                     break;
                 case ServiceAction.PAUSE_AUDIO:
                     Log.d("service","action pause");
+                    if(player.getState().equals(AudioPlayer.State.PAUSED))
+                        player.play();
+                    else
+                        player.pause();
+                    break;
+                case ServiceAction.DEVICE_UNPLUGGED:
+                    player.pause();
                     break;
             }
         }
@@ -109,6 +122,9 @@ public class AudioService extends AbstractAudioService implements ViewModelStore
         listViewModel.setList(library.getAll());
 
         this.handler.post(update_loop);
+
+        IntentFilter receiverFilter = new IntentFilter(Intent.ACTION_HEADSET_PLUG);
+        registerReceiver(new AudioDeviceBroadcastReceiver(), receiverFilter);
     }
 
     @Override

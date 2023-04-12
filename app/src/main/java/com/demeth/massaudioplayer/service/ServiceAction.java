@@ -7,6 +7,9 @@ public final class ServiceAction {
     public static final String END_SERVICE="massaudioplayer.END_SERVICE";
 
     public static final String START_SERVICE="massaudioplayer.START_SERVICE";
+    public static final String DEVICE_UNPLUGGED="massaudioplayer.DEVICE_UNPLUGGED";
+
+
 
     public static final int HANDLER_STOP_SERVICE=1;
 }

@@ -51,12 +51,12 @@ public class ControllerActivity extends ServiceBoundActivity {
         album.setOnTouchListener(new OnSwipeTouchDetector(this) {
             @Override
             public void onSwipeRight() {
-                service.getPlayer().next();
+                service.getPlayer().previous();
             }
 
             @Override
             public void onSwipeLeft() {
-                service.getPlayer().previous();
+                service.getPlayer().next();
             }
         });
 

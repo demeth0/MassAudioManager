@@ -28,6 +28,7 @@
 
             android:background="@drawable/search_field_background"
 
+            android:textColor="@color/background_deep"
             android:imeOptions="actionDone"
             android:hint="search"
             android:inputType="text"
@@ -74,6 +75,8 @@
             tools:ignore="ContentDescription,SpeakableTextPresentCheck" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+
+
     <HorizontalScrollView
         android:background="@color/background"
         android:layout_width="match_parent"
@@ -86,6 +89,8 @@
             android:id="@+id/fragment_list">
         </RadioGroup>
     </HorizontalScrollView>
+
+
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/list_displayer_fragment_container"
@@ -135,6 +140,7 @@
             />
         <!--add the song to the special playlist liked-->
         <ImageButton
+            android:id="@+id/main_like_button"
             android:paddingVertical="10dp"
             android:layout_width="0dp"
             android:layout_height="48dp"

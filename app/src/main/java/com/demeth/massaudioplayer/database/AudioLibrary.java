@@ -8,7 +8,7 @@ import android.provider.MediaStore;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.demeth.massaudioplayer.database.data_structures.LocalEntry;
+import com.demeth.massaudioplayer.database.data_structure.LocalEntry;
 
 import java.util.Collection;
 import java.util.HashMap;

@@ -1,5 +1,7 @@
 package com.demeth.massaudioplayer.service.notification;
 
+import static androidx.core.app.NotificationCompat.VISIBILITY_PUBLIC;
+
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -21,13 +23,6 @@ import com.demeth.massaudioplayer.ui.MainActivity;
  * classe qui s'occupe de la création et de la génération de la notification pour la partie foreground du service
  */
 public class NotificationBuilder {
-    /**
-     * string used for intent to transmit to service an audio control command
-     */
-    public static final String COMMAND_FLAG="audio service interaction message";
-
-    public static final String ACTION_NOTIFICATION="audio service interaction action";
-
     public static final String CHANNEL_ID = "massaudioplayer notification channel id";
     public static final int NOTIFICATION_ID=88;
 
@@ -87,15 +82,15 @@ public class NotificationBuilder {
 
         /*make the notification builder*/
         notification_builder = new NotificationCompat.Builder(service, CHANNEL_ID); //TODO channel id
-        notification_builder.setContent(notificationView)
-                .setSmallIcon(android.R.drawable.ic_media_play)
-                /*to set notification at the top*/
-                .setPriority(NotificationCompat.PRIORITY_MAX);
+
+        notification_builder.setCustomContentView(notificationView)
+                .setSmallIcon(android.R.drawable.ic_media_play);
 
         /*when clicking on the notification open the app main activity*/
         Intent start_activity = new Intent(service, MainActivity.class);
         PendingIntent start_activity_pending_intent = PendingIntent.getActivity(service,4,start_activity, flags);
         notification_builder.setContentIntent(start_activity_pending_intent);
+
     }
 
     /**
@@ -128,7 +123,7 @@ public class NotificationBuilder {
 
         notificationView.setTextViewText(R.id.notification_title,title);
 
-        notification_builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+        notification_builder.setVisibility(VISIBILITY_PUBLIC);
     }
 
     /**
@@ -172,6 +167,7 @@ public class NotificationBuilder {
         String description = context.getString(R.string.channel_description);
         int importance = NotificationManager.IMPORTANCE_HIGH; //want to be oin top but no sound
         NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+
         channel.enableVibration(false);
         channel.setDescription(description);
         channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);

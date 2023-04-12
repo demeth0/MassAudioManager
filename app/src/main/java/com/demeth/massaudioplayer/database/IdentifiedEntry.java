@@ -2,10 +2,12 @@ package com.demeth.massaudioplayer.database;
 
 import android.net.Uri;
 
-public abstract class IdentifiedEntry implements Typed,Comparable<IdentifiedEntry>{
-    private final int id;
-    private final String name;
-    private Uri albumCover;
+import java.io.Serializable;
+
+public abstract class IdentifiedEntry implements Typed,Comparable<IdentifiedEntry>, Serializable {
+    protected transient final int id;
+    protected final String name;
+    protected transient Uri albumCover;
 
     public IdentifiedEntry(String name, int id){
         this.name=name;

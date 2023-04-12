@@ -10,12 +10,14 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.text.Layout;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -29,6 +31,8 @@ import androidx.lifecycle.ViewModelProvider;
 import com.demeth.massaudioplayer.R;
 import com.demeth.massaudioplayer.database.AlbumLoader;
 import com.demeth.massaudioplayer.database.IdentifiedEntry;
+import com.demeth.massaudioplayer.database.playlist.Playlist;
+import com.demeth.massaudioplayer.database.playlist.PlaylistManager;
 import com.demeth.massaudioplayer.placeholder.PlaceholderContent;
 import com.demeth.massaudioplayer.service.AudioService;
 import com.demeth.massaudioplayer.service.BoundableActivity;
@@ -44,17 +48,21 @@ public class MainActivity extends ServiceBoundActivity {
     public static final SelectionManager selection_manager = new SelectionManager();
 
     private RadioGroup group=null;
+    private PlaylistManager playlist_manager;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
     }
 
     @Override
     public void onServiceConnection(){
         AudioService service = binder.getService(this);
+        playlist_manager = new PlaylistManager(this,service.getLibrary());
         //init
         setupCategorySelector();
         setupController();
@@ -71,6 +79,30 @@ public class MainActivity extends ServiceBoundActivity {
         remove_all.setOnClickListener(view -> {
             service.getPlayer().clearPlaylist();
         });
+
+        ImageButton liked = findViewById(R.id.main_like_button);
+        diffusionViewModel.getEntry().observe(this,identifiedEntry -> {
+            if(playlist_manager.get("liked").contains(identifiedEntry)){
+                liked.setImageResource(R.drawable.like_enabled);
+            }else{
+                liked.setImageResource(R.drawable.like);
+            }
+        });
+        liked.setOnClickListener(view -> {
+            IdentifiedEntry audio = diffusionViewModel.getEntry().getValue();
+            if(audio!=null){
+                Playlist p = playlist_manager.get("liked");
+                if(p.contains(audio)){
+                    p.remove(audio);
+                    liked.setImageResource(R.drawable.like);
+                }else{
+                    p.add(audio);
+                    liked.setImageResource(R.drawable.like_enabled);
+                }
+            }
+        });
+
+
     }
 
     private void setupController(){
@@ -152,5 +184,9 @@ public class MainActivity extends ServiceBoundActivity {
         but.setTextColor(this.getColor(R.color.white));
         group.addView(but);
         return but;
+    }
+
+    public PlaylistManager getPlaylistManager() {
+        return playlist_manager;
     }
 }

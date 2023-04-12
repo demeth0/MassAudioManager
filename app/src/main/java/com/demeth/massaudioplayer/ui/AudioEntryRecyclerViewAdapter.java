@@ -26,8 +26,8 @@ import java.util.List;
 public class AudioEntryRecyclerViewAdapter extends RecyclerView.Adapter<AudioEntryRecyclerViewAdapter.ViewHolder> {
 
     @FunctionalInterface
-    public static interface OnItemClicked {
-        public void oClicked(IdentifiedEntry entry);
+    public interface OnItemClicked {
+        void oClicked(IdentifiedEntry entry);
     }
 
     //TODO global uncheck all /check all
@@ -35,6 +35,10 @@ public class AudioEntryRecyclerViewAdapter extends RecyclerView.Adapter<AudioEnt
     private OnItemClicked onItemClicked;
 
     private final List<IdentifiedEntry> mValues;
+
+    public List<IdentifiedEntry> getValues() {
+        return mValues;
+    }
 
     private IdentifiedEntry highlighted_entry=null;
 
