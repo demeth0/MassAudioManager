@@ -6,6 +6,9 @@ import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
 
+/**
+ * detect earphone unplug event and pause audio on audio service to prevent embarrassment
+ */
 public class AudioDeviceBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {

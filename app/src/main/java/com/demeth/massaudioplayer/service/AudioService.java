@@ -6,7 +6,6 @@ import android.content.IntentFilter;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.lifecycle.DefaultLifecycleObserver;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelStore;
 import androidx.lifecycle.ViewModelStoreOwner;
@@ -14,14 +13,13 @@ import androidx.lifecycle.ViewModelStoreOwner;
 import com.demeth.massaudioplayer.audio_player.AudioPlayer;
 import com.demeth.massaudioplayer.database.AlbumLoader;
 import com.demeth.massaudioplayer.database.AudioLibrary;
-import com.demeth.massaudioplayer.database.IdentifiedEntry;
 import com.demeth.massaudioplayer.database.playlist.PlaylistManager;
-import com.demeth.massaudioplayer.placeholder.PlaceholderContent;
 import com.demeth.massaudioplayer.ui.viewmodel.DiffusionViewModel;
 import com.demeth.massaudioplayer.ui.viewmodel.ListViewModel;
 
-import java.util.Collections;
-
+/**
+ * foreground audio service that instantiate the audio player and provide all the player functionalities from the UI or the notification
+ */
 public class AudioService extends AbstractAudioService implements ViewModelStoreOwner, AudioPlayer.AudioPlayerListener {
     private ViewModelStore store;
 
@@ -33,20 +31,32 @@ public class AudioService extends AbstractAudioService implements ViewModelStore
 
     private PlaylistManager playlist_manager;
 
+    /**
+     * interface implementation to use ViewModels in the service
+     */
     @NonNull
     @Override
     public ViewModelStore getViewModelStore() {
         return store;
     }
 
+    /**
+     * @return the audio player
+     */
     public AudioPlayer getPlayer() {
         return player;
     }
 
+    /**
+     * @return the audio library
+     */
     public AudioLibrary getLibrary() {
         return library;
     }
 
+    /**
+     * @return the playlist manager
+     */
     public PlaylistManager getPlaylistManager() {
         return playlist_manager;
     }
@@ -114,6 +124,9 @@ public class AudioService extends AbstractAudioService implements ViewModelStore
         handler.postDelayed(AudioService.this.update_loop,100);
     };
 
+    /**
+     * init the service for the first time
+     */
     @Override
     public void firstInitialization() {
         AlbumLoader.open(this,this);
@@ -139,6 +152,9 @@ public class AudioService extends AbstractAudioService implements ViewModelStore
         registerReceiver(earphone_receiver, receiverFilter);
     }
 
+    /**
+     * close the service and all providers
+     */
     @Override
     void closeService() {
         super.closeService();
@@ -148,14 +164,21 @@ public class AudioService extends AbstractAudioService implements ViewModelStore
         unregisterReceiver(earphone_receiver);
     }
 
+    /**
+     * update the notification informations
+     * @param paused the state of the pause button
+     */
     @Override
     public void updateNotification(boolean paused) {
         notification_builder.setPauseButtonPaused(paused);
         notification_builder.updateNotification(player.getCurrentAudio());
     }
 
+    /**
+     * reload the content of the audio library fi new entries or access are given
+     */
     public void reloadLibrary(){
-        library.loadMusics(this);
+        getLibrary().loadMusics(this);
         listViewModel.setList(library.getAll());
     }
 

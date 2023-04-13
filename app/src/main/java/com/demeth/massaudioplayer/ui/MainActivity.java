@@ -1,46 +1,26 @@
 package com.demeth.massaudioplayer.ui;
 
 import android.annotation.SuppressLint;
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
-import android.text.Layout;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AutoCompleteTextView;
-import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.fragment.app.FragmentContainerView;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
 
 import com.demeth.massaudioplayer.R;
-import com.demeth.massaudioplayer.database.AlbumLoader;
 import com.demeth.massaudioplayer.database.IdentifiedEntry;
 import com.demeth.massaudioplayer.database.playlist.Playlist;
 import com.demeth.massaudioplayer.database.playlist.PlaylistManager;
-import com.demeth.massaudioplayer.placeholder.PlaceholderContent;
 import com.demeth.massaudioplayer.service.AudioService;
-import com.demeth.massaudioplayer.service.BoundableActivity;
-import com.demeth.massaudioplayer.service.notification.NotificationBuilder;
 import com.demeth.massaudioplayer.ui.fragments.AudioEntryDisplayer;
 import com.demeth.massaudioplayer.ui.fragments.SmallControllerFragment;
-import com.demeth.massaudioplayer.ui.viewmodel.DiffusionViewModel;
-import com.demeth.massaudioplayer.ui.viewmodel.ListViewModel;
 
 @SuppressLint("SetTextI18n")
 public class MainActivity extends ServiceBoundActivity {

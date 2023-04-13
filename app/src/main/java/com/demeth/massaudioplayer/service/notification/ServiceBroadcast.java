@@ -6,6 +6,9 @@ import android.content.Intent;
 
 import com.demeth.massaudioplayer.service.AudioService;
 
+/**
+ * bridge between notification and audio service.
+ */
 public class ServiceBroadcast extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {

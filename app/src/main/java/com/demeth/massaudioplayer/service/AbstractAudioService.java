@@ -15,6 +15,9 @@ import com.demeth.massaudioplayer.service.notification.NotificationBuilder;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * abstraction of AudioService that setup all connection stop and start related operations
+ */
 public abstract class AbstractAudioService  extends Service{
     /**
      * define a simple audio binder that return the service and get  the client informations
