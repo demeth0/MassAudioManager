@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:background="@color/background_deep"
+    android:keepScreenOn="true"
     android:layout_height="match_parent">
     <LinearLayout
         android:id="@+id/controller_menu_layout"
@@ -48,6 +49,7 @@
         tools:ignore="HardcodedText" />
 
     <ImageView
+        android:paddingHorizontal="10dp"
         android:id="@+id/controller_album_imageview"
 
         android:layout_width="match_parent"
@@ -71,7 +73,7 @@
         android:background="@color/background_light"
         android:minHeight="48dp"
         android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/controller_usefull_buttons_layout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
@@ -194,5 +196,40 @@
                 tools:ignore="SpeakableTextPresentCheck" />
 
         </LinearLayout>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
+    <!--some usefull buttons-->
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/controller_usefull_buttons_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/background"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+        <!--clear the queue-->
+        <ImageButton
+            android:id="@+id/controller_clear_queue"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:minWidth="0dp"
+            android:paddingVertical="10dp"
+            android:scaleType="fitCenter"
+            app:srcCompat="@drawable/clear_queue"
+
+            />
+        <!--add the song to the special playlist liked-->
+        <ImageButton
+            android:id="@+id/controller_like_button"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:minWidth="0dp"
+            android:paddingVertical="10dp"
+            android:scaleType="fitCenter"
+            app:srcCompat="@drawable/like" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
 </androidx.constraintlayout.widget.ConstraintLayout>

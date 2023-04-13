@@ -3,6 +3,7 @@ package com.demeth.massaudioplayer.ui;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -15,6 +16,10 @@ import androidx.lifecycle.ViewModelProvider;
 import com.demeth.massaudioplayer.R;
 import com.demeth.massaudioplayer.audio_player.AudioPlayer;
 import com.demeth.massaudioplayer.database.AlbumLoader;
+import com.demeth.massaudioplayer.database.DataType;
+import com.demeth.massaudioplayer.database.IdentifiedEntry;
+import com.demeth.massaudioplayer.database.playlist.Playlist;
+import com.demeth.massaudioplayer.database.playlist.PlaylistManager;
 import com.demeth.massaudioplayer.service.AudioService;
 import com.demeth.massaudioplayer.ui.utils.OnSwipeTouchDetector;
 import com.demeth.massaudioplayer.ui.viewmodel.DiffusionViewModel;
@@ -25,6 +30,8 @@ public class ControllerActivity extends ServiceBoundActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_controller);
+
+
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -41,6 +48,9 @@ public class ControllerActivity extends ServiceBoundActivity {
         ImageButton randbtn = findViewById(R.id.controller_control_random_button);
         ImageButton nextbtn = findViewById(R.id.controller_control_next_button);
         ImageButton previousbtn = findViewById(R.id.controller_control_previous_button);
+
+        ImageButton clear_queue = findViewById(R.id.controller_clear_queue);
+        ImageButton like = findViewById(R.id.controller_like_button);
 
         //to set title and album
         diffusionViewModel.getEntry().observe(this,identifiedEntry -> {
@@ -135,5 +145,35 @@ public class ControllerActivity extends ServiceBoundActivity {
 
         nextbtn.setOnClickListener(o -> service.getPlayer().next());
         previousbtn.setOnClickListener(o -> service.getPlayer().previous());
+
+        clear_queue.setOnClickListener(view -> {
+            diffusionViewModel.setEntry(IdentifiedEntry.EMPTY);
+            service.getPlayer().clearPlaylist();
+        });
+
+        PlaylistManager playlist_manager = service.getPlaylistManager();
+
+        diffusionViewModel.getEntry().observe(this,identifiedEntry -> {
+            if(playlist_manager.get("liked").contains(identifiedEntry)){
+                like.setImageResource(R.drawable.like_enabled);
+            }else{
+                like.setImageResource(R.drawable.like);
+            }
+        });
+        View.OnClickListener liked_listener =view -> {
+            IdentifiedEntry audio = diffusionViewModel.getEntry().getValue();
+            if(audio!=null){
+                Playlist p = playlist_manager.get("liked");
+                if(p.contains(audio)){
+                    p.remove(audio);
+                    like.setImageResource(R.drawable.like);
+                }else{
+                    p.add(audio);
+                    like.setImageResource(R.drawable.like_enabled);
+                }
+            }
+        };
+        liked_listener.onClick(like);
+        like.setOnClickListener(liked_listener);
     }
 }

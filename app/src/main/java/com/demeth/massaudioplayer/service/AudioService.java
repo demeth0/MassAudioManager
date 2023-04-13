@@ -1,5 +1,6 @@
 package com.demeth.massaudioplayer.service;
 
+import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.util.Log;
@@ -14,6 +15,7 @@ import com.demeth.massaudioplayer.audio_player.AudioPlayer;
 import com.demeth.massaudioplayer.database.AlbumLoader;
 import com.demeth.massaudioplayer.database.AudioLibrary;
 import com.demeth.massaudioplayer.database.IdentifiedEntry;
+import com.demeth.massaudioplayer.database.playlist.PlaylistManager;
 import com.demeth.massaudioplayer.placeholder.PlaceholderContent;
 import com.demeth.massaudioplayer.ui.viewmodel.DiffusionViewModel;
 import com.demeth.massaudioplayer.ui.viewmodel.ListViewModel;
@@ -29,6 +31,8 @@ public class AudioService extends AbstractAudioService implements ViewModelStore
     private AudioLibrary library;
     private AudioPlayer player;
 
+    private PlaylistManager playlist_manager;
+
     @NonNull
     @Override
     public ViewModelStore getViewModelStore() {
@@ -41,6 +45,10 @@ public class AudioService extends AbstractAudioService implements ViewModelStore
 
     public AudioLibrary getLibrary() {
         return library;
+    }
+
+    public PlaylistManager getPlaylistManager() {
+        return playlist_manager;
     }
 
     /**
@@ -57,6 +65,8 @@ public class AudioService extends AbstractAudioService implements ViewModelStore
      * le binder de ce service
      */
     private AudioBinder binder;
+
+    private BroadcastReceiver earphone_receiver;
 
     @Override
     protected AbstractAudioBinder<? extends AbstractAudioService> getBinder() {
@@ -118,13 +128,15 @@ public class AudioService extends AbstractAudioService implements ViewModelStore
         library=new AudioLibrary(this);
         player = new AudioPlayer(this);
         player.setListener(this);
+        playlist_manager = new PlaylistManager(this,library);
 
         listViewModel.setList(library.getAll());
 
         this.handler.post(update_loop);
 
         IntentFilter receiverFilter = new IntentFilter(Intent.ACTION_HEADSET_PLUG);
-        registerReceiver(new AudioDeviceBroadcastReceiver(), receiverFilter);
+        earphone_receiver = new AudioDeviceBroadcastReceiver();
+        registerReceiver(earphone_receiver, receiverFilter);
     }
 
     @Override
@@ -133,6 +145,7 @@ public class AudioService extends AbstractAudioService implements ViewModelStore
         AlbumLoader.close(this);
         store.clear();
         player.close();
+        unregisterReceiver(earphone_receiver);
     }
 
     @Override

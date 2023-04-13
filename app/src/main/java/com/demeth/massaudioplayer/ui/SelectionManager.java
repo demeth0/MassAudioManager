@@ -46,12 +46,12 @@ public class SelectionManager {
 
     }
 
-    private final Set<Integer> selected_values = new HashSet<>();
+    private final Set<IdentifiedEntry> selected_values = new HashSet<>();
 
     @SuppressLint("NotifyDataSetChanged")
     public void select(IdentifiedEntry entry, RecyclerView.Adapter<?> list_adapter){
-        if(!selected_values.contains(entry.getId())){
-            selected_values.add(entry.getId());
+        if(!selected_values.contains(entry)){
+            selected_values.add(entry);
             listener.onItemSelected();
             if(selected_values.size()==1){
                 list_adapter.notifyDataSetChanged();
@@ -60,13 +60,13 @@ public class SelectionManager {
         }
     }
 
-    public Collection<Integer> getSelected() {
+    public Collection<IdentifiedEntry> getSelected() {
         return selected_values;
     }
 
     @SuppressLint("NotifyDataSetChanged")
     public void select(Collection<IdentifiedEntry> entry, RecyclerView.Adapter<?> list_adapter){
-        selected_values.addAll(entry.stream().map(IdentifiedEntry::getId).collect(Collectors.toSet()));
+        selected_values.addAll(entry);
         listener.onItemSelected();
         if(selected_values.size()==entry.size()) {
             list_adapter.notifyDataSetChanged(); //enable display
@@ -76,8 +76,8 @@ public class SelectionManager {
 
     @SuppressLint("NotifyDataSetChanged")
     public void unselect(IdentifiedEntry entry, RecyclerView.Adapter<?> list_adapter){
-        if(selected_values.contains(entry.getId())){
-            selected_values.remove(entry.getId());
+        if(selected_values.contains(entry)){
+            selected_values.remove(entry);
             listener.onItemDeselected();
             if(selected_values.size()<=0) {
                 list_adapter.notifyDataSetChanged();
@@ -98,7 +98,7 @@ public class SelectionManager {
         list_adapter.notifyDataSetChanged();
     }
 
-    public boolean contains(int u){
+    public boolean contains(IdentifiedEntry u){
         return selected_values.contains(u);
     }
 

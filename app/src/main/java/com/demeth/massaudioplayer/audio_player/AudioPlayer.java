@@ -116,7 +116,7 @@ public class AudioPlayer implements Playable{
 
     //audio management
     public void setPlaylist(Collection<? extends IdentifiedEntry> playlist){
-        clearPlaylist();
+        _clearPlaylist();
 
         this.playlist.addAll(playlist);
         for(int i=0;i<this.playlist.size();i++){
@@ -129,11 +129,35 @@ public class AudioPlayer implements Playable{
         audioPlayerListener.onPlaylistChanged(AudioPlayer.this);
     }
 
+    public void appendToPlaylist(Collection<? extends IdentifiedEntry> playlist, boolean after_current){
+        if(after_current){
+            int i=0;
+            if(this.play_order.size()<1){ //if list empty
+                this.play_order.add(0);
+            }
+            for(;i<playlist.size();i++){
+                this.play_order.add(1,this.playlist.size()+i);
+            }
+        }else{
+            for(int i=0;i<playlist.size();i++){
+                this.play_order.add(this.playlist.size()+i);
+            }
+        }
+
+        this.playlist.addAll(playlist);
+        audioPlayerListener.onPlaylistChanged(AudioPlayer.this);
+    }
+
     public void moveToAudio(IdentifiedEntry s){
         audio_index = play_order.indexOf(playlist.indexOf(s));
     }
 
     public void clearPlaylist(){
+        _clearPlaylist();
+        audioPlayerListener.onPlaylistChanged(AudioPlayer.this);
+    }
+
+    private void _clearPlaylist(){
         this.playlist.clear();
         this.play_order.clear();
         this.pause();

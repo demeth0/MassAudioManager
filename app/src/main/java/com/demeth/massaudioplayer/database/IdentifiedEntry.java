@@ -5,6 +5,13 @@ import android.net.Uri;
 import java.io.Serializable;
 
 public abstract class IdentifiedEntry implements Typed,Comparable<IdentifiedEntry>, Serializable {
+    public static final IdentifiedEntry EMPTY = new IdentifiedEntry("",0) {
+        @Override
+        public DataType getType() {
+            return DataType.NONE;
+        }
+    };
+
     protected transient final int id;
     protected final String name;
     protected transient Uri albumCover;

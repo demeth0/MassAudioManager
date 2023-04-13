@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.demeth.massaudioplayer.R;
 import com.demeth.massaudioplayer.database.AlbumLoader;
+import com.demeth.massaudioplayer.database.DataType;
 import com.demeth.massaudioplayer.database.IdentifiedEntry;
 import com.demeth.massaudioplayer.databinding.FragmentAudioEntryDisplayerBinding;
 
@@ -29,8 +30,6 @@ public class AudioEntryRecyclerViewAdapter extends RecyclerView.Adapter<AudioEnt
     public interface OnItemClicked {
         void oClicked(IdentifiedEntry entry);
     }
-
-    //TODO global uncheck all /check all
 
     private OnItemClicked onItemClicked;
 
@@ -115,9 +114,11 @@ public class AudioEntryRecyclerViewAdapter extends RecyclerView.Adapter<AudioEnt
             this.itemView.postDelayed(this,200);
 
             // check box
-            checkBox.setChecked(MainActivity.selection_manager.contains(mItem.getId()));
+            checkBox.setChecked(MainActivity.selection_manager.contains(mItem));
             /*make a thrust table to understand this (shoud hide when no element and show when elements*/
-            if((MainActivity.selection_manager.size()>0) != (checkBox.getVisibility()==View.VISIBLE)){
+            if(mItem.getType().equals(DataType.PLAYLIST)){
+                checkBox.setVisibility(View.GONE);
+            }else if((MainActivity.selection_manager.size()>0) != (checkBox.getVisibility()==View.VISIBLE)){
                 if(checkBox.getVisibility()==View.VISIBLE){
                     checkBox.setVisibility(View.GONE);
                 }else{
@@ -146,7 +147,6 @@ public class AudioEntryRecyclerViewAdapter extends RecyclerView.Adapter<AudioEnt
 
         @Override
         public void onClick(View view) {
-            //TODO start the audio
             onItemClicked.oClicked(mItem);
         }
     }

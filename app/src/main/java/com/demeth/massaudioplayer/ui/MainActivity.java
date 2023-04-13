@@ -55,14 +55,12 @@ public class MainActivity extends ServiceBoundActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-
     }
 
     @Override
     public void onServiceConnection(){
         AudioService service = binder.getService(this);
-        playlist_manager = new PlaylistManager(this,service.getLibrary());
+        playlist_manager = service.getPlaylistManager();
         //init
         setupCategorySelector();
         setupController();
@@ -71,12 +69,16 @@ public class MainActivity extends ServiceBoundActivity {
         ImageButton play_all = findViewById(R.id.play_all_random_button);
         play_all.setOnClickListener(view -> {
             service.getPlayer().setRandom(true);
-            service.getPlayer().setPlaylist(listViewModel.getFilteredList().getValue());
+            AudioEntryDisplayer frag = (AudioEntryDisplayer) getSupportFragmentManager().findFragmentById(R.id.list_displayer_fragment_container);
+
+            assert frag != null;
+            service.getPlayer().setPlaylist(frag.getDisplayedContent());
             service.getPlayer().play();
         });
 
         ImageButton remove_all = findViewById(R.id.main_clear_queue);
         remove_all.setOnClickListener(view -> {
+            diffusionViewModel.setEntry(IdentifiedEntry.EMPTY);
             service.getPlayer().clearPlaylist();
         });
 
@@ -88,21 +90,23 @@ public class MainActivity extends ServiceBoundActivity {
                 liked.setImageResource(R.drawable.like);
             }
         });
-        liked.setOnClickListener(view -> {
-            IdentifiedEntry audio = diffusionViewModel.getEntry().getValue();
-            if(audio!=null){
+
+        View.OnClickListener liked_listener = view -> {
+            IdentifiedEntry _audio = diffusionViewModel.getEntry().getValue();
+            if(_audio!=null){
                 Playlist p = playlist_manager.get("liked");
-                if(p.contains(audio)){
-                    p.remove(audio);
+                if(p.contains(_audio)){
+                    p.remove(_audio);
                     liked.setImageResource(R.drawable.like);
                 }else{
-                    p.add(audio);
+                    p.add(_audio);
                     liked.setImageResource(R.drawable.like_enabled);
                 }
             }
-        });
+        };
 
-
+        liked_listener.onClick(liked); //init button
+        liked.setOnClickListener(liked_listener);
     }
 
     private void setupController(){
@@ -115,10 +119,10 @@ public class MainActivity extends ServiceBoundActivity {
         Observer<IdentifiedEntry> controller_apparition_observer = new Observer<IdentifiedEntry>() {
             @Override
             public void onChanged(IdentifiedEntry identifiedEntry) {
-                if(identifiedEntry!=null){
+                if(identifiedEntry.equals(IdentifiedEntry.EMPTY)){
+                    controller.setVisibility(View.GONE);
+                }else{
                     controller.setVisibility(View.VISIBLE);
-
-                    diffusionViewModel.getEntry().removeObserver(this);
                 }
             }
         };
