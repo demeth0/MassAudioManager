@@ -14,6 +14,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 
+/**
+ * load and provide all accessible audio from local storage and maybe more in future updates.
+ */
 public class AudioLibrary {
     private static final String[] projection = {
             MediaStore.Audio.Media.DISPLAY_NAME,
@@ -21,27 +24,56 @@ public class AudioLibrary {
             MediaStore.Audio.Media._ID
     };
 
+    /**
+     * create the library and try to load the musics a first time
+     * @param context the context to get the tracks
+     */
     public AudioLibrary(Context context){
         loadMusics(context);
     }
 
     private final HashMap<Integer, IdentifiedEntry> library = new HashMap<>();
 
+    /**
+     * try to obtain the first matching entry corresponding to the arguments
+     * @param title the title of the entry
+     * @param type the type of data the entry is from
+     * @return the entry or null
+     */
     public IdentifiedEntry get(@NonNull String title, @NonNull DataType type){
         return library.values().stream().parallel().filter(e -> e.getName().equals(title) && e.getType().equals(type)).findFirst().orElseGet(() -> null);
     }
+
+    /**
+     * return the entry corresponding to this ID, Caution, the ID change at each restart and should not be used as static references.
+     * @param id the id of the audio
+     * @return the entry corresponding to this audio
+     */
     public IdentifiedEntry get(int id){
         return library.get(id);
     }
 
+    /**
+     * @return all entries loaded
+     */
     public Collection<? extends IdentifiedEntry> getAll(){
         return library.values().stream().sorted().collect(Collectors.toList());
     }
 
+    /**
+     * get all entries that match the given ids
+     * @param match the ids to get the audio track from
+     * @return the list of entry found
+     */
     public Collection<? extends IdentifiedEntry> get(Collection<Integer> match){
         return match.stream().map(library::get).collect(Collectors.toList());
     }
 
+    /***
+     * get the first entry matching the following name, ignoring the type
+     * @param title the name of the entry
+     * @return the entry or null
+     */
     public @Nullable IdentifiedEntry get(@NonNull String title){
         return library.values().stream().parallel().filter(e -> e.getName().equals(title)).findFirst().orElseGet(() -> null);
     }

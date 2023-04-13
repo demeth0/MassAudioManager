@@ -20,6 +20,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * load the playlists from source directory. Then update the playlists and provide them.
+ */
 @SuppressWarnings("ConstantConditions")
 public class PlaylistManager {
 
@@ -29,6 +32,11 @@ public class PlaylistManager {
 
     private final AudioLibrary library;
 
+    /**
+     * load playlists from private file directory, remap the Entry from playlists information using the Library.
+     * @param context the context to access the directory
+     * @param library the current library of entry to remap them to the playlist
+     */
     public PlaylistManager(Context context, AudioLibrary library){
         dir=context.getFilesDir();
         this.library = library;
@@ -36,14 +44,26 @@ public class PlaylistManager {
         create("liked");
     }
 
+    /**
+     *
+     * @param name the name of the playlist to lookup
+     * @return the playlist or null
+     */
     public Playlist get(String name){
         return playlists.get(name);
     }
 
+    /**
+     * @return get all playlists loaded
+     */
     public Collection<Playlist> getAll(){
         return playlists.values();
     }
 
+    /**
+     * create a new empty playlist
+     * @param name the name of the playlist
+     */
     public void create(String name){
         File f = new File(dir+"/"+PLAYLIST_DIRECTORY+"/"+name);
         if(!f.exists()){
@@ -52,6 +72,9 @@ public class PlaylistManager {
         }
     }
 
+    /**
+     * load all playlists from disk
+     */
     public void load(){
         File pdir = new File(dir+"/"+PLAYLIST_DIRECTORY);
 
@@ -73,6 +96,10 @@ public class PlaylistManager {
         }
     }
 
+    /**
+     * update a playlist, handled by the Playlist. You should not need to call this function
+     * @param playlist the playlist to update
+     */
     public void update(Playlist playlist){
         try(ObjectOutputStream ois = new ObjectOutputStream(Files.newOutputStream(new File(dir.getPath() + "/"+ PLAYLIST_DIRECTORY+"/" + playlist.getName()).toPath()))){
             ois.writeObject(new ArrayList<>(playlist.get()));

@@ -15,6 +15,9 @@ import com.demeth.massaudioplayer.R;
 
 import java.io.IOException;
 
+/**
+ * static class that manage asynchronous album cover image's loading
+ */
 public class AlbumLoader {
 
     private static Object initiator;
@@ -104,7 +107,6 @@ public class AlbumLoader {
      * @param size the size
      * @param callback the callback
      */
-    @SuppressWarnings("unused")
     public static void getAlbumImage(Context context, IdentifiedEntry entry, int size, OnAlbumQueryFinished callback) {
         Bitmap res=default_bitmap;
         if(entry!=null && entry.getAlbumCover() != null && size>0) {
@@ -116,6 +118,9 @@ public class AlbumLoader {
         callback.onFinish(res);
     }
 
+    /**
+     * @return the default cover mage
+     */
     public static Bitmap getDefaultCover(){
         return default_bitmap;
     }
