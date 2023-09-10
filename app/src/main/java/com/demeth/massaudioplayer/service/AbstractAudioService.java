@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.HandlerThread;
 import android.os.IBinder;
-import android.os.Message;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
@@ -147,9 +146,10 @@ public abstract class AbstractAudioService  extends Service{
                     stopForeground(true);
                     closeService();
                     stopSelf();
-                    //Message msg = handler.obtainMessage();
-                    //msg.arg1 = ServiceAction.HANDLER_STOP_SERVICE;
-                    //handler.sendMessage(msg);
+                    // code template
+                    // Message msg = handler.obtainMessage();
+                    // msg.arg1 = ServiceAction.HANDLER_STOP_SERVICE;
+                    // handler.sendMessage(msg);
                     return START_NOT_STICKY;
                     //break;
             }

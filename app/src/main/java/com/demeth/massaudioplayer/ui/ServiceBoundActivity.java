@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
@@ -34,7 +35,12 @@ public abstract class ServiceBoundActivity extends AppCompatActivity implements 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        askPermissions();
+        if(Build.VERSION.SDK_INT>=33){
+            askPermissions(Manifest.permission.READ_MEDIA_AUDIO);
+        }else{
+            askPermissions(Manifest.permission.READ_EXTERNAL_STORAGE);
+        }
+
         NotificationBuilder.createNotificationChannel(this);
 
         //TODO bind to service
@@ -87,10 +93,10 @@ public abstract class ServiceBoundActivity extends AppCompatActivity implements 
     /**
      * ask for external storage reading permission
      */
-    private void askPermissions(){
-        if(ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE) ==
+    private void askPermissions(String permission){
+        if(ContextCompat.checkSelfPermission(getApplicationContext(), permission) ==
                 PackageManager.PERMISSION_DENIED){
-            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},PERMISSION_CODE);
+            ActivityCompat.requestPermissions(this,new String[]{permission},PERMISSION_CODE);
         }
     }
 
