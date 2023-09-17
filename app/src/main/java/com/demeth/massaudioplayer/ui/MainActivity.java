@@ -15,12 +15,18 @@ import androidx.fragment.app.FragmentContainerView;
 import androidx.lifecycle.Observer;
 
 import com.demeth.massaudioplayer.R;
-import com.demeth.massaudioplayer.database.IdentifiedEntry;
+
+import com.demeth.massaudioplayer.backend.models.objects.Audio;
+import com.demeth.massaudioplayer.backend.models.objects.AudioType;
 import com.demeth.massaudioplayer.database.playlist.Playlist;
 import com.demeth.massaudioplayer.database.playlist.PlaylistManager;
+
 import com.demeth.massaudioplayer.service.AudioService;
 import com.demeth.massaudioplayer.ui.fragments.AudioEntryDisplayer;
 import com.demeth.massaudioplayer.ui.fragments.SmallControllerFragment;
+
+import java.util.ArrayList;
+import java.util.Collections;
 
 @SuppressLint("SetTextI18n")
 public class MainActivity extends ServiceBoundActivity {
@@ -48,31 +54,31 @@ public class MainActivity extends ServiceBoundActivity {
 
         ImageButton play_all = findViewById(R.id.play_all_random_button);
         play_all.setOnClickListener(view -> {
-            service.getPlayer().setRandom(true);
+            service.set_shuffle_mode(true);
             AudioEntryDisplayer frag = (AudioEntryDisplayer) getSupportFragmentManager().findFragmentById(R.id.list_displayer_fragment_container);
 
             assert frag != null;
-            service.getPlayer().setPlaylist(frag.getDisplayedContent());
-            service.getPlayer().play();
+            service.set_playlist(new ArrayList<>(frag.getDisplayedContent()));
+            service.play();
         });
 
         ImageButton remove_all = findViewById(R.id.main_clear_queue);
         remove_all.setOnClickListener(view -> {
-            diffusionViewModel.setEntry(IdentifiedEntry.EMPTY);
-            service.getPlayer().clearPlaylist();
+            diffusionViewModel.setEntry(new Audio("","", AudioType.LOCAL)); //TODO define EMPTY
+            service.set_playlist(Collections.emptyList());
         });
 
         ImageButton liked = findViewById(R.id.main_like_button);
-        diffusionViewModel.getEntry().observe(this,identifiedEntry -> {
-            if(playlist_manager.get("liked").contains(identifiedEntry)){
+        diffusionViewModel.getEntry().observe(this,audio -> {
+            /*if(playlist_manager.get("liked").contains(identifiedEntry)){
                 liked.setImageResource(R.drawable.like_enabled);
             }else{
                 liked.setImageResource(R.drawable.like);
-            }
+            }*///TODO playlist
         });
 
         View.OnClickListener liked_listener = view -> {
-            IdentifiedEntry _audio = diffusionViewModel.getEntry().getValue();
+            /*IdentifiedEntry _audio = diffusionViewModel.getEntry().getValue();
             if(_audio!=null){
                 Playlist p = playlist_manager.get("liked");
                 if(p.contains(_audio)){
@@ -82,7 +88,7 @@ public class MainActivity extends ServiceBoundActivity {
                     p.add(_audio);
                     liked.setImageResource(R.drawable.like_enabled);
                 }
-            }
+            }*///TODO playlist
         };
 
         liked_listener.onClick(liked); //init button
@@ -96,10 +102,10 @@ public class MainActivity extends ServiceBoundActivity {
 
         FragmentContainerView controller = findViewById(R.id.small_controller_fragment_container);
         controller.setVisibility(View.GONE);
-        Observer<IdentifiedEntry> controller_apparition_observer = new Observer<IdentifiedEntry>() {
+        Observer<Audio> controller_apparition_observer = new Observer<Audio>() {
             @Override
-            public void onChanged(IdentifiedEntry identifiedEntry) {
-                if(identifiedEntry.equals(IdentifiedEntry.EMPTY)){
+            public void onChanged(Audio audio) {
+                if(audio.display_name.equals("")){ //TODO define EMPTY
                     controller.setVisibility(View.GONE);
                 }else{
                     controller.setVisibility(View.VISIBLE);

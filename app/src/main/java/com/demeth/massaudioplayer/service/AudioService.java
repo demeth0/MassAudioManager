@@ -1,6 +1,7 @@
 package com.demeth.massaudioplayer.service;
 
 import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.util.Log;
@@ -10,24 +11,38 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelStore;
 import androidx.lifecycle.ViewModelStoreOwner;
 
-import com.demeth.massaudioplayer.audio_player.AudioPlayer;
-import com.demeth.massaudioplayer.database.AlbumLoader;
-import com.demeth.massaudioplayer.database.AudioLibrary;
+
+import com.demeth.massaudioplayer.backend.AlbumLoader;
+import com.demeth.massaudioplayer.backend.adapters.ApplicationAudioManager;
+import com.demeth.massaudioplayer.backend.adapters.FileAudioPlayer;
+import com.demeth.massaudioplayer.backend.adapters.HashMapDatabase;
+import com.demeth.massaudioplayer.backend.adapters.LoadedAudioPlayerFactory;
+import com.demeth.massaudioplayer.backend.adapters.SequentialEventManager;
+import com.demeth.massaudioplayer.backend.models.adapters.AudioManager;
+import com.demeth.massaudioplayer.backend.models.adapters.AudioPlayerFactory;
+import com.demeth.massaudioplayer.backend.models.adapters.Database;
+import com.demeth.massaudioplayer.backend.models.adapters.EventManager;
+import com.demeth.massaudioplayer.backend.models.objects.Audio;
+import com.demeth.massaudioplayer.backend.models.objects.AudioType;
+
+import com.demeth.massaudioplayer.backend.models.objects.EventCodeMap;
+import com.demeth.massaudioplayer.backend.models.objects.Timestamp;
 import com.demeth.massaudioplayer.database.playlist.PlaylistManager;
 import com.demeth.massaudioplayer.ui.viewmodel.DiffusionViewModel;
 import com.demeth.massaudioplayer.ui.viewmodel.ListViewModel;
 
+import java.util.List;
+
 /**
  * foreground audio service that instantiate the audio player and provide all the player functionalities from the UI or the notification
  */
-public class AudioService extends AbstractAudioService implements ViewModelStoreOwner, AudioPlayer.AudioPlayerListener {
+public class AudioService extends AbstractAudioService implements ViewModelStoreOwner {
     private ViewModelStore store;
 
     private ListViewModel listViewModel;
     private DiffusionViewModel diffusionViewModel;
 
-    private AudioLibrary library;
-    private AudioPlayer player;
+    //private AudioPlayer player;
 
     private PlaylistManager playlist_manager;
 
@@ -40,18 +55,12 @@ public class AudioService extends AbstractAudioService implements ViewModelStore
         return store;
     }
 
-    /**
-     * @return the audio player
-     */
-    public AudioPlayer getPlayer() {
-        return player;
-    }
 
     /**
      * @return the audio library
      */
-    public AudioLibrary getLibrary() {
-        return library;
+    public Database getDatabase() {
+        return database;
     }
 
     /**
@@ -97,21 +106,22 @@ public class AudioService extends AbstractAudioService implements ViewModelStore
             switch(intent.getAction()){
                 case ServiceAction.NEXT_AUDIO:
                     Log.d("service","action next");
-                    player.next();
+                    manager.play_next();
                     break;
                 case ServiceAction.PREV_AUDIO:
                     Log.d("service","action previous");
-                    player.previous();
+                    manager.play_previous();
                     break;
                 case ServiceAction.PAUSE_AUDIO:
                     Log.d("service","action pause");
-                    if(player.getState().equals(AudioPlayer.State.PAUSED))
-                        player.play();
+
+                    if(manager.isPaused())
+                        manager.play();
                     else
-                        player.pause();
+                        manager.pause();
                     break;
                 case ServiceAction.DEVICE_UNPLUGGED:
-                    player.pause();
+                    manager.pause();
                     break;
             }
         }
@@ -120,15 +130,42 @@ public class AudioService extends AbstractAudioService implements ViewModelStore
     }
 
     private final Runnable update_loop = () -> {
-        diffusionViewModel.setCurrentTime(player.getPosition());
+        Timestamp stamp = AudioService.this.manager.timestamp();
+        diffusionViewModel.setCurrentTime((int)(stamp.getDuration()* stamp.getProgress()));
         handler.postDelayed(AudioService.this.update_loop,100);
     };
+
+    EventManager event_manager;
+    Database database;
+    AudioManager manager;
+
+    private void inject_dependencies(Context context){
+
+        event_manager = new SequentialEventManager();
+
+        database = new HashMapDatabase(context);
+
+        com.demeth.massaudioplayer.backend.models.adapters.AudioPlayer file_audio_player = new FileAudioPlayer(event_manager,database,context);
+
+        AudioPlayerFactory audio_player_factory = new LoadedAudioPlayerFactory();
+        audio_player_factory.register(AudioType.LOCAL,file_audio_player);
+        manager = new ApplicationAudioManager(audio_player_factory,event_manager);
+
+        event_manager.registerHandler(event->{
+            if(event.getCode() == EventCodeMap.EVENT_AUDIO_START){
+                onPlay();
+            }else if(event.getCode()==EventCodeMap.EVENT_AUDIO_COMPLETED){
+                onPause();
+            }
+        });
+    }
 
     /**
      * init the service for the first time
      */
     @Override
-    public void firstInitialization() {
+    public void firstInitialization() { //TODO entry point
+        inject_dependencies(this);
         AlbumLoader.open(this,this);
         binder = new AudioBinder();
 
@@ -138,12 +175,12 @@ public class AudioService extends AbstractAudioService implements ViewModelStore
 
        // listViewModel.setList(PlaceholderContent.ITEMS); //TODO test list
 
-        library=new AudioLibrary(this);
-        player = new AudioPlayer(this);
-        player.setListener(this);
+        com.demeth.massaudioplayer.database.AudioLibrary library=new com.demeth.massaudioplayer.database.AudioLibrary(this);
+        // player = new AudioPlayer(this);
+        // player.setListener(this);
         playlist_manager = new PlaylistManager(this,library);
 
-        listViewModel.setList(library.getAll());
+        listViewModel.setList(database.getEntries());
 
         this.handler.post(update_loop);
 
@@ -160,7 +197,7 @@ public class AudioService extends AbstractAudioService implements ViewModelStore
         super.closeService();
         AlbumLoader.close(this);
         store.clear();
-        player.close();
+        // player.close();
         unregisterReceiver(earphone_receiver);
     }
 
@@ -171,54 +208,113 @@ public class AudioService extends AbstractAudioService implements ViewModelStore
     @Override
     public void updateNotification(boolean paused) {
         notification_builder.setPauseButtonPaused(paused);
-        notification_builder.updateNotification(player.getCurrentAudio());
+        notification_builder.updateNotification(manager.current());
     }
 
     /**
      * reload the content of the audio library fi new entries or access are given
      */
     public void reloadLibrary(){
-        getLibrary().loadMusics(this);
-        listViewModel.setList(library.getAll());
+        database.reload(this);
+        listViewModel.setList(database.getEntries());
     }
 
-    @Override
-    public void onPlay(AudioPlayer player) {
+    public void play(int index){
+        manager.play(index);
+    }
+
+    public void play(Audio audio){
+        manager.play(manager.get().indexOf(audio));
+    }
+
+    public void play(){
+        boolean resuming = manager.isPaused();
+        manager.play();
+        if(resuming){
+            onResume();
+        }
+
+    }
+
+    public void set_playlist(List<Audio> audios){
+        manager.set(audios);
+        onPlaylistChanged();
+        onPause();
+    }
+
+    public List<Audio> get_playlist(){
+        return manager.get();
+    }
+
+    public Audio get_current_audio(){
+        return manager.current();
+    }
+
+    public int get_loop_mode(){
+        return manager.getLoopMode();
+    }
+
+    public void set_loop_mode(int mode){
+        manager.loop(mode);
+        onLoopModeChanged();
+    }
+
+    public void set_shuffle_mode(boolean mode){
+        manager.shuffle(mode);
+        onRandomModeChanged();
+    }
+
+    public boolean get_shuffle_mode(){
+        return manager.isShuffled();
+    }
+
+    public boolean is_audio_paused(){
+        return manager.isPaused();
+    }
+
+    public void pause(){
+        manager.pause();
+        onPause();
+    }
+
+    public void play_next_audio(){
+        manager.play_next();
+    }
+
+    public void play_previous_audio(){
+        manager.play_previous();
+    }
+
+    public void set_audio_progress(double progress){
+        manager.setTimestampProgress(progress);
+    }
+
+    private void onPlay() {
         updateNotification(false);
-        diffusionViewModel.setEntry(player.getCurrentAudio());
-        diffusionViewModel.setTime(0,player.getDuration());
+        diffusionViewModel.setEntry(manager.current());
+        diffusionViewModel.setTime(0,manager.timestamp().getDuration());
         diffusionViewModel.setPaused(false);
     }
 
-    @Override
-    public void onPause(AudioPlayer player) {
+    private void onPause() {
         updateNotification(true);
         diffusionViewModel.setPaused(true);
     }
 
-    @Override
-    public void onCompleted(AudioPlayer player) {
-
+    public void onPlaylistChanged() {
+        listViewModel.setQueue(manager.get());
     }
 
-    @Override
-    public void onPlaylistChanged(AudioPlayer player) {
-        listViewModel.setQueue(player.getPlaylist(true));
-    }
-
-    @Override
-    public void onResume(AudioPlayer player) {
+    public void onResume() {
         updateNotification(false);
         diffusionViewModel.setPaused(false);
     }
 
-    @Override
-    public void onLoopModeChanged(AudioPlayer player) {
-        diffusionViewModel.setLoopMode(player.getLoopMode());
+    public void onLoopModeChanged() {
+        diffusionViewModel.setLoopMode(manager.getLoopMode());
     }
 
-    @Override
-    public void onRandomModeChanged(AudioPlayer player) {
-        diffusionViewModel.setRandomMode(player.isRandom());
+    public void onRandomModeChanged() {
+        diffusionViewModel.setRandomMode(manager.isShuffled());
     }
 }

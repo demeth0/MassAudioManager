@@ -6,7 +6,8 @@ import android.widget.Filter;
 
 import androidx.annotation.NonNull;
 
-import com.demeth.massaudioplayer.database.IdentifiedEntry;
+
+import com.demeth.massaudioplayer.backend.models.objects.Audio;
 
 import java.util.Collection;
 import java.util.List;
@@ -14,7 +15,7 @@ import java.util.stream.Collectors;
 
 public class SearchFieldAutoCompleter extends ArrayAdapter<String> {
     private final Filter customFilter;
-    private Collection<? extends IdentifiedEntry> list=null;
+    private Collection<? extends Audio> list=null;
 
     /**
      * @param context context de l'application
@@ -30,7 +31,7 @@ public class SearchFieldAutoCompleter extends ArrayAdapter<String> {
                 if(charSequence!=null && SearchFieldAutoCompleter.this.list!=null){
                     res = new FilterResults();
                     String filter = charSequence.toString().toLowerCase();
-                    List<String> filtered = SearchFieldAutoCompleter.this.list.stream().map(IdentifiedEntry::getName).filter(name -> name.toLowerCase().contains(filter)).collect(Collectors.toList());
+                    List<String> filtered = SearchFieldAutoCompleter.this.list.stream().map(a -> a.display_name).filter(name -> name.toLowerCase().contains(filter)).collect(Collectors.toList());
                     res.values = filtered;
                     res.count = filtered.size();
                 }
@@ -61,7 +62,7 @@ public class SearchFieldAutoCompleter extends ArrayAdapter<String> {
     /**
      * @return the content from whom we need to filter
      */
-    public void setContent(Collection<? extends IdentifiedEntry> list){
+    public void setContent(Collection<? extends Audio> list){
         this.list=list;
     }
 }

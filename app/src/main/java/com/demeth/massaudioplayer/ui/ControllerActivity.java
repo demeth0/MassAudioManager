@@ -10,19 +10,20 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.ViewModelProvider;
 
 import com.demeth.massaudioplayer.R;
-import com.demeth.massaudioplayer.audio_player.AudioPlayer;
-import com.demeth.massaudioplayer.database.AlbumLoader;
-import com.demeth.massaudioplayer.database.DataType;
-import com.demeth.massaudioplayer.database.IdentifiedEntry;
-import com.demeth.massaudioplayer.database.playlist.Playlist;
+
+import com.demeth.massaudioplayer.backend.AlbumLoader;
+import com.demeth.massaudioplayer.backend.adapters.ApplicationAudioManager;
+import com.demeth.massaudioplayer.backend.models.objects.Audio;
+import com.demeth.massaudioplayer.backend.models.objects.AudioType;
+
 import com.demeth.massaudioplayer.database.playlist.PlaylistManager;
+
 import com.demeth.massaudioplayer.service.AudioService;
 import com.demeth.massaudioplayer.ui.utils.OnSwipeTouchDetector;
-import com.demeth.massaudioplayer.ui.viewmodel.DiffusionViewModel;
+
+import java.util.Collections;
 
 public class ControllerActivity extends ServiceBoundActivity {
 
@@ -53,20 +54,20 @@ public class ControllerActivity extends ServiceBoundActivity {
         ImageButton like = findViewById(R.id.controller_like_button);
 
         //to set title and album
-        diffusionViewModel.getEntry().observe(this,identifiedEntry -> {
-            title.setText(identifiedEntry.getName());
-            AlbumLoader.getAlbumImage(this,identifiedEntry,512,album::setImageBitmap);
+        diffusionViewModel.getEntry().observe(this,audio -> {
+            title.setText(audio.display_name);
+            AlbumLoader.getAlbumImage(this,audio,512,album::setImageBitmap);
         });
 
         album.setOnTouchListener(new OnSwipeTouchDetector(this) {
             @Override
             public void onSwipeRight() {
-                service.getPlayer().previous();
+                service.play_previous_audio();
             }
 
             @Override
             public void onSwipeLeft() {
-                service.getPlayer().next();
+                service.play_next_audio();
             }
         });
 
@@ -80,37 +81,37 @@ public class ControllerActivity extends ServiceBoundActivity {
             @Override public void onProgressChanged(SeekBar seekBar, int i, boolean b) {}
             @Override public void onStartTrackingTouch(SeekBar seekBar) {}
             @Override public void onStopTrackingTouch(SeekBar seekBar) {
-                float ratio=(float)seekBar.getProgress()/seekBar.getMax();
-                //noinspection ConstantConditions
-                service.getPlayer().seekTo((int) (diffusionViewModel.getTimestamp().getValue().duration*ratio));
+                double ratio=(double)seekBar.getProgress()/seekBar.getMax();
+                //no inspection constant conditions
+                service.set_audio_progress(ratio);
             }
         });
 
         diffusionViewModel.getLoopMode().observe(this,loopMode -> {
             Log.d("ControllerActivity","loop mode :"+loopMode);
             switch(loopMode){
-                case ALL:
+                case ApplicationAudioManager.LOOP_ALL:
                     loopbtn.setImageResource(R.drawable.loop_all);
                     break;
-                case NONE:
+                case ApplicationAudioManager.LOOP_NONE:
                     loopbtn.setImageResource(R.drawable.loop_none);
                     break;
-                case SINGLE:
+                case ApplicationAudioManager.LOOP_SINGLE:
                     loopbtn.setImageResource(R.drawable.loop_one);
                     break;
             }
         });
 
         loopbtn.setOnClickListener(view1 -> {
-            switch (service.getPlayer().getLoopMode()){
-                case SINGLE:
-                    service.getPlayer().setLoop(AudioPlayer.LoopMode.NONE);
+            switch (service.get_loop_mode()){
+                case ApplicationAudioManager.LOOP_SINGLE:
+                    service.set_loop_mode(ApplicationAudioManager.LOOP_NONE);
                     break;
-                case NONE:
-                    service.getPlayer().setLoop(AudioPlayer.LoopMode.ALL);
+                case ApplicationAudioManager.LOOP_NONE:
+                    service.set_loop_mode(ApplicationAudioManager.LOOP_ALL);
                     break;
-                case ALL:
-                    service.getPlayer().setLoop(AudioPlayer.LoopMode.SINGLE);
+                case ApplicationAudioManager.LOOP_ALL:
+                    service.set_loop_mode(ApplicationAudioManager.LOOP_SINGLE);
                     break;
             }
         });
@@ -124,7 +125,7 @@ public class ControllerActivity extends ServiceBoundActivity {
         });
 
         randbtn.setOnClickListener(view1 -> {
-            service.getPlayer().setRandom(!service.getPlayer().isRandom());
+            service.set_shuffle_mode(!service.get_shuffle_mode());
         });
 
 
@@ -137,32 +138,32 @@ public class ControllerActivity extends ServiceBoundActivity {
         });
 
         pause.setOnClickListener(view1 -> {
-            if(service.getPlayer().getState().equals(AudioPlayer.State.PAUSED))
-                service.getPlayer().play();
+            if(service.is_audio_paused())
+                service.play();
             else
-                service.getPlayer().pause();
+                service.pause();
         });
 
-        nextbtn.setOnClickListener(o -> service.getPlayer().next());
-        previousbtn.setOnClickListener(o -> service.getPlayer().previous());
+        nextbtn.setOnClickListener(o -> service.play_next_audio());
+        previousbtn.setOnClickListener(o -> service.play_previous_audio());
 
         clear_queue.setOnClickListener(view -> {
-            diffusionViewModel.setEntry(IdentifiedEntry.EMPTY);
-            service.getPlayer().clearPlaylist();
+            diffusionViewModel.setEntry(new Audio("","", AudioType.LOCAL)); //TODO EMPTY undefined
+            service.set_playlist(Collections.emptyList());
         });
 
         PlaylistManager playlist_manager = service.getPlaylistManager();
 
         diffusionViewModel.getEntry().observe(this,identifiedEntry -> {
-            if(playlist_manager.get("liked").contains(identifiedEntry)){
+            /*if(playlist_manager.get("liked").contains(identifiedEntry)){
                 like.setImageResource(R.drawable.like_enabled);
             }else{
                 like.setImageResource(R.drawable.like);
-            }
+            }*/ //TODO playlist
         });
         View.OnClickListener liked_listener =view -> {
-            IdentifiedEntry audio = diffusionViewModel.getEntry().getValue();
-            if(audio!=null){
+            Audio audio = diffusionViewModel.getEntry().getValue();
+            /*if(audio!=null){
                 Playlist p = playlist_manager.get("liked");
                 if(p.contains(audio)){
                     p.remove(audio);
@@ -171,7 +172,7 @@ public class ControllerActivity extends ServiceBoundActivity {
                     p.add(audio);
                     like.setImageResource(R.drawable.like_enabled);
                 }
-            }
+            }*///TODO playlist
         };
         liked_listener.onClick(like);
         like.setOnClickListener(liked_listener);

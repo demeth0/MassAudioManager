@@ -5,6 +5,8 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.demeth.massaudioplayer.audio_player.AudioPlayer;
+import com.demeth.massaudioplayer.backend.adapters.ApplicationAudioManager;
+import com.demeth.massaudioplayer.backend.models.objects.Audio;
 import com.demeth.massaudioplayer.database.IdentifiedEntry;
 
 public class DiffusionViewModel extends ViewModel {
@@ -26,9 +28,9 @@ public class DiffusionViewModel extends ViewModel {
     /*music diffusion current timestamps*/
     private final MutableLiveData<Timestamp> timestamp = new MutableLiveData<>(new Timestamp());
 
-    private final MutableLiveData<IdentifiedEntry> entry = new MutableLiveData<>();
+    private final MutableLiveData<Audio> entry = new MutableLiveData<>();
 
-    private final MutableLiveData<AudioPlayer.LoopMode> loopMode = new MutableLiveData<>(AudioPlayer.LoopMode.NONE);
+    private final MutableLiveData<Integer> loopMode = new MutableLiveData<>(ApplicationAudioManager.LOOP_NONE);
     private final MutableLiveData<Boolean> randomMode = new MutableLiveData<>(false);
     private final MutableLiveData<Boolean> paused = new MutableLiveData<>(true);
 
@@ -42,11 +44,11 @@ public class DiffusionViewModel extends ViewModel {
         timestamp.setValue(timestamp.getValue().setCurrent(current).setDuration(duration));
     }
 
-    public void setEntry(IdentifiedEntry entry) {
+    public void setEntry(Audio entry) {
         this.entry.setValue(entry);
     }
 
-    public LiveData<IdentifiedEntry> getEntry() {
+    public LiveData<Audio> getEntry() {
         return entry;
     }
 
@@ -58,7 +60,7 @@ public class DiffusionViewModel extends ViewModel {
         return randomMode;
     }
 
-    public LiveData<AudioPlayer.LoopMode> getLoopMode() {
+    public LiveData<Integer> getLoopMode() {
         return loopMode;
     }
 
@@ -70,7 +72,7 @@ public class DiffusionViewModel extends ViewModel {
         paused.setValue(mode);
     }
 
-    public void setLoopMode(AudioPlayer.LoopMode mode){
+    public void setLoopMode(int mode){
         loopMode.setValue(mode);
     }
 

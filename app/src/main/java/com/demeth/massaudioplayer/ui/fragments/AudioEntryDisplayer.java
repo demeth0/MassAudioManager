@@ -19,9 +19,10 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.demeth.massaudioplayer.R;
-import com.demeth.massaudioplayer.database.IdentifiedEntry;
-import com.demeth.massaudioplayer.database.playlist.Playlist;
-import com.demeth.massaudioplayer.database.playlist.PlaylistManager;
+import com.demeth.massaudioplayer.backend.models.adapters.AudioManager;
+import com.demeth.massaudioplayer.backend.models.objects.Audio;
+
+
 import com.demeth.massaudioplayer.service.AudioService;
 import com.demeth.massaudioplayer.service.BoundableActivity;
 import com.demeth.massaudioplayer.ui.AudioEntryRecyclerViewAdapter;
@@ -31,8 +32,10 @@ import com.demeth.massaudioplayer.ui.SelectionManager;
 import com.demeth.massaudioplayer.ui.viewmodel.DiffusionViewModel;
 import com.demeth.massaudioplayer.ui.viewmodel.ListViewModel;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * A fragment representing a list of Items.
@@ -48,7 +51,7 @@ public class AudioEntryDisplayer extends Fragment {
     //for tied references
     private OnBackPressedCallback playlist_callback;
     private AudioEntryRecyclerViewAdapter.OnItemClicked playlist_onClickedPlaylist;
-    private Playlist active_playlist = null;
+    // private Playlist active_playlist = null; //TODO playlists
 
     private View global_selection_layout;
     /**
@@ -155,10 +158,10 @@ public class AudioEntryDisplayer extends Fragment {
     private void serviceDependentInitializations(AudioService service, View view){
         rec_adapter.setOnItemClicked(entry -> {
             if(category.equals(Category.QUEUE)){
-                service.getPlayer().moveToAudio(entry);
+                service.play(entry);
             }else{
-                service.getPlayer().setPlaylist(Collections.singletonList(entry));
-                service.getPlayer().play();
+                service.set_playlist(Collections.singletonList(entry));
+                service.play();
             }
         });
 
@@ -168,11 +171,15 @@ public class AudioEntryDisplayer extends Fragment {
         Button selection_add_to_playlist = view.findViewById(R.id.selection_add_to_playlist);
         Button selection_play_after = view.findViewById(R.id.selection_play_after);
 
-        selection_add_to_queue.setOnClickListener(view1 -> service.getPlayer().appendToPlaylist(MainActivity.selection_manager.getSelected(),false));
+        selection_add_to_queue.setOnClickListener(view1 -> {
+            List<Audio> new_list  = service.get_playlist();
+            new_list.addAll(new ArrayList<>(MainActivity.selection_manager.getSelected()));
+            // manager.set(new_list); // TODO do not call set to prevent shuffling
+        });
 
         selection_play.setOnClickListener(view1 -> {
-            service.getPlayer().setPlaylist(MainActivity.selection_manager.getSelected());
-            service.getPlayer().play();
+            service.set_playlist(new ArrayList<>(MainActivity.selection_manager.getSelected()));
+            service.play();
         });
 
         selection_add_to_playlist.setOnClickListener(view1 -> {
@@ -180,16 +187,20 @@ public class AudioEntryDisplayer extends Fragment {
             Log.d("AudioEntryDisplayer","TODO a implémenter avec popup");
         });
 
-        selection_play_after.setOnClickListener(view1 -> service.getPlayer().appendToPlaylist(MainActivity.selection_manager.getSelected(),true));
+        selection_play_after.setOnClickListener(view1 -> {
+            List<Audio> new_list  = service.get_playlist();
+            new_list.addAll(new_list.indexOf(service.get_current_audio()),MainActivity.selection_manager.getSelected());
+            // manager.set(new_list); // TODO do not call set to prevent shuffling
+        });
 
         //category list
         switch(category){
             case QUEUE:
                 viewModel.getQueue().observe(getViewLifecycleOwner(), this::setRecAdapterContent);
-                rec_adapter.setOnItemClicked(entry -> service.getPlayer().moveToAudio(entry));
+                rec_adapter.setOnItemClicked(service::play);
                 break;
             case PLAYLISTS:
-                PlaylistManager manager = ((MainActivity)requireActivity()).getPlaylistManager();
+                /*PlaylistManager manager = ((MainActivity)requireActivity()).getPlaylistManager();
                 final Playlist.OnUpdateListener onUpdate = p -> setRecAdapterContent(p.get());
                 global_selection_layout.setVisibility(View.GONE);
                 playlist_onClickedPlaylist = entry -> {
@@ -211,7 +222,7 @@ public class AudioEntryDisplayer extends Fragment {
                     });
                 };
 
-                playlist_callback = new OnBackPressedCallback(false /* enabled by default */) {
+                playlist_callback = new OnBackPressedCallback(false) { // enabled by default
                     @Override
                     public void handleOnBackPressed() {
                         //return to playlists
@@ -225,23 +236,23 @@ public class AudioEntryDisplayer extends Fragment {
 
                 requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(),playlist_callback);
                 setRecAdapterContent(manager.getAll());
-                rec_adapter.setOnItemClicked(playlist_onClickedPlaylist);
+                rec_adapter.setOnItemClicked(playlist_onClickedPlaylist);*/
                 break;
             case PISTES:
                 viewModel.getFilteredList().observe(getViewLifecycleOwner(), this::setRecAdapterContent);
                 rec_adapter.setOnItemClicked(entry -> {
-                    service.getPlayer().setPlaylist(Collections.singletonList(entry));
-                    service.getPlayer().play();
+                    service.set_playlist(Collections.singletonList(entry));
+                    service.play();
                 });
                 break;
         }
     }
 
-    public Collection<IdentifiedEntry> getDisplayedContent(){
+    public Collection<Audio> getDisplayedContent(){
         return rec_adapter.getValues();
     }
 
-    private void setRecAdapterContent(Collection<? extends IdentifiedEntry> data){
+    private void setRecAdapterContent(Collection<? extends Audio> data){
         rec_adapter.setContent(data);
         updateCheckBox();
     }

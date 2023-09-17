@@ -9,6 +9,7 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
+import com.demeth.massaudioplayer.backend.models.adapters.Database;
 import com.demeth.massaudioplayer.service.notification.NotificationBuilder;
 
 import java.util.HashSet;
@@ -58,7 +59,6 @@ public abstract class AbstractAudioService  extends Service{
     protected AudioServiceHandler handler;
 
     protected NotificationBuilder notification_builder;
-
 
 
     /**

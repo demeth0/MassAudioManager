@@ -14,8 +14,11 @@ import android.widget.RemoteViews;
 import androidx.core.app.NotificationCompat;
 
 import com.demeth.massaudioplayer.R;
-import com.demeth.massaudioplayer.database.AlbumLoader;
-import com.demeth.massaudioplayer.database.IdentifiedEntry;
+
+import com.demeth.massaudioplayer.backend.AlbumLoader;
+import com.demeth.massaudioplayer.backend.models.objects.Audio;
+import com.demeth.massaudioplayer.service.AbstractAudioService;
+import com.demeth.massaudioplayer.service.AudioService;
 import com.demeth.massaudioplayer.service.ServiceAction;
 import com.demeth.massaudioplayer.ui.MainActivity;
 
@@ -34,7 +37,7 @@ public class NotificationBuilder {
     /**
      * referenceto the service bound to this notification
      */
-    private final Service service;
+    private final AbstractAudioService service;
 
     /**
      * notification manager used to create notification builder and edit current notification
@@ -54,7 +57,7 @@ public class NotificationBuilder {
     /** to change the pause button texture */
     private int pauseButtonResource = android.R.drawable.ic_media_play;
 
-    public NotificationBuilder(Service service){
+    public NotificationBuilder(AbstractAudioService service){
         this.service = service;
         createNotificationBuilder();
     }
@@ -110,11 +113,11 @@ public class NotificationBuilder {
      * prépare le builder pour affichage de la notification (appel dynamique)
      * /@param file la track qui défini l'affichage de la notification
      */
-    private void prepareBuilder(IdentifiedEntry tr){ //TODO add update to notification
+    private void prepareBuilder(Audio tr){ //TODO add update to notification
         createNotificationBuilder();
         String title="";
         if(tr != null){
-            title = tr.getName();
+            title = tr.display_name;
         }
 
         //TODO album images
@@ -140,7 +143,7 @@ public class NotificationBuilder {
      * met a jour la notification avec la nouvelle track
      * /@param file la nouvelle donnée a utiliser pour construire la notification
      */
-    public void updateNotification(IdentifiedEntry tr){
+    public void updateNotification(Audio tr){
         prepareBuilder(tr);
         manager.notify(NOTIFICATION_ID, notification_builder.build());
     }

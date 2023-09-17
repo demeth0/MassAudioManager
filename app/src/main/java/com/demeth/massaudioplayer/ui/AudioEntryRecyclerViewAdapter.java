@@ -12,9 +12,11 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.demeth.massaudioplayer.R;
-import com.demeth.massaudioplayer.database.AlbumLoader;
-import com.demeth.massaudioplayer.database.DataType;
-import com.demeth.massaudioplayer.database.IdentifiedEntry;
+
+import com.demeth.massaudioplayer.backend.models.objects.Audio;
+import com.demeth.massaudioplayer.backend.AlbumLoader;
+import com.demeth.massaudioplayer.database.DataType; //TODO playlist
+
 import com.demeth.massaudioplayer.databinding.FragmentAudioEntryDisplayerBinding;
 
 import java.util.ArrayList;
@@ -22,34 +24,34 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * {@link RecyclerView.Adapter} that can display a {@link IdentifiedEntry}.
+ * {@link RecyclerView.Adapter} that can display a {@link com.demeth.massaudioplayer.backend.models.objects.Audio}.
  */
 public class AudioEntryRecyclerViewAdapter extends RecyclerView.Adapter<AudioEntryRecyclerViewAdapter.ViewHolder> {
 
     @FunctionalInterface
     public interface OnItemClicked {
-        void oClicked(IdentifiedEntry entry);
+        void onClicked(Audio entry);
     }
 
     private OnItemClicked onItemClicked;
 
-    private final List<IdentifiedEntry> mValues;
+    private final List<Audio> mValues;
 
-    public List<IdentifiedEntry> getValues() {
+    public List<Audio> getValues() {
         return mValues;
     }
 
-    private IdentifiedEntry highlighted_entry=null;
+    private Audio highlighted_entry=null;
 
     @SuppressLint("NotifyDataSetChanged")
-    public void setContent(Collection<? extends IdentifiedEntry> mValues){
+    public void setContent(Collection<? extends Audio> mValues){
         this.mValues.clear();
         this.mValues.addAll(mValues);
         notifyDataSetChanged();
     }
 
-    public void setHighlighted(IdentifiedEntry entry) {
-        IdentifiedEntry temp = highlighted_entry;
+    public void setHighlighted(Audio entry) {
+        Audio temp = highlighted_entry;
         highlighted_entry = entry;
         if(temp!=null)notifyItemChanged(mValues.indexOf(temp));
         notifyItemChanged(mValues.indexOf(highlighted_entry));
@@ -83,7 +85,7 @@ public class AudioEntryRecyclerViewAdapter extends RecyclerView.Adapter<AudioEnt
         private final TextView title;
         private final CheckBox checkBox;
         private final ImageButton album;
-        public IdentifiedEntry mItem;
+        public Audio mItem;
 
         public ViewHolder(FragmentAudioEntryDisplayerBinding binding) {
             super(binding.getRoot());
@@ -100,11 +102,11 @@ public class AudioEntryRecyclerViewAdapter extends RecyclerView.Adapter<AudioEnt
             });
         }
 
-        public void setContent(IdentifiedEntry new_entry){
+        public void setContent(Audio new_entry){
             mItem = new_entry;
 
             //text box
-            title.setText(mItem.getName());
+            title.setText(mItem.display_name);
             if(new_entry.equals(highlighted_entry)) title.setTextColor(title.getContext().getColor(R.color.foreground)); //TODO add shadow
             else title.setTextColor(title.getContext().getColor(R.color.white));
 
@@ -116,7 +118,7 @@ public class AudioEntryRecyclerViewAdapter extends RecyclerView.Adapter<AudioEnt
             // check box
             checkBox.setChecked(MainActivity.selection_manager.contains(mItem));
             /*make a thrust table to understand this (shoud hide when no element and show when elements*/
-            if(mItem.getType().equals(DataType.PLAYLIST)){
+            if(mItem.type.equals(DataType.PLAYLIST)){
                 checkBox.setVisibility(View.GONE);
             }else if((MainActivity.selection_manager.size()>0) != (checkBox.getVisibility()==View.VISIBLE)){
                 if(checkBox.getVisibility()==View.VISIBLE){
@@ -147,7 +149,7 @@ public class AudioEntryRecyclerViewAdapter extends RecyclerView.Adapter<AudioEnt
 
         @Override
         public void onClick(View view) {
-            onItemClicked.oClicked(mItem);
+            onItemClicked.onClicked(mItem);
         }
     }
 }

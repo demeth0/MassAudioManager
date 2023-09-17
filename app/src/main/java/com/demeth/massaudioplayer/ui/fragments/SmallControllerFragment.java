@@ -11,21 +11,20 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.demeth.massaudioplayer.R;
-import com.demeth.massaudioplayer.audio_player.AudioPlayer;
-import com.demeth.massaudioplayer.database.AlbumLoader;
+
+import com.demeth.massaudioplayer.backend.adapters.ApplicationAudioManager;
+import com.demeth.massaudioplayer.backend.AlbumLoader;
+
 import com.demeth.massaudioplayer.service.AudioService;
 import com.demeth.massaudioplayer.service.BoundableActivity;
 import com.demeth.massaudioplayer.ui.ControllerActivity;
-import com.demeth.massaudioplayer.ui.MainActivity;
 import com.demeth.massaudioplayer.ui.SquareImageButton;
 import com.demeth.massaudioplayer.ui.viewmodel.DiffusionViewModel;
-import com.demeth.massaudioplayer.ui.viewmodel.ListViewModel;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -70,37 +69,37 @@ public class SmallControllerFragment extends Fragment {
             SeekBar bar = view.findViewById(R.id.small_controller_progression_bar);
 
             //to set title and album
-            diffusionViewModel.getEntry().observe(getViewLifecycleOwner(),identifiedEntry -> {
-                title.setText(identifiedEntry.getName());
+            diffusionViewModel.getEntry().observe(getViewLifecycleOwner(),audio -> {
+                title.setText(audio.display_name);
                 //album.setImageBitmap();
-                AlbumLoader.getAlbumImage(view,identifiedEntry,Math.max(album.getWidth(),128),album::setImageBitmap);
+                AlbumLoader.getAlbumImage(view,audio,Math.max(album.getWidth(),128),album::setImageBitmap);
             });
 
             ImageButton loopbtn = view.findViewById(R.id.main_control_loop_button);
             diffusionViewModel.getLoopMode().observe(getViewLifecycleOwner(),loopMode -> {
                 switch(loopMode){
-                    case ALL:
+                    case ApplicationAudioManager.LOOP_ALL:
                         loopbtn.setImageResource(R.drawable.loop_all);
                         break;
-                    case NONE:
+                    case ApplicationAudioManager.LOOP_NONE:
                         loopbtn.setImageResource(R.drawable.loop_none);
                         break;
-                    case SINGLE:
+                    case ApplicationAudioManager.LOOP_SINGLE:
                         loopbtn.setImageResource(R.drawable.loop_one);
                         break;
                 }
             });
 
             loopbtn.setOnClickListener(view1 -> {
-                switch (service.getPlayer().getLoopMode()){
-                    case SINGLE:
-                        service.getPlayer().setLoop(AudioPlayer.LoopMode.NONE);
+                switch (service.get_loop_mode()){
+                    case ApplicationAudioManager.LOOP_SINGLE:
+                        service.set_loop_mode(ApplicationAudioManager.LOOP_NONE);
                         break;
-                    case NONE:
-                        service.getPlayer().setLoop(AudioPlayer.LoopMode.ALL);
+                    case ApplicationAudioManager.LOOP_NONE:
+                        service.set_loop_mode(ApplicationAudioManager.LOOP_ALL);
                         break;
-                    case ALL:
-                        service.getPlayer().setLoop(AudioPlayer.LoopMode.SINGLE);
+                    case ApplicationAudioManager.LOOP_ALL:
+                        service.set_loop_mode(ApplicationAudioManager.LOOP_SINGLE);
                         break;
                 }
             });
@@ -116,7 +115,7 @@ public class SmallControllerFragment extends Fragment {
             });
 
             randbtn.setOnClickListener(view1 -> {
-                service.getPlayer().setRandom(!service.getPlayer().isRandom());
+                service.set_shuffle_mode(!service.get_shuffle_mode());
             });
 
             ImageButton pause = view.findViewById(R.id.main_control_play_button);
@@ -130,16 +129,16 @@ public class SmallControllerFragment extends Fragment {
             });
 
             pause.setOnClickListener(view1 -> {
-                if(service.getPlayer().getState().equals(AudioPlayer.State.PAUSED))
-                    service.getPlayer().play();
+                if(service.is_audio_paused())
+                    service.play();
                 else
-                    service.getPlayer().pause();
+                    service.pause();
             });
 
             ImageButton next = view.findViewById(R.id.main_control_next_button);
-            next.setOnClickListener(o -> service.getPlayer().next());
+            next.setOnClickListener(o -> service.play_next_audio());
             ImageButton prev = view.findViewById(R.id.main_control_previous_button);
-            prev.setOnClickListener(o -> service.getPlayer().previous());
+            prev.setOnClickListener(o -> service.play_previous_audio());
 
             /*to set time*/
             diffusionViewModel.getTimestamp().observe(getViewLifecycleOwner(),timestamp -> {
@@ -152,9 +151,9 @@ public class SmallControllerFragment extends Fragment {
                 @Override public void onProgressChanged(SeekBar seekBar, int i, boolean b) {}
                 @Override public void onStartTrackingTouch(SeekBar seekBar) {}
                 @Override public void onStopTrackingTouch(SeekBar seekBar) {
-                    float ratio=(float)seekBar.getProgress()/seekBar.getMax();
-                    //noinspection ConstantConditions
-                    service.getPlayer().seekTo((int) (diffusionViewModel.getTimestamp().getValue().duration*ratio));
+                    double ratio=(double)seekBar.getProgress()/seekBar.getMax();
+                    //no inspection constant conditions
+                    service.set_audio_progress(ratio);
                 }
             });
 
