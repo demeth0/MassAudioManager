@@ -269,6 +269,7 @@ public class ApplicationAudioManagerTest {
         time = manager.timestamp();
         assertEquals(0.0d,time.getProgress(),0.02d);
         assertEquals(10L,time.getDuration());
+        assertFalse(true);
 
     }
 }
