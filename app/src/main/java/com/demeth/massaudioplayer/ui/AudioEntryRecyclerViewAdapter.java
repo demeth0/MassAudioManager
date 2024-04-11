@@ -1,6 +1,7 @@
 package com.demeth.massaudioplayer.ui;
 
 import android.annotation.SuppressLint;
+import android.media.MediaRecorder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,8 +16,9 @@ import com.demeth.massaudioplayer.R;
 
 import com.demeth.massaudioplayer.backend.models.objects.Audio;
 import com.demeth.massaudioplayer.backend.AlbumLoader;
-import com.demeth.massaudioplayer.database.DataType; //TODO playlist
+//import com.demeth.massaudioplayer.database.DataType; //TODO playlist
 
+import com.demeth.massaudioplayer.backend.models.objects.AudioType;
 import com.demeth.massaudioplayer.databinding.FragmentAudioEntryDisplayerBinding;
 
 import java.util.ArrayList;
@@ -30,7 +32,7 @@ public class AudioEntryRecyclerViewAdapter extends RecyclerView.Adapter<AudioEnt
 
     @FunctionalInterface
     public interface OnItemClicked {
-        void onClicked(Audio entry);
+        void onClicked(Audio entry, int index);
     }
 
     private OnItemClicked onItemClicked;
@@ -73,7 +75,7 @@ public class AudioEntryRecyclerViewAdapter extends RecyclerView.Adapter<AudioEnt
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.setContent(mValues.get(position));
+        holder.setContent(mValues.get(position), position);
     }
 
     @Override
@@ -86,6 +88,7 @@ public class AudioEntryRecyclerViewAdapter extends RecyclerView.Adapter<AudioEnt
         private final CheckBox checkBox;
         private final ImageButton album;
         public Audio mItem;
+        public int item_index=-1;
 
         public ViewHolder(FragmentAudioEntryDisplayerBinding binding) {
             super(binding.getRoot());
@@ -102,8 +105,9 @@ public class AudioEntryRecyclerViewAdapter extends RecyclerView.Adapter<AudioEnt
             });
         }
 
-        public void setContent(Audio new_entry){
+        public void setContent(Audio new_entry, int index){
             mItem = new_entry;
+            item_index=index;
 
             //text box
             title.setText(mItem.display_name);
@@ -118,7 +122,7 @@ public class AudioEntryRecyclerViewAdapter extends RecyclerView.Adapter<AudioEnt
             // check box
             checkBox.setChecked(MainActivity.selection_manager.contains(mItem));
             /*make a thrust table to understand this (shoud hide when no element and show when elements*/
-            if(mItem.type.equals(DataType.PLAYLIST)){
+            if(mItem.type.equals(AudioType.PLAYLIST)){
                 checkBox.setVisibility(View.GONE);
             }else if((MainActivity.selection_manager.size()>0) != (checkBox.getVisibility()==View.VISIBLE)){
                 if(checkBox.getVisibility()==View.VISIBLE){
@@ -149,7 +153,7 @@ public class AudioEntryRecyclerViewAdapter extends RecyclerView.Adapter<AudioEnt
 
         @Override
         public void onClick(View view) {
-            onItemClicked.onClicked(mItem);
+            onItemClicked.onClicked(mItem,item_index);
         }
     }
 }

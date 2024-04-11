@@ -1,16 +1,21 @@
-package com.demeth.massaudioplayer.audio_player.adapters;
+package com.demeth.massaudioplayer.backend.adapters;
 
 import static org.junit.Assert.*;
 
 import com.demeth.massaudioplayer.backend.adapters.ApplicationAudioManager;
+import com.demeth.massaudioplayer.backend.adapters.SmartAudioProvider;
 import com.demeth.massaudioplayer.backend.models.adapters.AudioPlayer;
 import com.demeth.massaudioplayer.backend.models.adapters.AudioPlayerFactory;
+import com.demeth.massaudioplayer.backend.models.adapters.AudioProvider;
 import com.demeth.massaudioplayer.backend.models.adapters.EventManager;
 import com.demeth.massaudioplayer.backend.models.objects.Audio;
 import com.demeth.massaudioplayer.backend.models.objects.AudioType;
 import com.demeth.massaudioplayer.backend.models.objects.Event;
 import com.demeth.massaudioplayer.backend.models.objects.EventCodeMap;
+import com.demeth.massaudioplayer.backend.models.objects.LoopMode;
+import com.demeth.massaudioplayer.backend.models.objects.Playlist;
 import com.demeth.massaudioplayer.backend.models.objects.Timestamp;
+import com.demeth.massaudioplayer.service.AudioService;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -88,7 +93,7 @@ public class ApplicationAudioManagerTest {
         }
 
         @Override
-        public void registerHandler(EventHandler handler) {
+        public void registerHandler(String ID, EventHandler handler) {
             this.handler = handler;
         }
     }
@@ -98,34 +103,33 @@ public class ApplicationAudioManagerTest {
     StubEventManager event_manager;
 
     List<Audio> test_data;
-
+    AudioProvider audio_provider;
     @Before
     public void setUp() {
         player_factory = new StubAudioPlayerFactory();
         event_manager = new StubEventManager();
-        manager = new ApplicationAudioManager(player_factory, event_manager);
+        audio_provider=new SmartAudioProvider();
+        manager = new ApplicationAudioManager(player_factory, event_manager,audio_provider);
         test_data = new ArrayList<>();
         for(int i = 0; i<100 ; i++){
             test_data.add(new Audio("bbb "+i,"aaa "+i,AudioType.LOCAL));
         }
     }
 
-    @Test
-    public void set_playlist(){
-        manager.set(test_data);
-        assertEquals(test_data, manager.get());
-    }
+
 
     @Test
     public void play_audio(){
-        manager.set(test_data);
+        audio_provider.set_playlist(new Playlist(test_data));
+        audio_provider.move_to_next();
         manager.play();
         assertEquals(test_data.get(0),player_factory.dummy_player.active_audio);
     }
 
     @Test
     public void pause_and_resume(){
-        manager.set(test_data);
+        audio_provider.set_playlist(new Playlist(test_data));
+        audio_provider.move_to_next();
         manager.play();  // play
         manager.pause(); //pause
         manager.play();  //resume
@@ -135,7 +139,8 @@ public class ApplicationAudioManagerTest {
 
     @Test
     public void stop(){
-        manager.set(test_data);
+        audio_provider.set_playlist(new Playlist(test_data));
+        audio_provider.move_to_next();
         manager.play();  // play
         event_manager.trigger(new Event(EventCodeMap.EVENT_AUDIO_COMPLETED));
         assertEquals(test_data.get(1),player_factory.dummy_player.active_audio);
@@ -143,34 +148,37 @@ public class ApplicationAudioManagerTest {
 
     @Test
     public void pause_status(){
-        manager.set(test_data);
+        audio_provider.set_playlist(new Playlist(test_data));
+        audio_provider.move_to_next();
         assertTrue(manager.isPaused());
         manager.play();  // play
         assertFalse(manager.isPaused());
         manager.pause();
         assertTrue(manager.isPaused());
-
-        manager.play(test_data.size()-1);
+        audio_provider.set_audio_from_playlist(test_data.size()-1);
+        manager.play();
         event_manager.trigger(new Event(EventCodeMap.EVENT_AUDIO_COMPLETED));
         assertTrue(manager.isPaused());
     }
 
     @Test
     public void play_variable_position(){
-        manager.set(test_data);
-        manager.play(5);  // play
+        audio_provider.set_playlist(new Playlist(test_data));
+        audio_provider.set_audio_from_playlist(5);
+        manager.play();  // play
         assertEquals(test_data.get(5),player_factory.dummy_player.active_audio);
     }
 
     @Test
     public void play_multiple(){
-        manager.set(test_data);
-        manager.play(5);  // play
+        audio_provider.set_playlist(new Playlist(test_data));
+        audio_provider.set_audio_from_playlist(5);
+        manager.play();  // play
 
         player_factory.dummy_player.progress_set = 0.5d;
         player_factory.dummy_player.duration_set = 10;
-
-        manager.play(5);
+        audio_provider.set_audio_from_playlist(5);
+        manager.play();
         assertEquals(0.0d,player_factory.dummy_player.progress_set,0.02d);
 
         player_factory.dummy_player.progress_set = 0.5d;
@@ -180,8 +188,9 @@ public class ApplicationAudioManagerTest {
 
     @Test
     public void play_previous(){
-        manager.set(test_data);
-        manager.play(5);  // play
+        audio_provider.set_playlist(new Playlist(test_data));
+        audio_provider.set_audio_from_playlist(5);
+        manager.play();  // play
 
         player_factory.dummy_player.progress_set = 0.0d;
         player_factory.dummy_player.duration_set = 1;
@@ -193,8 +202,9 @@ public class ApplicationAudioManagerTest {
 
     @Test
     public void play_previous_rewind(){
-        manager.set(test_data);
-        manager.play(5);  // play
+        audio_provider.set_playlist(new Playlist(test_data));
+        audio_provider.set_audio_from_playlist(5);
+        manager.play();  // play
 
         player_factory.dummy_player.progress_set = 0.5d;
         player_factory.dummy_player.duration_set = 10;
@@ -207,8 +217,9 @@ public class ApplicationAudioManagerTest {
 
     @Test
     public void play_next(){
-        manager.set(test_data);
-        manager.play(5);  // play
+        audio_provider.set_playlist(new Playlist(test_data));
+        audio_provider.set_audio_from_playlist(5);
+        manager.play();  // play
 
         player_factory.dummy_player.progress_set = 0.0d;
         player_factory.dummy_player.duration_set = 1;
@@ -220,138 +231,41 @@ public class ApplicationAudioManagerTest {
 
     @Test
     public void play_next_end(){
-        manager.set(test_data);
-        manager.play(test_data.size()-1);  // play
+        audio_provider.set_playlist(new Playlist(test_data));
+
+        audio_provider.set_audio_from_playlist(test_data.size()-1);
+        manager.play();  // play
 
         player_factory.dummy_player.progress_set = 0.0d;
         player_factory.dummy_player.duration_set = 1;
 
+        event_manager.trigger(new Event(EventCodeMap.EVENT_AUDIO_COMPLETED));
 
-        manager.play_next();
-        assertEquals(test_data.get(0),player_factory.dummy_player.active_audio);
+        assertNull(audio_provider.get_audio());
     }
 
     @Test
     public void play_previous_zero(){
-        manager.set(test_data);
-        manager.play(0);  // play
+        audio_provider.set_playlist(new Playlist(test_data));
+        audio_provider.move_to_next();
+        manager.play();  // play
 
         player_factory.dummy_player.progress_set = 0.0d;
         player_factory.dummy_player.duration_set = 1;
 
 
         manager.play_previous();
-        assertEquals(test_data.get(0),player_factory.dummy_player.active_audio);
+        assertEquals(test_data.get(99),player_factory.dummy_player.active_audio);
     }
 
-    @Test
-    public void shuffle_mode(){
-        List<Audio> copy_data = new ArrayList<>(test_data);
-        manager.set(copy_data);
-        manager.shuffle(true);
-        assertNotEquals(test_data,manager.get());
-    }
-
-    @Test
-    public void shuffle_mode_after(){
-        List<Audio> copy_data = new ArrayList<>(test_data);
-        manager.shuffle(true);
-        manager.set(copy_data);
-        assertNotEquals(test_data,manager.get());
-    }
-
-    @Test
-    public void shuffle_mode_reset(){
-        List<Audio> copy_data = new ArrayList<>(test_data);
-        manager.shuffle(true);
-        manager.set(copy_data);
-
-        List<Audio> copy_data_2 = new ArrayList<>(manager.get());
-
-        manager.play(copy_data.size()-1);
-        manager.play_next();
-
-        assertNotEquals(copy_data_2,manager.get());
-    }
-
-    // TODO sort for disabling shuffle mode not yet implemented
-
-    @Test
-    public void loop_none_playlist_end(){
-        manager.set(test_data);
-        manager.play(test_data.size()-1);
-        event_manager.trigger(new Event(EventCodeMap.EVENT_AUDIO_COMPLETED));
-        assertEquals(test_data.get(test_data.size()-1),player_factory.dummy_player.active_audio);
-        manager.play();
-        assertEquals(test_data.get(0),player_factory.dummy_player.active_audio);
-        assertEquals(ApplicationAudioManager.LOOP_NONE,manager.getLoopMode());
-    }
-
-    @Test
-    public void loop_all_playlist_end(){
-        manager.set(test_data);
-        manager.loop(ApplicationAudioManager.LOOP_ALL);
-        manager.play(test_data.size()-1);
-        event_manager.trigger(new Event(EventCodeMap.EVENT_AUDIO_COMPLETED));
-
-        assertEquals(test_data.get(0),player_factory.dummy_player.active_audio);
-        assertEquals(ApplicationAudioManager.LOOP_ALL,manager.getLoopMode());
-    }
-
-    @Test
-    public void loop_single_play_end(){
-        manager.set(test_data);
-        manager.loop(ApplicationAudioManager.LOOP_SINGLE);
-        manager.play(5);
-        event_manager.trigger(new Event(EventCodeMap.EVENT_AUDIO_COMPLETED));
-        assertEquals(test_data.get(5),player_factory.dummy_player.active_audio);
-        assertEquals(ApplicationAudioManager.LOOP_SINGLE,manager.getLoopMode());
-    }
-
-    @Test
-    public void loop_single_skip(){
-        manager.set(test_data);
-        manager.loop(ApplicationAudioManager.LOOP_SINGLE);
-        manager.play(5);
-        manager.play_next();
-        assertEquals(test_data.get(5),player_factory.dummy_player.active_audio);
-    }
-
-    @Test
-    public void loop_single_previous_rewind(){
-        manager.set(test_data);
-        manager.loop(ApplicationAudioManager.LOOP_SINGLE);
-
-        manager.play(5);
-        player_factory.dummy_player.progress_set = 0.15d; // more than 4 seconds
-        player_factory.dummy_player.duration_set = 40;
-
-        manager.play_previous();
-        assertEquals(test_data.get(5),player_factory.dummy_player.active_audio);
-        assertEquals(0d,player_factory.dummy_player.progress_set,0.02);
-    }
-
-    @Test
-    public void loop_single_previous(){
-        manager.set(test_data);
-        manager.loop(ApplicationAudioManager.LOOP_SINGLE);
-
-        manager.play(5);
-        player_factory.dummy_player.progress_set = 0.05d; // more than 4 seconds
-        player_factory.dummy_player.duration_set = 40;
-
-
-        manager.play_previous();
-        assertEquals(test_data.get(5),player_factory.dummy_player.active_audio);
-        assertEquals(0d,player_factory.dummy_player.progress_set,0.02);
-    }
 
     @Test
     public void get_timestamp(){
         Timestamp time = manager.timestamp();
         assertEquals(0.0d,time.getProgress(),0.02d);
         assertEquals(0L,time.getDuration());
-        manager.set(test_data);
+        audio_provider.set_playlist(new Playlist(test_data));
+        audio_provider.move_to_next();
         time = manager.timestamp();
         assertEquals(0.0d,time.getProgress(),0.02d);
         assertEquals(10L,time.getDuration());

@@ -156,9 +156,10 @@ public class AudioEntryDisplayer extends Fragment {
     }
 
     private void serviceDependentInitializations(AudioService service, View view){
-        rec_adapter.setOnItemClicked(entry -> {
+        rec_adapter.setOnItemClicked((entry,index) -> {
             if(category.equals(Category.QUEUE)){
-                service.play(entry);
+
+                service.play(entry, AudioService.AudioListSource.PLAYLIST);//TODO find queue or playlist
             }else{
                 service.set_playlist(Collections.singletonList(entry));
                 service.play();
@@ -197,7 +198,7 @@ public class AudioEntryDisplayer extends Fragment {
         switch(category){
             case QUEUE:
                 viewModel.getQueue().observe(getViewLifecycleOwner(), this::setRecAdapterContent);
-                rec_adapter.setOnItemClicked(service::play);
+                rec_adapter.setOnItemClicked((a,s)->service.play(a, AudioService.AudioListSource.PLAYLIST)); //TODO same
                 break;
             case PLAYLISTS:
                 /*PlaylistManager manager = ((MainActivity)requireActivity()).getPlaylistManager();
@@ -240,7 +241,7 @@ public class AudioEntryDisplayer extends Fragment {
                 break;
             case PISTES:
                 viewModel.getFilteredList().observe(getViewLifecycleOwner(), this::setRecAdapterContent);
-                rec_adapter.setOnItemClicked(entry -> {
+                rec_adapter.setOnItemClicked((entry,i) -> {
                     service.set_playlist(Collections.singletonList(entry));
                     service.play();
                 });

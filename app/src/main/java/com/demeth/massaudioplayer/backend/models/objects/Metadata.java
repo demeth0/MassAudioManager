@@ -4,7 +4,7 @@ import android.net.Uri;
 
 public class Metadata {
     public static class FileAudioMetadata extends Metadata{
-        private String display_name;
+        // private String display_name;
         private Uri uri;
 
         public FileAudioMetadata(Uri uri){

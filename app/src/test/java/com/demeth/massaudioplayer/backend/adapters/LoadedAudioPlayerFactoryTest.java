@@ -1,4 +1,4 @@
-package com.demeth.massaudioplayer.audio_player.adapters;
+package com.demeth.massaudioplayer.backend.adapters;
 
 import static org.junit.Assert.*;
 
@@ -14,7 +14,7 @@ import org.junit.Test;
 public class LoadedAudioPlayerFactoryTest {
     private LoadedAudioPlayerFactory factory;
 
-    final class StubAudioPlayer implements AudioPlayer{
+    static final class StubAudioPlayer implements AudioPlayer{
 
         @Override
         public void play(Audio audio) {
@@ -52,7 +52,7 @@ public class LoadedAudioPlayerFactoryTest {
         }
     }
 
-    private final AudioPlayer dummy_player=  new StubAudioPlayer();
+    private final AudioPlayer dummy_player= new StubAudioPlayer();
     @Before
     public void setUp() throws Exception {
         factory = new LoadedAudioPlayerFactory();

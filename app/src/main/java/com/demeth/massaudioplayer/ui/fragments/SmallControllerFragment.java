@@ -20,6 +20,7 @@ import com.demeth.massaudioplayer.R;
 import com.demeth.massaudioplayer.backend.adapters.ApplicationAudioManager;
 import com.demeth.massaudioplayer.backend.AlbumLoader;
 
+import com.demeth.massaudioplayer.backend.models.objects.LoopMode;
 import com.demeth.massaudioplayer.service.AudioService;
 import com.demeth.massaudioplayer.service.BoundableActivity;
 import com.demeth.massaudioplayer.ui.ControllerActivity;
@@ -78,13 +79,13 @@ public class SmallControllerFragment extends Fragment {
             ImageButton loopbtn = view.findViewById(R.id.main_control_loop_button);
             diffusionViewModel.getLoopMode().observe(getViewLifecycleOwner(),loopMode -> {
                 switch(loopMode){
-                    case ApplicationAudioManager.LOOP_ALL:
+                    case ALL:
                         loopbtn.setImageResource(R.drawable.loop_all);
                         break;
-                    case ApplicationAudioManager.LOOP_NONE:
+                    case NONE:
                         loopbtn.setImageResource(R.drawable.loop_none);
                         break;
-                    case ApplicationAudioManager.LOOP_SINGLE:
+                    case SINGLE:
                         loopbtn.setImageResource(R.drawable.loop_one);
                         break;
                 }
@@ -92,14 +93,14 @@ public class SmallControllerFragment extends Fragment {
 
             loopbtn.setOnClickListener(view1 -> {
                 switch (service.get_loop_mode()){
-                    case ApplicationAudioManager.LOOP_SINGLE:
-                        service.set_loop_mode(ApplicationAudioManager.LOOP_NONE);
+                    case SINGLE:
+                        service.set_loop_mode(LoopMode.NONE);
                         break;
-                    case ApplicationAudioManager.LOOP_NONE:
-                        service.set_loop_mode(ApplicationAudioManager.LOOP_ALL);
+                    case NONE:
+                        service.set_loop_mode(LoopMode.ALL);
                         break;
-                    case ApplicationAudioManager.LOOP_ALL:
-                        service.set_loop_mode(ApplicationAudioManager.LOOP_SINGLE);
+                    case ALL:
+                        service.set_loop_mode(LoopMode.SINGLE);
                         break;
                 }
             });
@@ -142,9 +143,16 @@ public class SmallControllerFragment extends Fragment {
 
             /*to set time*/
             diffusionViewModel.getTimestamp().observe(getViewLifecycleOwner(),timestamp -> {
-                timer.setText(timer.getContext().getString(R.string.timestamp,(timestamp.current/60000),(timestamp.current/1000)%60,timestamp.duration/60000, (timestamp.duration/1000)%60));
+                Log.d("[abc]", "timestamp: "+timestamp.current+" "+timestamp.duration);
+                timer.setText(
+                        timer.getContext()
+                        .getString(
+                                R.string.timestamp,
+                                (timestamp.current/60000),
+                                (timestamp.current/1000)%60,timestamp.duration/60000,
+                                (timestamp.duration/1000)%60));
                 //TODO set seek bar
-                float ratio=(float)timestamp.current/timestamp.duration;
+                float ratio=(float)timestamp.current/(float)timestamp.duration;
                 bar.setProgress((int)(bar.getMax()*ratio));
             });
             bar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {

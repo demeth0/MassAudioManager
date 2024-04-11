@@ -17,17 +17,22 @@ import com.demeth.massaudioplayer.backend.adapters.ApplicationAudioManager;
 import com.demeth.massaudioplayer.backend.adapters.FileAudioPlayer;
 import com.demeth.massaudioplayer.backend.adapters.HashMapDatabase;
 import com.demeth.massaudioplayer.backend.adapters.LoadedAudioPlayerFactory;
+import com.demeth.massaudioplayer.backend.adapters.LocalFileDatabaseProvider;
 import com.demeth.massaudioplayer.backend.adapters.SequentialEventManager;
+import com.demeth.massaudioplayer.backend.adapters.SmartAudioProvider;
 import com.demeth.massaudioplayer.backend.models.adapters.AudioManager;
+import com.demeth.massaudioplayer.backend.models.adapters.AudioPlayer;
 import com.demeth.massaudioplayer.backend.models.adapters.AudioPlayerFactory;
+import com.demeth.massaudioplayer.backend.models.adapters.AudioProvider;
 import com.demeth.massaudioplayer.backend.models.adapters.Database;
 import com.demeth.massaudioplayer.backend.models.adapters.EventManager;
 import com.demeth.massaudioplayer.backend.models.objects.Audio;
 import com.demeth.massaudioplayer.backend.models.objects.AudioType;
 
 import com.demeth.massaudioplayer.backend.models.objects.EventCodeMap;
+import com.demeth.massaudioplayer.backend.models.objects.LoopMode;
+import com.demeth.massaudioplayer.backend.models.objects.Playlist;
 import com.demeth.massaudioplayer.backend.models.objects.Timestamp;
-import com.demeth.massaudioplayer.database.playlist.PlaylistManager;
 import com.demeth.massaudioplayer.ui.viewmodel.DiffusionViewModel;
 import com.demeth.massaudioplayer.ui.viewmodel.ListViewModel;
 
@@ -37,6 +42,11 @@ import java.util.List;
  * foreground audio service that instantiate the audio player and provide all the player functionalities from the UI or the notification
  */
 public class AudioService extends AbstractAudioService implements ViewModelStoreOwner {
+    public enum AudioListSource{
+        QUEUE,
+        PLAYLIST
+    }
+
     private ViewModelStore store;
 
     private ListViewModel listViewModel;
@@ -44,7 +54,7 @@ public class AudioService extends AbstractAudioService implements ViewModelStore
 
     //private AudioPlayer player;
 
-    private PlaylistManager playlist_manager;
+    //private PlaylistManager playlist_manager;
 
     /**
      * interface implementation to use ViewModels in the service
@@ -66,9 +76,9 @@ public class AudioService extends AbstractAudioService implements ViewModelStore
     /**
      * @return the playlist manager
      */
-    public PlaylistManager getPlaylistManager() {
-        return playlist_manager;
-    }
+    //public PlaylistManager getPlaylistManager() {
+    //    return null;//playlist_manager;
+    //}
 
     /**
      * classe du binder pour étre lié comme il faut a la cclasse AudioService
@@ -102,7 +112,7 @@ public class AudioService extends AbstractAudioService implements ViewModelStore
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         int ret = super.onStartCommand(intent, flags, startId);
-        if(intent!=null){
+        if(intent!=null && intent.getAction()!=null){
             switch(intent.getAction()){
                 case ServiceAction.NEXT_AUDIO:
                     Log.d("service","action next");
@@ -138,20 +148,22 @@ public class AudioService extends AbstractAudioService implements ViewModelStore
     EventManager event_manager;
     Database database;
     AudioManager manager;
+    AudioProvider audio_provider;
 
     private void inject_dependencies(Context context){
 
         event_manager = new SequentialEventManager();
+        LocalFileDatabaseProvider local_provider = new LocalFileDatabaseProvider();
+        database = new HashMapDatabase(context, local_provider);
 
-        database = new HashMapDatabase(context);
-
-        com.demeth.massaudioplayer.backend.models.adapters.AudioPlayer file_audio_player = new FileAudioPlayer(event_manager,database,context);
+        AudioPlayer file_audio_player = new FileAudioPlayer(event_manager,database,context);
 
         AudioPlayerFactory audio_player_factory = new LoadedAudioPlayerFactory();
         audio_player_factory.register(AudioType.LOCAL,file_audio_player);
-        manager = new ApplicationAudioManager(audio_player_factory,event_manager);
+        audio_provider = new SmartAudioProvider();
+        manager = new ApplicationAudioManager(audio_player_factory,event_manager,audio_provider);
 
-        event_manager.registerHandler(event->{
+        event_manager.registerHandler("Service",event->{
             if(event.getCode() == EventCodeMap.EVENT_AUDIO_START){
                 onPlay();
             }else if(event.getCode()==EventCodeMap.EVENT_AUDIO_COMPLETED){
@@ -175,10 +187,10 @@ public class AudioService extends AbstractAudioService implements ViewModelStore
 
        // listViewModel.setList(PlaceholderContent.ITEMS); //TODO test list
 
-        com.demeth.massaudioplayer.database.AudioLibrary library=new com.demeth.massaudioplayer.database.AudioLibrary(this);
+        //com.demeth.massaudioplayer.database.AudioLibrary library=new com.demeth.massaudioplayer.database.AudioLibrary(this);
         // player = new AudioPlayer(this);
         // player.setListener(this);
-        playlist_manager = new PlaylistManager(this,library);
+        //playlist_manager = new PlaylistManager(this,library);
 
         listViewModel.setList(database.getEntries());
 
@@ -208,7 +220,7 @@ public class AudioService extends AbstractAudioService implements ViewModelStore
     @Override
     public void updateNotification(boolean paused) {
         notification_builder.setPauseButtonPaused(paused);
-        notification_builder.updateNotification(manager.current());
+        notification_builder.updateNotification(audio_provider.get_audio());
     }
 
     /**
@@ -219,12 +231,32 @@ public class AudioService extends AbstractAudioService implements ViewModelStore
         listViewModel.setList(database.getEntries());
     }
 
-    public void play(int index){
-        manager.play(index);
+    public void play(int index,AudioListSource source){
+        switch(source){
+            case PLAYLIST:
+                audio_provider.set_audio_from_playlist(index);
+                break;
+            case QUEUE:
+                audio_provider.set_audio_from_queue(index);
+                break;
+        }
+        manager.play();
     }
 
-    public void play(Audio audio){
-        manager.play(manager.get().indexOf(audio));
+    public void play(Audio audio, AudioListSource source){
+        List<Audio> lookup;
+        switch(source){
+            case PLAYLIST:
+                lookup=audio_provider.view_playlist();
+                audio_provider.set_audio_from_playlist(lookup.indexOf(audio));
+                break;
+            case QUEUE:
+                lookup=audio_provider.view_queue();
+                audio_provider.set_audio_from_queue(lookup.indexOf(audio));
+                break;
+        }
+
+        manager.play();
     }
 
     public void play(){
@@ -237,35 +269,38 @@ public class AudioService extends AbstractAudioService implements ViewModelStore
     }
 
     public void set_playlist(List<Audio> audios){
-        manager.set(audios);
+        audio_provider.set_playlist(new Playlist(audios));
         onPlaylistChanged();
         onPause();
     }
 
     public List<Audio> get_playlist(){
-        return manager.get();
+        List<Audio> all_audio = audio_provider.view_queue();
+        all_audio.addAll(audio_provider.view_playlist());
+        return all_audio;
     }
 
     public Audio get_current_audio(){
-        return manager.current();
+        return audio_provider.get_audio();
     }
 
-    public int get_loop_mode(){
-        return manager.getLoopMode();
+    public LoopMode get_loop_mode(){
+        return audio_provider.get_loop();
     }
 
-    public void set_loop_mode(int mode){
-        manager.loop(mode);
+    public void set_loop_mode(LoopMode mode){
+        audio_provider.set_loop(mode);
         onLoopModeChanged();
     }
 
     public void set_shuffle_mode(boolean mode){
-        manager.shuffle(mode);
+        audio_provider.set_random(mode);
         onRandomModeChanged();
     }
 
+    /** @noinspection BooleanMethodIsAlwaysInverted*/
     public boolean get_shuffle_mode(){
-        return manager.isShuffled();
+            return audio_provider.get_random();
     }
 
     public boolean is_audio_paused(){
@@ -291,7 +326,7 @@ public class AudioService extends AbstractAudioService implements ViewModelStore
 
     private void onPlay() {
         updateNotification(false);
-        diffusionViewModel.setEntry(manager.current());
+        diffusionViewModel.setEntry(audio_provider.get_audio());
         diffusionViewModel.setTime(0,manager.timestamp().getDuration());
         diffusionViewModel.setPaused(false);
     }
@@ -302,7 +337,7 @@ public class AudioService extends AbstractAudioService implements ViewModelStore
     }
 
     public void onPlaylistChanged() {
-        listViewModel.setQueue(manager.get());
+        listViewModel.setQueue(get_playlist());
     }
 
     public void onResume() {
@@ -311,10 +346,10 @@ public class AudioService extends AbstractAudioService implements ViewModelStore
     }
 
     public void onLoopModeChanged() {
-        diffusionViewModel.setLoopMode(manager.getLoopMode());
+        diffusionViewModel.setLoopMode(audio_provider.get_loop());
     }
 
     public void onRandomModeChanged() {
-        diffusionViewModel.setRandomMode(manager.isShuffled());
+        diffusionViewModel.setRandomMode(audio_provider.get_random());
     }
 }

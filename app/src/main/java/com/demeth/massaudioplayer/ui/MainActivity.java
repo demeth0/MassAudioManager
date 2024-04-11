@@ -18,8 +18,6 @@ import com.demeth.massaudioplayer.R;
 
 import com.demeth.massaudioplayer.backend.models.objects.Audio;
 import com.demeth.massaudioplayer.backend.models.objects.AudioType;
-import com.demeth.massaudioplayer.database.playlist.Playlist;
-import com.demeth.massaudioplayer.database.playlist.PlaylistManager;
 
 import com.demeth.massaudioplayer.service.AudioService;
 import com.demeth.massaudioplayer.ui.fragments.AudioEntryDisplayer;
@@ -34,7 +32,7 @@ public class MainActivity extends ServiceBoundActivity {
     public static final SelectionManager selection_manager = new SelectionManager();
 
     private RadioGroup group=null;
-    private PlaylistManager playlist_manager;
+    //private PlaylistManager playlist_manager;
 
 
     @Override
@@ -46,7 +44,7 @@ public class MainActivity extends ServiceBoundActivity {
     @Override
     public void onServiceConnection(){
         AudioService service = binder.getService(this);
-        playlist_manager = service.getPlaylistManager();
+        //playlist_manager = service.getPlaylistManager();
         //init
         setupCategorySelector();
         setupController();
@@ -176,7 +174,7 @@ public class MainActivity extends ServiceBoundActivity {
         return but;
     }
 
-    public PlaylistManager getPlaylistManager() {
-        return playlist_manager;
-    }
+    //public PlaylistManager getPlaylistManager() {
+    //    return playlist_manager;
+    //}
 }

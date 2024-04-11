@@ -14,11 +14,10 @@ import androidx.annotation.Nullable;
 import com.demeth.massaudioplayer.R;
 
 import com.demeth.massaudioplayer.backend.AlbumLoader;
-import com.demeth.massaudioplayer.backend.adapters.ApplicationAudioManager;
 import com.demeth.massaudioplayer.backend.models.objects.Audio;
 import com.demeth.massaudioplayer.backend.models.objects.AudioType;
 
-import com.demeth.massaudioplayer.database.playlist.PlaylistManager;
+import com.demeth.massaudioplayer.backend.models.objects.LoopMode;
 
 import com.demeth.massaudioplayer.service.AudioService;
 import com.demeth.massaudioplayer.ui.utils.OnSwipeTouchDetector;
@@ -90,13 +89,13 @@ public class ControllerActivity extends ServiceBoundActivity {
         diffusionViewModel.getLoopMode().observe(this,loopMode -> {
             Log.d("ControllerActivity","loop mode :"+loopMode);
             switch(loopMode){
-                case ApplicationAudioManager.LOOP_ALL:
+                case ALL:
                     loopbtn.setImageResource(R.drawable.loop_all);
                     break;
-                case ApplicationAudioManager.LOOP_NONE:
+                case NONE:
                     loopbtn.setImageResource(R.drawable.loop_none);
                     break;
-                case ApplicationAudioManager.LOOP_SINGLE:
+                case SINGLE:
                     loopbtn.setImageResource(R.drawable.loop_one);
                     break;
             }
@@ -104,14 +103,14 @@ public class ControllerActivity extends ServiceBoundActivity {
 
         loopbtn.setOnClickListener(view1 -> {
             switch (service.get_loop_mode()){
-                case ApplicationAudioManager.LOOP_SINGLE:
-                    service.set_loop_mode(ApplicationAudioManager.LOOP_NONE);
+                case SINGLE:
+                    service.set_loop_mode(LoopMode.NONE);
                     break;
-                case ApplicationAudioManager.LOOP_NONE:
-                    service.set_loop_mode(ApplicationAudioManager.LOOP_ALL);
+                case NONE:
+                    service.set_loop_mode(LoopMode.ALL);
                     break;
-                case ApplicationAudioManager.LOOP_ALL:
-                    service.set_loop_mode(ApplicationAudioManager.LOOP_SINGLE);
+                case ALL:
+                    service.set_loop_mode(LoopMode.SINGLE);
                     break;
             }
         });
@@ -152,7 +151,7 @@ public class ControllerActivity extends ServiceBoundActivity {
             service.set_playlist(Collections.emptyList());
         });
 
-        PlaylistManager playlist_manager = service.getPlaylistManager();
+        //PlaylistManager playlist_manager = service.getPlaylistManager();
 
         diffusionViewModel.getEntry().observe(this,identifiedEntry -> {
             /*if(playlist_manager.get("liked").contains(identifiedEntry)){

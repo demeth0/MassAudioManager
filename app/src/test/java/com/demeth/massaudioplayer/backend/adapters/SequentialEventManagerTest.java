@@ -1,4 +1,4 @@
-package com.demeth.massaudioplayer.audio_player.adapters;
+package com.demeth.massaudioplayer.backend.adapters;
 
 import static org.junit.Assert.*;
 
@@ -23,7 +23,7 @@ public class SequentialEventManagerTest {
     @Test
     public void register_handler() {
 
-        manager.registerHandler((event)->{
+        manager.registerHandler("test",(event)->{
             if(event.getCode()==10)
                 triggered1=true;
         });
@@ -33,11 +33,11 @@ public class SequentialEventManagerTest {
 
     @Test
     public void register_multiple_handler_same_event() {
-        manager.registerHandler((event)->{
+        manager.registerHandler("test1",(event)->{
             if(event.getCode()==10)
                 triggered1=true;
         });
-        manager.registerHandler((event)->{
+        manager.registerHandler("test2",(event)->{
             if(event.getCode()==10)
                 triggered2=true;
         });
@@ -48,11 +48,11 @@ public class SequentialEventManagerTest {
 
     @Test
     public void register_multiple_handler() {
-        manager.registerHandler((event)->{
+        manager.registerHandler("test",(event)->{
             if(event.getCode()==10)
                 triggered1=true;
         });
-        manager.registerHandler((event)->{
+        manager.registerHandler("test",(event)->{
             if(event.getCode()==15)
                 triggered2=true;
         });
@@ -64,7 +64,7 @@ public class SequentialEventManagerTest {
     @Test
     public void register_handler_pass_data() {
         final Object data = new Object();
-        manager.registerHandler((event)->{
+        manager.registerHandler("test",(event)->{
             if(event.getCode()==10){
                 triggered1=true;
                 assertEquals(data, event.getData());

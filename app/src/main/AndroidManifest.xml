@@ -2,12 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+        tools:ignore="ScopedStorage" />
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
-
-    <uses-permission android:name="READ_USER_DICTIONARY"/>
+    <uses-permission android:name="READ_USER_DICTIONARY" />
 
     <application
         android:allowBackup="true"
@@ -19,7 +19,7 @@
         android:theme="@style/Theme.MassAudioPlayer"
         tools:targetApi="31">
         <activity
-            android:name=".ui.MainActivity"
+            android:name=".frontend.HomeActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -27,14 +27,34 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.ControllerActivity">
-        </activity>
-        <service android:name=".service.AudioService"
+        <!--activity
+            android:name=".ui.MainActivity"
+
+
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-->
+
+        <activity android:name=".ui.ControllerActivity"></activity>
+
+        <service
+            android:name=".service.AudioService"
             android:enabled="true"
-            android:exported="false"/>
-        <receiver android:name=".service.notification.ServiceBroadcast"
+            android:exported="false" />
+
+        <service
+            android:name=".frontend.service.AudioService"
             android:enabled="true"
-            android:exported="false"/>
+            android:exported="false" />
+
+        <receiver
+            android:name=".service.notification.ServiceBroadcast"
+            android:enabled="true"
+            android:exported="false" />
     </application>
 
 </manifest>

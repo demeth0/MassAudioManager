@@ -6,5 +6,6 @@ package com.demeth.massaudioplayer.backend.models.objects;
 public enum AudioType {
     SPOTIFY,
     LOCAL,
-    YOUTUBE
+    YOUTUBE,
+    PLAYLIST //TODO keep ?
 }

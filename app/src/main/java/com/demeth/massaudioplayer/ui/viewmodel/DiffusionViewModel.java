@@ -4,10 +4,8 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.demeth.massaudioplayer.audio_player.AudioPlayer;
-import com.demeth.massaudioplayer.backend.adapters.ApplicationAudioManager;
 import com.demeth.massaudioplayer.backend.models.objects.Audio;
-import com.demeth.massaudioplayer.database.IdentifiedEntry;
+import com.demeth.massaudioplayer.backend.models.objects.LoopMode;
 
 public class DiffusionViewModel extends ViewModel {
     public static class Timestamp{
@@ -30,7 +28,7 @@ public class DiffusionViewModel extends ViewModel {
 
     private final MutableLiveData<Audio> entry = new MutableLiveData<>();
 
-    private final MutableLiveData<Integer> loopMode = new MutableLiveData<>(ApplicationAudioManager.LOOP_NONE);
+    private final MutableLiveData<LoopMode> loopMode = new MutableLiveData<>(LoopMode.NONE);
     private final MutableLiveData<Boolean> randomMode = new MutableLiveData<>(false);
     private final MutableLiveData<Boolean> paused = new MutableLiveData<>(true);
 
@@ -60,7 +58,7 @@ public class DiffusionViewModel extends ViewModel {
         return randomMode;
     }
 
-    public LiveData<Integer> getLoopMode() {
+    public LiveData<LoopMode> getLoopMode() {
         return loopMode;
     }
 
@@ -72,7 +70,7 @@ public class DiffusionViewModel extends ViewModel {
         paused.setValue(mode);
     }
 
-    public void setLoopMode(int mode){
+    public void setLoopMode(LoopMode mode){
         loopMode.setValue(mode);
     }
 

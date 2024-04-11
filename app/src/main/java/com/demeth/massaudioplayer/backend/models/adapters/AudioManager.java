@@ -1,6 +1,7 @@
 package com.demeth.massaudioplayer.backend.models.adapters;
 
 import com.demeth.massaudioplayer.backend.models.objects.Audio;
+import com.demeth.massaudioplayer.backend.models.objects.LoopMode;
 import com.demeth.massaudioplayer.backend.models.objects.Timestamp;
 
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.List;
  * Manage a list of playable audios. can change the mode of ordering with loop options or shuffling. Will play the audio in chain.
  */
 public interface AudioManager {
+
     /**
      * @return The time progress of the audio playing
      */
@@ -21,7 +23,7 @@ public interface AudioManager {
     void setTimestampProgress(double progress);
 
     /**
-     * Play the list of audio loaded from the index 0 or resume a paused audio.
+     * Play the list of audio loaded with audio provider.
      */
     void play();
 
@@ -37,39 +39,6 @@ public interface AudioManager {
     boolean isPaused();
 
     /**
-     *
-     * @return get the list of audio loaded
-     */
-    List<Audio> get();
-
-    /**
-     * Set the list of audio to play.
-     * @param list
-     */
-    void set(List<Audio> list);
-
-    Audio current();
-
-    /**
-     * Set the shuffling mode
-     * @param mode
-     */
-    void shuffle(boolean mode);
-
-    /**
-     *
-     * @return If the play list is shuffled.
-     */
-    boolean isShuffled();
-
-    /**
-     * Set the loop mode (between none, single and list)
-     * @param mode the mode
-     */
-    void loop(int mode);
-    int getLoopMode();
-
-    /**
      * PLay the previous audio in the play list or restart from the begining if the audio file have played for more than 4 seconds or if it's the first audio in the play list.
      */
     void play_previous();
@@ -78,10 +47,4 @@ public interface AudioManager {
      * Play the next audio in the playlist or restart from the begining of the play list.
      */
     void play_next();
-
-    /**
-     * Play the audio in the playlist at the position given by the index.
-     * @param index The audio to play in the playlist.
-     */
-    void play(int index);
 }
