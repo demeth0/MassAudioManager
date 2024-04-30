@@ -17,7 +17,6 @@ import com.demeth.massaudioplayer.backend.models.adapters.AudioProvider;
 import com.demeth.massaudioplayer.backend.models.adapters.Database;
 import com.demeth.massaudioplayer.backend.models.adapters.EventManager;
 import com.demeth.massaudioplayer.backend.models.objects.AudioType;
-import com.demeth.massaudioplayer.backend.models.objects.EventCodeMap;
 
 public class Dependencies {
     EventManager event_manager;

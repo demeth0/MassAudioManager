@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-
 import com.demeth.massaudioplayer.backend.models.objects.Audio;
 
 import java.util.Collection;

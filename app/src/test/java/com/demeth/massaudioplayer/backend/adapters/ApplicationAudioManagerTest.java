@@ -1,9 +1,10 @@
 package com.demeth.massaudioplayer.backend.adapters;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
-import com.demeth.massaudioplayer.backend.adapters.ApplicationAudioManager;
-import com.demeth.massaudioplayer.backend.adapters.SmartAudioProvider;
 import com.demeth.massaudioplayer.backend.models.adapters.AudioPlayer;
 import com.demeth.massaudioplayer.backend.models.adapters.AudioPlayerFactory;
 import com.demeth.massaudioplayer.backend.models.adapters.AudioProvider;
@@ -12,16 +13,15 @@ import com.demeth.massaudioplayer.backend.models.objects.Audio;
 import com.demeth.massaudioplayer.backend.models.objects.AudioType;
 import com.demeth.massaudioplayer.backend.models.objects.Event;
 import com.demeth.massaudioplayer.backend.models.objects.EventCodeMap;
-import com.demeth.massaudioplayer.backend.models.objects.LoopMode;
 import com.demeth.massaudioplayer.backend.models.objects.Playlist;
 import com.demeth.massaudioplayer.backend.models.objects.Timestamp;
-import com.demeth.massaudioplayer.service.AudioService;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class ApplicationAudioManagerTest {
 
@@ -86,15 +86,20 @@ public class ApplicationAudioManagerTest {
     }
 
     static class StubEventManager implements EventManager{
-        EventHandler handler;
+        EventHandler handler=null;
         @Override
         public void trigger(Event event) {
-            this.handler.handle(event);
+            if(!Objects.isNull(this.handler)) this.handler.handle(event);
         }
 
         @Override
         public void registerHandler(String ID, EventHandler handler) {
             this.handler = handler;
+        }
+
+        @Override
+        public void removeHandler(String ID) {
+            handler = null;
         }
     }
 

@@ -3,7 +3,6 @@ package com.demeth.massaudioplayer.backend.models.adapters;
 import com.demeth.massaudioplayer.backend.models.objects.Audio;
 import com.demeth.massaudioplayer.backend.models.objects.LoopMode;
 import com.demeth.massaudioplayer.backend.models.objects.Playlist;
-import com.demeth.massaudioplayer.backend.models.objects.Queue;
 
 import java.util.List;
 

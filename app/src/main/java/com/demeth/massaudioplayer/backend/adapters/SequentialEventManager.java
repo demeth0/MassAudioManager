@@ -4,7 +4,6 @@ import com.demeth.massaudioplayer.backend.models.adapters.EventManager;
 import com.demeth.massaudioplayer.backend.models.objects.Event;
 
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 
 public class SequentialEventManager implements EventManager {
     private LinkedHashMap<String,EventHandler> handlers;
@@ -21,5 +20,12 @@ public class SequentialEventManager implements EventManager {
     @Override
     public void registerHandler(String ID, EventHandler handler) {
         handlers.put(ID,handler);
+    }
+
+    @Override
+    public void removeHandler(String ID) {
+        if(handlers.containsKey(ID)){
+            handlers.remove(ID);
+        }
     }
 }

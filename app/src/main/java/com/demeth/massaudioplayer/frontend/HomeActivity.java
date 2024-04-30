@@ -1,11 +1,5 @@
 package com.demeth.massaudioplayer.frontend;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.lifecycle.ViewModelProvider;
-
 import android.Manifest;
 import android.content.ComponentName;
 import android.content.Context;
@@ -23,23 +17,15 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModelProvider;
+
 import com.demeth.massaudioplayer.R;
-import com.demeth.massaudioplayer.backend.UseCases;
-import com.demeth.massaudioplayer.backend.adapters.ApplicationAudioManager;
-import com.demeth.massaudioplayer.backend.adapters.FileAudioPlayer;
-import com.demeth.massaudioplayer.backend.adapters.HashMapDatabase;
-import com.demeth.massaudioplayer.backend.adapters.LoadedAudioPlayerFactory;
-import com.demeth.massaudioplayer.backend.adapters.LocalFileDatabaseProvider;
-import com.demeth.massaudioplayer.backend.adapters.SequentialEventManager;
-import com.demeth.massaudioplayer.backend.adapters.SmartAudioProvider;
-import com.demeth.massaudioplayer.backend.models.adapters.AudioManager;
-import com.demeth.massaudioplayer.backend.models.adapters.AudioPlayer;
-import com.demeth.massaudioplayer.backend.models.adapters.AudioPlayerFactory;
-import com.demeth.massaudioplayer.backend.models.adapters.AudioProvider;
-import com.demeth.massaudioplayer.backend.models.adapters.Database;
-import com.demeth.massaudioplayer.backend.models.adapters.EventManager;
+import com.demeth.massaudioplayer.backend.Shiraori;
 import com.demeth.massaudioplayer.backend.models.objects.Audio;
-import com.demeth.massaudioplayer.backend.models.objects.AudioType;
 import com.demeth.massaudioplayer.backend.models.objects.EventCodeMap;
 import com.demeth.massaudioplayer.frontend.service.AudioService;
 import com.demeth.massaudioplayer.frontend.service.AudioServiceBoundable;
@@ -53,6 +39,8 @@ import java.util.List;
  * Main activity will contain the welcome page when opening the application. Will start the audio service and display a list of playables audios.
  */
 public class HomeActivity extends AppCompatActivity implements AudioServiceBoundable {
+
+    private HomeViewModel viewModel;
     private final static int PERMISSION_CODE=750;
     private AudioService.ServiceBinder binder;
     private AudioService service;
@@ -72,6 +60,13 @@ public class HomeActivity extends AppCompatActivity implements AudioServiceBound
         NotificationBuilder.createNotificationChannel(this);
         setContentView(R.layout.activity_home);
 
+        /* Create or retrieve the view model bound to this activity used to update UI componennts */
+        viewModel = new ViewModelProvider(this).get(HomeViewModel.class);
+
+        connect_activity_to_service();
+    }
+
+    private void connect_activity_to_service(){
         /* Connect this activity to the service */
         connection = new ServiceConnection() {
             @Override
@@ -82,14 +77,14 @@ public class HomeActivity extends AppCompatActivity implements AudioServiceBound
                 //pre init
                 service = binder.getService(HomeActivity.this);
 
-                UseCases.setHandler("MainUI",event->{
-                    if(event.getCode() == EventCodeMap.EVENT_AUDIO_START){
-                        ping("Event audio started");
-                    }else if(event.getCode()==EventCodeMap.EVENT_AUDIO_COMPLETED){
-                        ping("Event audio completed");
-                    }}
-                , service.getDependencies());
-                update_list_view(UseCases.getDatabaseEntries(service.getDependencies()));
+                Shiraori.setHandler("MainUI", event->{
+                            if(event.getCode() == EventCodeMap.EVENT_AUDIO_START){
+                                ping("Event audio started");
+                            }else if(event.getCode()==EventCodeMap.EVENT_AUDIO_COMPLETED){
+                                ping("Event audio completed");
+                            }}
+                        , service.getDependencies());
+                update_list_view(Shiraori.getDatabaseEntries(service.getDependencies()));
             }
 
             @Override
@@ -145,7 +140,7 @@ public class HomeActivity extends AppCompatActivity implements AudioServiceBound
         lv.setAdapter(new MyAdapter(audios));
         lv.setOnItemClickListener((adapterView, view, i, l) -> {
             Audio audio = (Audio) adapterView.getItemAtPosition(i);
-            UseCases.playAudio(audio, service.getDependencies());
+            Shiraori.playAudio(audio, service.getDependencies());
         });
     }
 
@@ -173,8 +168,8 @@ public class HomeActivity extends AppCompatActivity implements AudioServiceBound
                 Toast.makeText(this, "permission denied the application will not be able to read audio files", Toast.LENGTH_LONG).show();
                 finish();
             }else{
-                UseCases.reloadDatabase(this, service.getDependencies());
-                update_list_view(UseCases.getDatabaseEntries(service.getDependencies()));
+                Shiraori.reloadDatabase(this, service.getDependencies());
+                update_list_view(Shiraori.getDatabaseEntries(service.getDependencies()));
             }
         }
     }

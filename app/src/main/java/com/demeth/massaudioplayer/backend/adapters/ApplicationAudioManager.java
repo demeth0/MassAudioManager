@@ -7,13 +7,7 @@ import com.demeth.massaudioplayer.backend.models.adapters.AudioProvider;
 import com.demeth.massaudioplayer.backend.models.adapters.EventManager;
 import com.demeth.massaudioplayer.backend.models.objects.Audio;
 import com.demeth.massaudioplayer.backend.models.objects.EventCodeMap;
-import com.demeth.massaudioplayer.backend.models.objects.LoopMode;
-import com.demeth.massaudioplayer.backend.models.objects.Playlist;
 import com.demeth.massaudioplayer.backend.models.objects.Timestamp;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Implement the version of the audio manager for Android application.

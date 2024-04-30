@@ -15,10 +15,8 @@ import androidx.fragment.app.FragmentContainerView;
 import androidx.lifecycle.Observer;
 
 import com.demeth.massaudioplayer.R;
-
 import com.demeth.massaudioplayer.backend.models.objects.Audio;
 import com.demeth.massaudioplayer.backend.models.objects.AudioType;
-
 import com.demeth.massaudioplayer.service.AudioService;
 import com.demeth.massaudioplayer.ui.fragments.AudioEntryDisplayer;
 import com.demeth.massaudioplayer.ui.fragments.SmallControllerFragment;

@@ -1,10 +1,6 @@
 package com.demeth.massaudioplayer.backend.adapters;
 
 import android.content.Context;
-import android.database.Cursor;
-import android.net.Uri;
-import android.provider.MediaStore;
-import android.util.Log;
 
 import com.demeth.massaudioplayer.backend.models.adapters.Database;
 import com.demeth.massaudioplayer.backend.models.adapters.DatabaseContentProvider;
@@ -14,8 +10,6 @@ import com.demeth.massaudioplayer.backend.models.objects.Metadata;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -58,7 +52,7 @@ public class HashMapDatabase implements Database {
             DatabaseContentProvider.Content content = provider.next();
             audio = content.audio;
             metadata = content.metadata;
-            if(audio_entries.containsKey(audio.path))
+            if(audio_entries.containsKey(audio.path)) // TODO in case two audio from different type have the same path this will crash.
                 throw new RuntimeException(new DuplicateEntriesException());
 
             audio_entries.put(audio.path,audio);

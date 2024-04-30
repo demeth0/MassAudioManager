@@ -12,13 +12,10 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 
 import com.demeth.massaudioplayer.R;
-
 import com.demeth.massaudioplayer.backend.AlbumLoader;
 import com.demeth.massaudioplayer.backend.models.objects.Audio;
 import com.demeth.massaudioplayer.backend.models.objects.AudioType;
-
 import com.demeth.massaudioplayer.backend.models.objects.LoopMode;
-
 import com.demeth.massaudioplayer.service.AudioService;
 import com.demeth.massaudioplayer.ui.utils.OnSwipeTouchDetector;
 

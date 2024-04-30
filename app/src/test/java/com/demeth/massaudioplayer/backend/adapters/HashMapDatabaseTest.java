@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import android.content.Context;
 import android.net.Uri;
 
+import com.demeth.massaudioplayer.backend.models.adapters.Database;
 import com.demeth.massaudioplayer.backend.models.adapters.DatabaseContentProvider;
 import com.demeth.massaudioplayer.backend.models.objects.Audio;
 import com.demeth.massaudioplayer.backend.models.objects.AudioType;
@@ -37,20 +38,29 @@ public class HashMapDatabaseTest {
         }
     }
     class StubDatabaseContentProvider implements DatabaseContentProvider{
+        ArrayList<Audio> local_list=audios;
+        int size = SIZE;
+
+        public StubDatabaseContentProvider(){
+            override();
+        }
+
+        public void override(){}
+
         int i=0;
         @Override
         public Content next() {
 
-            if(this.i>=SIZE) return null;
+            if(this.i>=size) return null;
 
-            Content c= new Content(audios.get(this.i),new StubFileMetadata(this.i));
+            Content c= new Content(local_list.get(this.i),new StubFileMetadata(this.i));
             this.i++;
             return c;
         }
 
         @Override
         public boolean hasNext() {
-            if(this.i>=SIZE)
+            if(this.i>=size)
                 return false;
             return true;
         }
@@ -62,7 +72,7 @@ public class HashMapDatabaseTest {
 
         @Override
         public void close() {
-            i=SIZE;
+            i=size;
         }
     }
 
@@ -110,6 +120,26 @@ public class HashMapDatabaseTest {
         for(int i=5;i<SIZE;i++){
             assertTrue(data.contains(audios.get(i)));
         }
+    }
+
+    @Test
+    public void test_duplicate_entry(){
+        ArrayList<Audio> audios_d=new ArrayList<>(audios);
+        audios_d.add(audios.get(0));
+        provider = new StubDatabaseContentProvider(){
+            public void override(){
+                local_list = audios_d;
+                size=audios_d.size();
+            }
+        };
+
+        try{
+            database = new HashMapDatabase(DUMMY_CONTEXT,provider);
+            fail();
+        }catch(RuntimeException e){
+            assertTrue(e.getCause() instanceof HashMapDatabase.DuplicateEntriesException);
+        }
+
     }
 
     @Test

@@ -6,7 +6,6 @@ import android.widget.Filter;
 
 import androidx.annotation.NonNull;
 
-
 import com.demeth.massaudioplayer.backend.models.objects.Audio;
 
 import java.util.Collection;

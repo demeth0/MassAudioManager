@@ -8,19 +8,15 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.util.AndroidException;
 import android.util.Log;
 import android.widget.RemoteViews;
 
 import androidx.core.app.NotificationCompat;
 
 import com.demeth.massaudioplayer.R;
-import com.demeth.massaudioplayer.backend.AlbumLoader;
 import com.demeth.massaudioplayer.backend.models.objects.Audio;
 import com.demeth.massaudioplayer.frontend.HomeActivity;
-import com.demeth.massaudioplayer.service.ServiceAction;
 import com.demeth.massaudioplayer.service.notification.ServiceBroadcast;
-import com.demeth.massaudioplayer.ui.MainActivity;
 
 public class NotificationBuilder {    public static final String CHANNEL_ID = "massaudioplayer notification channel id";
     public static final int NOTIFICATION_ID=88;

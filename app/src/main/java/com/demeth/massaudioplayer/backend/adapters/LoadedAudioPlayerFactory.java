@@ -1,8 +1,8 @@
 package com.demeth.massaudioplayer.backend.adapters;
 
+import com.demeth.massaudioplayer.backend.models.adapters.AudioPlayer;
 import com.demeth.massaudioplayer.backend.models.adapters.AudioPlayerFactory;
 import com.demeth.massaudioplayer.backend.models.objects.AudioType;
-import com.demeth.massaudioplayer.backend.models.adapters.AudioPlayer;
 
 import java.util.HashMap;
 

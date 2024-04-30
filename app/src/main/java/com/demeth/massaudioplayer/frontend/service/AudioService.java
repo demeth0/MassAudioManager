@@ -7,8 +7,7 @@ import android.os.IBinder;
 import android.util.Log;
 
 import com.demeth.massaudioplayer.backend.Dependencies;
-import com.demeth.massaudioplayer.backend.UseCases;
-import com.demeth.massaudioplayer.service.ServiceAction;
+import com.demeth.massaudioplayer.backend.Shiraori;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -70,7 +69,7 @@ public class AudioService extends Service {
             This call create the foreground service notification required by all foreground services*/
             notification_builder = new NotificationBuilder(this);
             startForeground(NotificationBuilder.NOTIFICATION_ID,notification_builder.getNotification());
-            dependencies = UseCases.openDependencies(this);
+            dependencies = Shiraori.openDependencies(this);
         }
 
         return START_STICKY;

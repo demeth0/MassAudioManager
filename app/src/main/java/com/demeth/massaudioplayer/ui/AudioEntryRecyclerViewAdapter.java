@@ -1,7 +1,6 @@
 package com.demeth.massaudioplayer.ui;
 
 import android.annotation.SuppressLint;
-import android.media.MediaRecorder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,11 +12,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.demeth.massaudioplayer.R;
-
-import com.demeth.massaudioplayer.backend.models.objects.Audio;
 import com.demeth.massaudioplayer.backend.AlbumLoader;
-//import com.demeth.massaudioplayer.database.DataType; //TODO playlist
-
+import com.demeth.massaudioplayer.backend.models.objects.Audio;
 import com.demeth.massaudioplayer.backend.models.objects.AudioType;
 import com.demeth.massaudioplayer.databinding.FragmentAudioEntryDisplayerBinding;
 

@@ -1,10 +1,6 @@
 package com.demeth.massaudioplayer.backend.models.adapters;
 
-import com.demeth.massaudioplayer.backend.models.objects.Audio;
-import com.demeth.massaudioplayer.backend.models.objects.LoopMode;
 import com.demeth.massaudioplayer.backend.models.objects.Timestamp;
-
-import java.util.List;
 
 /**
  * Manage a list of playable audios. can change the mode of ordering with loop options or shuffling. Will play the audio in chain.

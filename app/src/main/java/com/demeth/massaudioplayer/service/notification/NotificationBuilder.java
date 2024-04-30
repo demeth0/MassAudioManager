@@ -6,7 +6,6 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.widget.RemoteViews;
@@ -14,11 +13,9 @@ import android.widget.RemoteViews;
 import androidx.core.app.NotificationCompat;
 
 import com.demeth.massaudioplayer.R;
-
 import com.demeth.massaudioplayer.backend.AlbumLoader;
 import com.demeth.massaudioplayer.backend.models.objects.Audio;
 import com.demeth.massaudioplayer.service.AbstractAudioService;
-import com.demeth.massaudioplayer.service.AudioService;
 import com.demeth.massaudioplayer.service.ServiceAction;
 import com.demeth.massaudioplayer.ui.MainActivity;
 

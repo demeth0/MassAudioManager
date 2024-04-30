@@ -11,7 +11,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelStore;
 import androidx.lifecycle.ViewModelStoreOwner;
 
-
 import com.demeth.massaudioplayer.backend.AlbumLoader;
 import com.demeth.massaudioplayer.backend.adapters.ApplicationAudioManager;
 import com.demeth.massaudioplayer.backend.adapters.FileAudioPlayer;
@@ -28,7 +27,6 @@ import com.demeth.massaudioplayer.backend.models.adapters.Database;
 import com.demeth.massaudioplayer.backend.models.adapters.EventManager;
 import com.demeth.massaudioplayer.backend.models.objects.Audio;
 import com.demeth.massaudioplayer.backend.models.objects.AudioType;
-
 import com.demeth.massaudioplayer.backend.models.objects.EventCodeMap;
 import com.demeth.massaudioplayer.backend.models.objects.LoopMode;
 import com.demeth.massaudioplayer.backend.models.objects.Playlist;

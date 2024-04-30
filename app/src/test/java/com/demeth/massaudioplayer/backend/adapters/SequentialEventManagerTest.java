@@ -1,8 +1,10 @@
 package com.demeth.massaudioplayer.backend.adapters;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-import com.demeth.massaudioplayer.backend.adapters.SequentialEventManager;
 import com.demeth.massaudioplayer.backend.models.adapters.EventManager;
 import com.demeth.massaudioplayer.backend.models.objects.Event;
 
@@ -73,4 +75,33 @@ public class SequentialEventManagerTest {
         manager.trigger(new Event(10,data));
         assertTrue(triggered1);
     }
+
+    @Test
+    public void remove_handler_pass_data() {
+        triggered2=false;
+        manager.registerHandler("test",(event)->{
+            if(event.getCode()==10){
+                triggered1=true;
+                triggered2=!triggered2;
+            }
+        });
+        manager.trigger(new Event(10,null));
+        assertTrue(triggered1);
+
+        manager.removeHandler(("test"));
+        assertTrue(triggered2);
+
+        manager.removeHandler("no handler");
+    }
+
+    @Test
+    public void remove_unknown_handler_pass_data() {
+        try{
+            manager.removeHandler("no handler");
+        }catch(Exception e){
+            fail();
+        }
+
+    }
+
 }

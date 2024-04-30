@@ -19,10 +19,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.demeth.massaudioplayer.R;
-import com.demeth.massaudioplayer.backend.models.adapters.AudioManager;
 import com.demeth.massaudioplayer.backend.models.objects.Audio;
-
-
 import com.demeth.massaudioplayer.service.AudioService;
 import com.demeth.massaudioplayer.service.BoundableActivity;
 import com.demeth.massaudioplayer.ui.AudioEntryRecyclerViewAdapter;

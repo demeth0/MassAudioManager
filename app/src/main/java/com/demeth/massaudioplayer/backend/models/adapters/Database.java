@@ -7,7 +7,6 @@ import com.demeth.massaudioplayer.backend.models.objects.Audio;
 import com.demeth.massaudioplayer.backend.models.objects.Metadata;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.function.Predicate;
 
 public interface Database {

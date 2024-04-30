@@ -10,4 +10,6 @@ public interface EventManager {
     void trigger(Event event);
 
     void registerHandler(String ID, EventHandler handler);
+
+    void removeHandler(String ID);
 }
