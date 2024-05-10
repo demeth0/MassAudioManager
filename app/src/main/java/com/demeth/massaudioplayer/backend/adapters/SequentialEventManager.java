@@ -4,17 +4,19 @@ import com.demeth.massaudioplayer.backend.models.adapters.EventManager;
 import com.demeth.massaudioplayer.backend.models.objects.Event;
 
 import java.util.LinkedHashMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class SequentialEventManager implements EventManager {
-    private LinkedHashMap<String,EventHandler> handlers;
+    private final ConcurrentHashMap<String,EventHandler> handlers;
 
     public SequentialEventManager(){
-        handlers = new LinkedHashMap<>();
+        handlers = new ConcurrentHashMap<>();
     }
 
     @Override
     public void trigger(Event event) {
-        handlers.entrySet().forEach(h->h.getValue().handle(event));
+        handlers.forEach((key, value) -> value.handle(event));
     }
 
     @Override
@@ -24,8 +26,6 @@ public class SequentialEventManager implements EventManager {
 
     @Override
     public void removeHandler(String ID) {
-        if(handlers.containsKey(ID)){
-            handlers.remove(ID);
-        }
+        handlers.remove(ID);
     }
 }

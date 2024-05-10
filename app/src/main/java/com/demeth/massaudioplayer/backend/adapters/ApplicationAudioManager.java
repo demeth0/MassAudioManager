@@ -36,7 +36,7 @@ public class ApplicationAudioManager implements AudioManager {
             if(event.getCode()== EventCodeMap.EVENT_AUDIO_COMPLETED){
                 audio_provider.advance_to_next();
                 if(audio_provider.get_audio()==null){
-                    play_status=INACTIVE;
+                    set_play_status(INACTIVE);
                 }else{
                     play();
                 }
@@ -101,7 +101,7 @@ public class ApplicationAudioManager implements AudioManager {
         }else{
             audio_player.play(audio);
         }
-        play_status=PLAYING; // Event handler will change this value in case of exceptions
+        set_play_status(PLAYING); // Event handler will change this value in case of exceptions
     }
 
     @Override
@@ -112,11 +112,15 @@ public class ApplicationAudioManager implements AudioManager {
         AudioPlayer audio_player = get_audio_player();
         if(audio_player==null) return;
         audio_player.pause();
-        play_status=PAUSED;
+        set_play_status(PAUSED);
     }
 
     @Override
     public boolean isPaused() {
         return this.play_status!=PLAYING;
+    }
+
+    private void set_play_status(int status){
+        play_status = status;
     }
 }

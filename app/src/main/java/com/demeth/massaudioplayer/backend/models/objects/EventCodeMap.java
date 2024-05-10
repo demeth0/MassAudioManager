@@ -14,4 +14,12 @@ public class EventCodeMap {
      * This event is triggered when an audio start to be diffused. This event is not triggered when an audio resume after being paused.
      */
     public static final int EVENT_AUDIO_START = 2;
+
+    public static final int EVENT_RANDOM_MODE_CHANGED = 3;
+
+    public static final int EVENT_LOOP_MODE_CHANGED = 4;
+
+    public static final int EVENT_DATABASE_RELOADED = 5;
+
+
 }

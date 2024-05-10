@@ -11,50 +11,52 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.ListView;
-import android.widget.TextView;
+import android.view.inputmethod.EditorInfo;
+import android.widget.AutoCompleteTextView;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentContainerView;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.demeth.massaudioplayer.R;
+import com.demeth.massaudioplayer.backend.Dependencies;
 import com.demeth.massaudioplayer.backend.Shiraori;
-import com.demeth.massaudioplayer.backend.models.objects.Audio;
 import com.demeth.massaudioplayer.backend.models.objects.EventCodeMap;
+import com.demeth.massaudioplayer.backend.models.objects.LoopMode;
+import com.demeth.massaudioplayer.frontend.components.SearchFieldAutoCompleteArrayAdapter;
+import com.demeth.massaudioplayer.frontend.fragments.AudioSelectionFragment;
+import com.demeth.massaudioplayer.frontend.fragments.HomeAudioControlsFragment;
 import com.demeth.massaudioplayer.frontend.service.AudioService;
 import com.demeth.massaudioplayer.frontend.service.AudioServiceBoundable;
 import com.demeth.massaudioplayer.frontend.service.NotificationBuilder;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import com.demeth.massaudioplayer.ui.SearchFieldAutoCompleter;
 
 /**
  * Main activity will contain the welcome page when opening the application. Will start the audio service and display a list of playables audios.
  */
 public class HomeActivity extends AppCompatActivity implements AudioServiceBoundable {
 
+
+    private static final String HOME_HANDLERS = "HOME_";
+
     private HomeViewModel viewModel;
     private final static int PERMISSION_CODE=750;
     private AudioService.ServiceBinder binder;
-    private AudioService service;
+    private AudioService service=null;
     ServiceConnection connection;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         /* Manage permissions */
-        if(Build.VERSION.SDK_INT>=33){
-            askPermissions(Manifest.permission.READ_MEDIA_AUDIO);
+        requestExternalStoragePermission();
+        if(Build.VERSION.SDK_INT>=33)
             askPermissions(Manifest.permission.POST_NOTIFICATIONS);
-        }else{
-            askPermissions(Manifest.permission.READ_EXTERNAL_STORAGE);
-        }
 
         /* Create if not the notification channel used by notifications of the application */
         NotificationBuilder.createNotificationChannel(this);
@@ -64,6 +66,23 @@ public class HomeActivity extends AppCompatActivity implements AudioServiceBound
         viewModel = new ViewModelProvider(this).get(HomeViewModel.class);
 
         connect_activity_to_service();
+    }
+
+    private void loadFragments(){
+        Bundle bun = new Bundle();
+        bun.putBinder("service",binder);
+        getSupportFragmentManager().beginTransaction().replace(R.id.controller_fragment_container, HomeAudioControlsFragment.class,bun).setReorderingAllowed(true).commit();
+
+        FragmentContainerView controller = findViewById(R.id.controller_fragment_container);
+        viewModel.getControllerVisibility().observe(this, aBoolean -> {
+            if(aBoolean){
+                controller.setVisibility(View.VISIBLE);
+            }else{
+                controller.setVisibility(View.GONE);
+            }
+        });
+
+        getSupportFragmentManager().beginTransaction().replace(R.id.audio_selection_fragment_container, AudioSelectionFragment.class,bun).setReorderingAllowed(true).commit();
     }
 
     private void connect_activity_to_service(){
@@ -84,73 +103,107 @@ public class HomeActivity extends AppCompatActivity implements AudioServiceBound
                                 ping("Event audio completed");
                             }}
                         , service.getDependencies());
-                update_list_view(Shiraori.getDatabaseEntries(service.getDependencies()));
+                loadFragments();
+                bindViewModel(service.getDependencies());
             }
 
             @Override
             public void onServiceDisconnected(ComponentName componentName) {
                 Log.d("[abc]","HomeActivity disconnected from service");
+                unbindViewModel(service.getDependencies());
             }
         };
         Log.d("[abc]","binding to service");
         bindService(new Intent(this,AudioService.class),connection, Context.BIND_AUTO_CREATE);
     }
 
+    private void bindViewModel(Dependencies dep){
+        Shiraori.setHandler(HOME_HANDLERS+"random",event -> {
+            if(event.getCode() == EventCodeMap.EVENT_RANDOM_MODE_CHANGED){
+                if(event.getData()!=null)
+                    viewModel.setRandomModeUI((boolean)event.getData());
+            }
+        }, dep);
+
+        viewModel.setRandomModeUI(Shiraori.isRandomModeEnabled(dep));
+
+        Shiraori.setHandler(HOME_HANDLERS+"loop",event -> {
+            if(event.getCode() == EventCodeMap.EVENT_LOOP_MODE_CHANGED){
+                if(event.getData()!=null)
+                    viewModel.setLoopModeUI((LoopMode)event.getData());
+            }
+        },dep);
+
+        viewModel.setLoopModeUI(Shiraori.getLoopMode(dep));
+
+        Shiraori.setHandler(HOME_HANDLERS+"controller_visibility",event -> {
+            if(event.getCode() == EventCodeMap.EVENT_AUDIO_START){
+                viewModel.setControllerVisibility(true);
+                Shiraori.unsetHandler(HOME_HANDLERS+"controller_visibility",dep);
+            }
+        },dep);
+        //TODO if currently music is playing enable visibility !
+
+        Shiraori.setHandler(HOME_HANDLERS+"play_pause_state",event -> {
+            if(event.getCode() == EventCodeMap.EVENT_AUDIO_START){
+                viewModel.setPlayPauseStateUI(true);
+            }else if(event.getCode() == EventCodeMap.EVENT_AUDIO_COMPLETED){
+                viewModel.setPlayPauseStateUI(false);
+            }
+        },dep);
+
+        setupSearchBar(dep);
+    }
+
+    private void unbindViewModel(Dependencies dep){
+        Shiraori.unsetHandler(HOME_HANDLERS+"random",dep);
+    }
+
+    private void setupSearchBar(Dependencies dep){
+        AutoCompleteTextView search_field = findViewById(R.id.search_bar);
+        SearchFieldAutoCompleteArrayAdapter searchFieldAutoCompleter = new SearchFieldAutoCompleteArrayAdapter(this,android.R.layout.simple_list_item_1);
+        search_field.setAdapter(searchFieldAutoCompleter);
+        search_field.setThreshold(1);
+        searchFieldAutoCompleter.setContent(Shiraori.getDatabaseEntries(dep)); //TODO use MVVM
+
+        ImageButton search_button = findViewById(R.id.search_button);
+        search_button.setOnClickListener(v -> {
+            viewModel.setSearchQuery(search_field.getText().toString());
+            search_field.clearFocus();
+        });
+        search_field.setOnEditorActionListener((v, actionId, event) -> {
+            boolean ret = true;
+            //IME Input Methode
+            if(actionId== EditorInfo.IME_ACTION_DONE){
+                viewModel.setSearchQuery(search_field.getText().toString());
+                search_field.clearFocus();
+                ret = false;
+            }
+            //If action was consumed ? (success or fail) to close or not the keyboard
+            return ret;
+            });
+    }
+
     private void ping(String arg){
         Log.d("[abc]","received call "+arg);
     }
 
-    private class MyAdapter extends BaseAdapter {
-        List<Audio> items;
-        public MyAdapter(Collection<Audio> data){
-            items = new ArrayList<>(data);
-        }
-
-        // override other abstract methods here
-
-        @Override
-        public int getCount() {
-            return items.size();
-        }
-
-        @Override
-        public Object getItem(int i) {
-            return items.get(i);
-        }
-
-        @Override
-        public long getItemId(int i) {
-            return items.get(i).hashCode();
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup container) {
-            if (convertView == null) {
-                convertView = getLayoutInflater().inflate(R.layout.list_view_dummy_layout, container, false);
-            }
-
-            ((TextView) convertView.findViewById(R.id.list_view_item))
-                    .setText(((Audio)getItem(position)).display_name);
-            return convertView;
-        }
-    }
-
-    private void update_list_view(Collection<Audio> audios){
-        ListView lv = findViewById(R.id.list_view);
-        lv.setAdapter(new MyAdapter(audios));
-        lv.setOnItemClickListener((adapterView, view, i, l) -> {
-            Audio audio = (Audio) adapterView.getItemAtPosition(i);
-            Shiraori.playAudio(audio, service.getDependencies());
-        });
-    }
-
     /**
-     * ask for external storage reading permission
+     * ask for permission
      */
     private void askPermissions(String permission){
         if(ContextCompat.checkSelfPermission(getApplicationContext(), permission) ==
                 PackageManager.PERMISSION_DENIED){
             ActivityCompat.requestPermissions(this,new String[]{permission},PERMISSION_CODE);
+        }
+    }
+
+    private void requestExternalStoragePermission(){
+        // we need to start the service first before asking for storage permission
+        if(Build.VERSION.SDK_INT>=33){
+            askPermissions(Manifest.permission.READ_MEDIA_AUDIO);
+        }else{
+            askPermissions(Manifest.permission.READ_EXTERNAL_STORAGE);
         }
     }
 
@@ -168,8 +221,8 @@ public class HomeActivity extends AppCompatActivity implements AudioServiceBound
                 Toast.makeText(this, "permission denied the application will not be able to read audio files", Toast.LENGTH_LONG).show();
                 finish();
             }else{
-                Shiraori.reloadDatabase(this, service.getDependencies());
-                update_list_view(Shiraori.getDatabaseEntries(service.getDependencies()));
+                if(service!=null)
+                    Shiraori.reloadDatabase(this, service.getDependencies());
             }
         }
     }
