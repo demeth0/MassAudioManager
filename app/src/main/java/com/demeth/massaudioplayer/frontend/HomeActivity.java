@@ -37,6 +37,9 @@ import com.demeth.massaudioplayer.frontend.service.AudioServiceBoundable;
 import com.demeth.massaudioplayer.frontend.service.NotificationBuilder;
 import com.demeth.massaudioplayer.ui.SearchFieldAutoCompleter;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 /**
  * Main activity will contain the welcome page when opening the application. Will start the audio service and display a list of playables audios.
  */
@@ -70,7 +73,7 @@ public class HomeActivity extends AppCompatActivity implements AudioServiceBound
 
     private void loadFragments(){
         Bundle bun = new Bundle();
-        bun.putBinder("service",binder);
+        bun.putBinder("audio_service",binder);
         getSupportFragmentManager().beginTransaction().replace(R.id.controller_fragment_container, HomeAudioControlsFragment.class,bun).setReorderingAllowed(true).commit();
 
         FragmentContainerView controller = findViewById(R.id.controller_fragment_container);
@@ -95,6 +98,7 @@ public class HomeActivity extends AppCompatActivity implements AudioServiceBound
 
                 //pre init
                 service = binder.getService(HomeActivity.this);
+                //TODO bind too fast, service don't have time to init dependencies sometimes.
 
                 Shiraori.setHandler("MainUI", event->{
                             if(event.getCode() == EventCodeMap.EVENT_AUDIO_START){
@@ -145,14 +149,35 @@ public class HomeActivity extends AppCompatActivity implements AudioServiceBound
         //TODO if currently music is playing enable visibility !
 
         Shiraori.setHandler(HOME_HANDLERS+"play_pause_state",event -> {
-            if(event.getCode() == EventCodeMap.EVENT_AUDIO_START){
+            if(event.getCode() == EventCodeMap.EVENT_AUDIO_START || event.getCode() == EventCodeMap.EVENT_AUDIO_RESUME){
                 viewModel.setPlayPauseStateUI(true);
-            }else if(event.getCode() == EventCodeMap.EVENT_AUDIO_COMPLETED){
+            }else if(event.getCode() == EventCodeMap.EVENT_AUDIO_COMPLETED || event.getCode() == EventCodeMap.EVENT_AUDIO_PAUSED){
                 viewModel.setPlayPauseStateUI(false);
             }
         },dep);
 
+        Shiraori.setHandler(HOME_HANDLERS+"update_current_audio_info",event -> {
+            if(event.getCode() == EventCodeMap.EVENT_AUDIO_START){
+                viewModel.setCurrentAudioUI(Shiraori.getCurrentAudio(dep));
+            }
+        },dep);
+
         setupSearchBar(dep);
+        init_timestamp_timer(dep);
+    }
+
+    private Timer timestamp_timer = null;
+    private TimerTask timestamp_timer_task;
+
+    private void init_timestamp_timer(Dependencies dep){
+        timestamp_timer_task = new TimerTask() {
+            @Override
+            public void run() {
+                viewModel.setAudioTimestamp(Shiraori.getTimestamp(dep));
+            }
+        };
+        timestamp_timer = new Timer(false);
+        timestamp_timer.schedule(timestamp_timer_task,0,1000/15);
     }
 
     private void unbindViewModel(Dependencies dep){

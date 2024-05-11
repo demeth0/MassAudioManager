@@ -83,13 +83,18 @@ public interface AudioProvider {
     void set_audio_from_playlist(int audio_index);
 
     /**
-     * When user skip an audio
+     * When user skip an audio.
      */
     void move_to_next();
 
     /**
-     * when an audio is completed and need to load the next
+     * when an audio is completed and need to load the next.
      */
     void advance_to_next();
     void move_to_prev();
+
+    /**
+     * Clear the queue of any pending audio to play.
+     */
+    void clear_queue();
 }

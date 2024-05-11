@@ -1,11 +1,15 @@
 package com.demeth.massaudioplayer.frontend.fragments;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.SeekBar;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -16,21 +20,28 @@ import com.demeth.massaudioplayer.R;
 import com.demeth.massaudioplayer.backend.Dependencies;
 import com.demeth.massaudioplayer.backend.Shiraori;
 import com.demeth.massaudioplayer.backend.models.objects.LoopMode;
+import com.demeth.massaudioplayer.backend.models.objects.Timestamp;
 import com.demeth.massaudioplayer.frontend.HomeViewModel;
 import com.demeth.massaudioplayer.frontend.service.AudioServiceBoundable;
 import com.demeth.massaudioplayer.frontend.service.AudioService;
 
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.Executor;
+
 public class HomeAudioControlsFragment extends Fragment {
 
     private HomeViewModel viewModel;
-    private ImageButton random_button,loop_button,play_pause_button;
+    private ImageButton random_button,loop_button,play_pause_button, next_button, previous_button;
+    private TextView title, timestamp_text;
+
+    private SeekBar timestamp_bar;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_home_audio_controls, container, false);
     }
-
 
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstance){
@@ -39,20 +50,36 @@ public class HomeAudioControlsFragment extends Fragment {
         load_components(view);
 
         Bundle bun = this.getArguments();
-        if(bun==null || !bun.containsKey("service")){
+        if(bun==null || !bun.containsKey("audio_service")){
             return;
         }
-        Dependencies dep = ((AudioService.ServiceBinder) bun.getBinder("service")).getService((AudioServiceBoundable) requireActivity()).getDependencies();
+        Dependencies dep = ((AudioService.ServiceBinder) bun.getBinder("audio_service")).getService((AudioServiceBoundable) requireActivity()).getDependencies();
 
         setup_random(dep);
         setup_loop(dep);
         setup_pause_play(dep);
+        setup_next_button(dep);
+        setup_previous_button(dep);
+        setup_timestamp(dep);
+
+        viewModel.getCurrentAudioUI().observe(requireActivity(), audio -> {
+            if(audio==null) {
+                title.setText("");
+            }else{
+                title.setText(audio.display_name);
+            }
+        });
     }
 
     private void load_components(View view){
         random_button = view.findViewById(R.id.random_button);
         loop_button = view.findViewById(R.id.loop_button);
         play_pause_button = view.findViewById(R.id.play_button);
+        next_button = view.findViewById(R.id.next_button);
+        title = view.findViewById(R.id.audio_title);
+        previous_button = view.findViewById(R.id.previous_button);
+        timestamp_text = view.findViewById(R.id.audio_text_timer);
+        timestamp_bar = view.findViewById(R.id.time_progression_bar);
     }
 
     private void setup_random(Dependencies dep){
@@ -68,7 +95,6 @@ public class HomeAudioControlsFragment extends Fragment {
             Log.d("Whatever", "Random button pressed");
             if(viewModel.getRandomModeUI().getValue()!=null){
                 Log.d("Whatever", "got current value: "+viewModel.getRandomModeUI().getValue());
-
                 Shiraori.setRandomModeEnabled(!viewModel.getRandomModeUI().getValue(),dep);
             }
         });
@@ -111,7 +137,48 @@ public class HomeAudioControlsFragment extends Fragment {
             }else{
                 play_pause_button.setImageResource(android.R.drawable.ic_media_play);
             }
+        });
 
+        play_pause_button.setOnClickListener(v -> {
+            Shiraori.pauseAudio(dep);
+        });
+    }
+
+    private void setup_next_button(Dependencies dep){
+        next_button.setOnClickListener(v -> {
+            viewModel.setCurrentAudioUI(null); // reset current audio on the UI because we have no guaranty that the next audio will be loaded
+            Shiraori.skipToNextAudio(dep);
+        });
+    }
+
+    private void setup_previous_button(Dependencies dep){
+        previous_button.setOnClickListener(v -> {
+            Shiraori.skipToPreviousAudio(dep);
+        });
+    }
+
+    private void setup_timestamp(Dependencies dependencies){
+        viewModel.getAudioTimestamp().observe(requireActivity(),ts -> {
+            if(ts==null) return;
+            int current = (int) (ts.getDuration()*ts.getProgress());
+            timestamp_text.setText(
+                    timestamp_text.getContext()
+                            .getString(
+                                    R.string.timestamp,
+                                    (current/60000),
+                                    (current/1000)%60,ts.getDuration()/60000,
+                                    (ts.getDuration()/1000)%60));
+            timestamp_bar.setProgress((int)(timestamp_bar.getMax()*ts.getProgress()));
+        });
+
+        timestamp_bar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {}
+            @Override public void onStartTrackingTouch(SeekBar seekBar) {}
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                double ratio=(double)seekBar.getProgress()/seekBar.getMax();
+                Shiraori.setTimestamp(ratio, dependencies);
+            }
         });
     }
 }

@@ -7,6 +7,7 @@ import com.demeth.massaudioplayer.backend.models.objects.Audio;
 import com.demeth.massaudioplayer.backend.models.objects.Event;
 import com.demeth.massaudioplayer.backend.models.objects.EventCodeMap;
 import com.demeth.massaudioplayer.backend.models.objects.LoopMode;
+import com.demeth.massaudioplayer.backend.models.objects.Timestamp;
 
 import java.util.Collection;
 
@@ -92,8 +93,62 @@ public class Shiraori {
      */
     public static void playAudio(Audio audio, Dependencies dependencies){
         dependencies.audio_provider.add_to_queue(audio);
-        dependencies.audio_provider.move_to_next();
+        dependencies.audio_manager.play_next();
+    }
 
-        dependencies.audio_manager.play();
+    /**
+     * Skip to the next audio in the waiting list and play it.
+     * @param dependencies The backend dependencies.
+     */
+    public static void skipToNextAudio(Dependencies dependencies){
+        dependencies.audio_manager.play_next();
+    }
+
+    public static void skipToPreviousAudio(Dependencies dependencies){
+        dependencies.audio_manager.play_previous();
+    }
+
+    public static Timestamp getTimestamp(Dependencies dependencies){
+        return dependencies.audio_manager.timestamp();
+    }
+
+    public static void setTimestamp(double timestamp_progress, Dependencies dependencies){
+        dependencies.audio_manager.setTimestampProgress(timestamp_progress);
+    }
+
+    /**
+     * Add a list of audio to the queue of the audio manager and play it.
+     * @param audios A collection of audio to add to the queue and start immediately.
+     * @param dependencies The backend dependencies.
+     */
+    public static void playAudios(Collection<Audio> audios, Dependencies dependencies){
+        dependencies.audio_provider.clear_queue();
+
+        for(Audio a : audios)
+            dependencies.audio_provider.add_to_queue(a);
+        dependencies.audio_manager.play_next();
+    }
+
+    public static Audio getCurrentAudio(Dependencies dependencies){
+        return dependencies.audio_provider.get_audio();
+    }
+
+    /**
+     * This function pause the audio. If the audio is paused or completed, will resume diffusion anyway or start from beginning.
+     * @param dep The backend dependencies.
+     */
+    public static void pauseAudio(Dependencies dep){
+        if(dep.audio_manager.isPaused()){
+            boolean audio_completed = dep.audio_provider.get_audio()==null;
+            // TODO Temporary ? If the audio is null with the current implementation taht mean that the audio is finished and is not paused.
+            dep.audio_manager.play();
+
+            // TODO should we really trigger a resume event here ?
+            dep.event_manager.trigger(new Event(EventCodeMap.EVENT_AUDIO_RESUME));
+        }else{
+            dep.audio_manager.pause();
+            dep.event_manager.trigger(new Event(EventCodeMap.EVENT_AUDIO_PAUSED));
+        }
+
     }
 }

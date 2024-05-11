@@ -211,7 +211,7 @@ public class ApplicationAudioManagerTest {
         audio_provider.set_audio_from_playlist(5);
         manager.play();  // play
 
-        player_factory.dummy_player.progress_set = 0.5d;
+        player_factory.dummy_player.progress_set = 5;
         player_factory.dummy_player.duration_set = 10;
 
 

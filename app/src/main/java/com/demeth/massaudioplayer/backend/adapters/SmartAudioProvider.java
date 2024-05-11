@@ -6,6 +6,8 @@ import com.demeth.massaudioplayer.backend.models.objects.LoopMode;
 import com.demeth.massaudioplayer.backend.models.objects.Playlist;
 import com.demeth.massaudioplayer.backend.models.objects.Queue;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 public class SmartAudioProvider implements AudioProvider {
@@ -73,7 +75,10 @@ public class SmartAudioProvider implements AudioProvider {
 
     @Override
     public List<Audio> view_playlist() {
-        return playlist.view();
+        if(playlist!=null)
+            return playlist.view();
+        else
+            return Collections.emptyList();
     }
 
     @Override
@@ -94,6 +99,7 @@ public class SmartAudioProvider implements AudioProvider {
 
     @Override
     public void set_audio_from_playlist(int audio_index){
+        if(playlist==null) return;
         playlist.set(audio_index);
         current_audio=playlist.get();
     }
@@ -110,7 +116,9 @@ public class SmartAudioProvider implements AudioProvider {
         }else{
             current_audio = queue.next();
             if(current_audio==null){
-                current_audio=playlist.next();
+                if(playlist!=null){
+                    current_audio=playlist.next();
+                }
             }
         }
     }
@@ -125,7 +133,8 @@ public class SmartAudioProvider implements AudioProvider {
         }else if(loop_mode.equals(LoopMode.ALL)){
             current_audio = queue.next();
             if(current_audio==null){
-                current_audio=playlist.next();
+                if(playlist!=null)
+                    current_audio=playlist.next();
             }
         }else{
             current_audio = queue.next();
@@ -138,6 +147,12 @@ public class SmartAudioProvider implements AudioProvider {
     @Override
     public void move_to_prev() {
         if(!loop_mode.equals(LoopMode.SINGLE))
-            current_audio = playlist.prev();
+            if(playlist!=null)
+                current_audio = playlist.prev();
+    }
+
+    @Override
+    public void clear_queue() {
+        queue.clear();
     }
 }

@@ -12,6 +12,7 @@ import com.demeth.massaudioplayer.backend.Shiraori;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * Foreground service that will host the playback and audio management module. Can be used from notification, activities and Broadcast.
@@ -52,6 +53,7 @@ public class AudioService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         Log.d("[abc] AudioService","service onBind call");
+
         return service_binder;
     }
 
@@ -67,9 +69,9 @@ public class AudioService extends Service {
         if(Objects.equals(intent.getAction(), ACTION_START_NOTIFICATION)){
             /*Should call startForeground() 5seconds after starting the service.
             This call create the foreground service notification required by all foreground services*/
+            dependencies = Shiraori.openDependencies(this);
             notification_builder = new NotificationBuilder(this);
             startForeground(NotificationBuilder.NOTIFICATION_ID,notification_builder.getNotification());
-            dependencies = Shiraori.openDependencies(this);
         }
 
         return START_STICKY;

@@ -21,5 +21,12 @@ public class EventCodeMap {
 
     public static final int EVENT_DATABASE_RELOADED = 5;
 
+    /**
+     * Triggered when an audio was paused but resume.
+     */
+    public static final int EVENT_AUDIO_RESUME = 6;
+
+    public static final int EVENT_AUDIO_PAUSED = 7;
+
 
 }

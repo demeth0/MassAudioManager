@@ -1,5 +1,7 @@
 package com.demeth.massaudioplayer.backend.adapters;
 
+import android.util.Log;
+
 import com.demeth.massaudioplayer.backend.models.adapters.AudioManager;
 import com.demeth.massaudioplayer.backend.models.adapters.AudioPlayer;
 import com.demeth.massaudioplayer.backend.models.adapters.AudioPlayerFactory;
@@ -49,6 +51,9 @@ public class ApplicationAudioManager implements AudioManager {
         if(stamp.getDuration()*stamp.getProgress()>4){
             setTimestampProgress(0d);
         }else {
+            AudioPlayer player = get_audio_player();
+            if(player!=null) player.stop();
+            set_play_status(INACTIVE);
             audio_provider.move_to_prev();
         }
         play();
@@ -57,6 +62,9 @@ public class ApplicationAudioManager implements AudioManager {
 
     @Override
     public void play_next(){
+        AudioPlayer player = get_audio_player();
+        if(player!=null) player.stop();
+        set_play_status(INACTIVE);
         audio_provider.move_to_next();
         play();
     }
@@ -80,7 +88,7 @@ public class ApplicationAudioManager implements AudioManager {
         AudioPlayer audio_player = get_audio_player();
         if(audio_player==null)
             return new Timestamp(0,0);
-        return new Timestamp(audio_player.duration(),audio_player.progress());
+        return new Timestamp(audio_player.duration(),audio_player.progress()/audio_player.duration());
     }
 
     @Override
@@ -99,6 +107,8 @@ public class ApplicationAudioManager implements AudioManager {
         if(play_status==PAUSED){
             audio_player.resume();
         }else{
+            if(audio == null)
+                return;
             audio_player.play(audio);
         }
         set_play_status(PLAYING); // Event handler will change this value in case of exceptions

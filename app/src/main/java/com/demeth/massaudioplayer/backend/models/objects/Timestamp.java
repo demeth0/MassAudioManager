@@ -1,5 +1,7 @@
 package com.demeth.massaudioplayer.backend.models.objects;
 
+import android.util.Log;
+
 /**
  * Timestamp is an object structure that represent a progression of an audio track. The total duration is
  * saved in seconds and the current progress of the track is represented as a double precision integer between 0 and 1. <br><br>

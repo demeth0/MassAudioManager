@@ -52,12 +52,12 @@ public class AudioSelectionFragment extends Fragment {
         load_components(view);
 
         Bundle bun = this.getArguments();
-        if (bun == null || !bun.containsKey("service")) {
+        if (bun == null || !bun.containsKey("audio_service")) {
             return;
         }
-        Dependencies dep = ((AudioService.ServiceBinder) bun.getBinder("service")).getService((AudioServiceBoundable) requireActivity()).getDependencies();
+        Dependencies dep = ((AudioService.ServiceBinder) bun.getBinder("audio_service")).getService((AudioServiceBoundable) requireActivity()).getDependencies();
 
-        loadFragments(bun.getBinder("service"));
+        loadFragments(bun.getBinder("audio_service"));
         setCategoryButtons();
 
         viewModel.getAudioSelectionCategory().observe(requireActivity(),s -> {
@@ -67,7 +67,7 @@ public class AudioSelectionFragment extends Fragment {
 
     private void loadFragments(IBinder binder){
         fragment_view_model_bundle = new Bundle();
-        fragment_view_model_bundle.putBinder("service",binder);
+        fragment_view_model_bundle.putBinder("audio_service",binder);
 
         getParentFragmentManager().beginTransaction().replace(R.id.selection_list_fragment_container, AllAudioListFragment.class,fragment_view_model_bundle).setReorderingAllowed(true).commit();
     }

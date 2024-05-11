@@ -8,6 +8,7 @@
         tools:ignore="ScopedStorage" />
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
     <uses-permission android:name="READ_USER_DICTIONARY" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"/>
 
     <application
         android:allowBackup="true"
@@ -48,6 +49,7 @@
 
         <service
             android:name=".frontend.service.AudioService"
+            android:foregroundServiceType="mediaPlayback"
             android:enabled="true"
             android:exported="false" />
 

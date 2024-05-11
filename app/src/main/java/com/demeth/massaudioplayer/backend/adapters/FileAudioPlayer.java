@@ -21,6 +21,8 @@ public class FileAudioPlayer implements AudioPlayer {
     private final Context context;
     private final Database database;
 
+    private boolean timestamp_access_ok = false;
+
     public FileAudioPlayer(EventManager event_manager, Database database, Context context){
         this.event_manager = event_manager;
         this.context = context;
@@ -34,11 +36,12 @@ public class FileAudioPlayer implements AudioPlayer {
         );
 
         mp.setOnCompletionListener((_mp)->{
-            event_manager.trigger(new Event(EventCodeMap.EVENT_AUDIO_COMPLETED));
+            this.event_manager.trigger(new Event(EventCodeMap.EVENT_AUDIO_COMPLETED));
         });
         mp.setOnPreparedListener((_mp)->{
             mp.start();
-            event_manager.trigger(new Event(EventCodeMap.EVENT_AUDIO_START));
+            timestamp_access_ok = true;
+            this.event_manager.trigger(new Event(EventCodeMap.EVENT_AUDIO_START));
         });
     }
 
@@ -48,6 +51,7 @@ public class FileAudioPlayer implements AudioPlayer {
         //begin playing when prepare finish
 
         try {
+            timestamp_access_ok = false;
             mp.reset();
             Metadata.FileAudioMetadata metadata = (Metadata.FileAudioMetadata) database.getMetadata(audio);
             mp.setDataSource(this.context, metadata.getUri()); //TODO find solution maybe Database
@@ -75,17 +79,25 @@ public class FileAudioPlayer implements AudioPlayer {
     @Override
     public double progress() {
         // return 0 if unavailable
-        return mp.getCurrentPosition();
+        if(timestamp_access_ok)
+            return mp.getCurrentPosition();
+        else
+            return 0;
     }
 
     @Override
     public int duration() {
         // return 0 if unavailable
-        return mp.getDuration();
+        if(timestamp_access_ok)
+            return mp.getDuration();
+        else
+            return 0;
     }
 
     @Override
     public void stop() {
+
+            mp.stop();
 
     }
 }

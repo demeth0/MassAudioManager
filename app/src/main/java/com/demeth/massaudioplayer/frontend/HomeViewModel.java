@@ -4,7 +4,9 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.demeth.massaudioplayer.backend.models.objects.Audio;
 import com.demeth.massaudioplayer.backend.models.objects.LoopMode;
+import com.demeth.massaudioplayer.backend.models.objects.Timestamp;
 
 /**
  * This ViewModel is responsible for updating the UI elements of the Home page of the application.<br> <br>
@@ -23,6 +25,10 @@ public class HomeViewModel extends ViewModel {
     private final MutableLiveData<String> category = new MutableLiveData<>("PISTES");
 
     private final MutableLiveData<String> validated_search_query = new MutableLiveData<>("");
+
+    private final MutableLiveData<Audio> current_audio = new MutableLiveData<>(null);
+
+    private final MutableLiveData<Timestamp> audio_timestamp = new MutableLiveData<>(new Timestamp(0,0));
 
     public void setRandomModeUI(boolean random_mode){
         randomMode.postValue(random_mode);
@@ -77,5 +83,21 @@ public class HomeViewModel extends ViewModel {
 
     public LiveData<String> getSearchQuery(){
         return validated_search_query;
+    }
+
+    public void setCurrentAudioUI(Audio audio){
+        current_audio.postValue(audio);
+    }
+
+    public LiveData<Audio> getCurrentAudioUI(){
+        return  current_audio;
+    }
+
+    public void setAudioTimestamp(Timestamp stamp){
+        audio_timestamp.postValue(stamp);
+    }
+
+    public LiveData<Timestamp> getAudioTimestamp(){
+        return audio_timestamp;
     }
 }

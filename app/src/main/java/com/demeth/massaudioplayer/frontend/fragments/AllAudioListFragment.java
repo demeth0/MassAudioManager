@@ -22,6 +22,7 @@ import com.demeth.massaudioplayer.frontend.service.AudioServiceBoundable;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -70,6 +71,7 @@ public class AllAudioListFragment extends Fragment {
 
     private HomeViewModel viewModel;
     private ListView audio_list;
+
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstance) {
         super.onViewCreated(view, savedInstance);
@@ -77,22 +79,29 @@ public class AllAudioListFragment extends Fragment {
         load_components(view);
 
         Bundle bun = this.getArguments();
-        if (bun == null || !bun.containsKey("service")) {
+        if (bun == null || !bun.containsKey("audio_service")) {
             return;
         }
-        Dependencies dep = ((AudioService.ServiceBinder) bun.getBinder("service")).getService((AudioServiceBoundable) requireActivity()).getDependencies();
+        Dependencies dep = ((AudioService.ServiceBinder) bun.getBinder("audio_service")).getService((AudioServiceBoundable) requireActivity()).getDependencies();
         audio_list.setAdapter(new MyAdapter(Shiraori.getDatabaseEntries(dep)));
         audio_list.setOnItemClickListener((adapterView, _view, i, l) -> {
             Audio audio = (Audio) adapterView.getItemAtPosition(i);
-            Shiraori.playAudio(audio, dep);
+            Audio audio2 = (Audio) adapterView.getItemAtPosition(i+1);
+            ArrayList<Audio> _l = new ArrayList<>();
+            _l.add(audio);
+            _l.add(audio2);
+            Shiraori.playAudios(_l, dep);
         });
 
         viewModel.getSearchQuery().observe(requireActivity(),s -> {
             audio_list.setAdapter(new MyAdapter(Shiraori.getDatabaseEntries(dep).stream().filter(a->a.display_name.toLowerCase().contains(s.toLowerCase())).collect(Collectors.toCollection(ArrayList::new))));
         });
+
+
     }
 
     private void load_components(View view){
         audio_list = view.findViewById(R.id.list_view);
+
     }
 }
