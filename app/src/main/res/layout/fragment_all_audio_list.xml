@@ -4,15 +4,32 @@
     android:layout_width="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_height="match_parent"
+    android:background="@color/background_mid_deep"
     tools:context=".frontend.fragments.AllAudioListFragment">
-
-    <ListView
-        android:id="@+id/list_view"
+<!--
+<androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/list"
+        android:name="com.demeth.massaudioplayer.AudioEntryDisplayer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        app:layoutManager="LinearLayoutManager"
+        tools:context=".ui.fragments.AudioEntryDisplayer"
+        android:background="@color/background_deep"
+        tools:listitem="@layout/fragment_audio_entry_displayer" />
+-->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/audio_list"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        app:layoutManager="LinearLayoutManager"
+        tools:listitem="@layout/fragment_audio_entry_displayer"
+        android:background="@color/background_deep"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
+        app:layout_constraintTop_toTopOf="parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

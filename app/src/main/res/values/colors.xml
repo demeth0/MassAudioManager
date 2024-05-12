@@ -10,6 +10,7 @@
     <color name="transparent">#00000000</color>
 
     <color name="background_deep">#FF020204</color>
+    <color name="background_mid_deep">#FF030204</color>
     <color name="background">#FF04131e</color>
     <color name="background_light">#FF0d2534</color>
     <color name="background_very_light">#FF194162</color>

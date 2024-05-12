@@ -274,6 +274,25 @@ public class ApplicationAudioManagerTest {
         time = manager.timestamp();
         assertEquals(0.0d,time.getProgress(),0.02d);
         assertEquals(10L,time.getDuration());
+    }
 
+    @Test
+    public void play_next_from_queue_playlist_empty(){
+        audio_provider.add_to_queue(test_data.get(0));
+        manager.play_next();
+        manager.play_next();
+        assertNull(audio_provider.get_audio());
+        manager.play_next();
+        assertNull(audio_provider.get_audio());
+    }
+
+    @Test
+    public void play_prev_from_queue_playlist_empty(){
+        audio_provider.add_to_queue(test_data.get(0));
+        manager.play_previous();
+        manager.play_previous();
+        assertNull(audio_provider.get_audio());
+        manager.play_previous();
+        assertNull(audio_provider.get_audio());
     }
 }
