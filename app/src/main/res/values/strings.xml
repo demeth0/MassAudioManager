@@ -7,4 +7,5 @@
     <string name="timestamp_default">00:00/00:00</string>
     <string name="channel_name">Audio app notifications</string>
     <string name="channel_description">channel for this app notifications, like the media controller notification</string>
+    <string name="search_bar_hint_text">search</string>
 </resources>

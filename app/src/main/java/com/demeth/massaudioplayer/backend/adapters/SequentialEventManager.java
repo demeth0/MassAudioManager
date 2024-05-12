@@ -3,9 +3,7 @@ package com.demeth.massaudioplayer.backend.adapters;
 import com.demeth.massaudioplayer.backend.models.adapters.EventManager;
 import com.demeth.massaudioplayer.backend.models.objects.Event;
 
-import java.util.LinkedHashMap;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class SequentialEventManager implements EventManager {
     private final ConcurrentHashMap<String,EventHandler> handlers;

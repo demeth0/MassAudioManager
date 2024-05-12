@@ -28,33 +28,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <!--activity
-            android:name=".ui.MainActivity"
-
-
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity-->
-
-        <activity android:name=".ui.ControllerActivity"></activity>
-
-        <service
-            android:name=".service.AudioService"
-            android:enabled="true"
-            android:exported="false" />
 
         <service
             android:name=".frontend.service.AudioService"
             android:foregroundServiceType="mediaPlayback"
-            android:enabled="true"
-            android:exported="false" />
-
-        <receiver
-            android:name=".service.notification.ServiceBroadcast"
             android:enabled="true"
             android:exported="false" />
     </application>

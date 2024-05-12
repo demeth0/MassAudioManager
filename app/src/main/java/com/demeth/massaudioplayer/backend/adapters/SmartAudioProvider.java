@@ -6,7 +6,6 @@ import com.demeth.massaudioplayer.backend.models.objects.LoopMode;
 import com.demeth.massaudioplayer.backend.models.objects.Playlist;
 import com.demeth.massaudioplayer.backend.models.objects.Queue;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 

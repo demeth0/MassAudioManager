@@ -5,10 +5,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -17,7 +15,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.demeth.massaudioplayer.R;
-import com.demeth.massaudioplayer.backend.AlbumLoader;
 import com.demeth.massaudioplayer.backend.Dependencies;
 import com.demeth.massaudioplayer.backend.Shiraori;
 import com.demeth.massaudioplayer.backend.models.objects.Audio;
@@ -28,9 +25,6 @@ import com.demeth.massaudioplayer.frontend.service.AudioServiceBoundable;
 import com.demeth.massaudioplayer.ui.AudioEntryRecyclerViewAdapter;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -131,7 +125,7 @@ public class AllAudioListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_all_audio_list, container, false);
+        return inflater.inflate(R.layout.fragment_home_all_audio_list, container, false);
     }
 
     private HomeViewModel viewModel;

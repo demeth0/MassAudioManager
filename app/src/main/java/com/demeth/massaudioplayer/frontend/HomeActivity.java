@@ -13,7 +13,6 @@ import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AutoCompleteTextView;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -35,7 +34,6 @@ import com.demeth.massaudioplayer.frontend.fragments.HomeAudioControlsFragment;
 import com.demeth.massaudioplayer.frontend.service.AudioService;
 import com.demeth.massaudioplayer.frontend.service.AudioServiceBoundable;
 import com.demeth.massaudioplayer.frontend.service.NotificationBuilder;
-import com.demeth.massaudioplayer.ui.SearchFieldAutoCompleter;
 
 import java.util.Timer;
 import java.util.TimerTask;

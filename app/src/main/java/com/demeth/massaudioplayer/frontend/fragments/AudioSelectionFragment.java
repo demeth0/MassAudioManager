@@ -2,35 +2,23 @@ package com.demeth.massaudioplayer.frontend.fragments;
 
 import android.os.Bundle;
 import android.os.IBinder;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentContainerView;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.demeth.massaudioplayer.R;
 import com.demeth.massaudioplayer.backend.Dependencies;
-import com.demeth.massaudioplayer.backend.Shiraori;
-import com.demeth.massaudioplayer.backend.models.objects.Audio;
-import com.demeth.massaudioplayer.backend.models.objects.EventCodeMap;
 import com.demeth.massaudioplayer.frontend.HomeViewModel;
 import com.demeth.massaudioplayer.frontend.service.AudioService;
 import com.demeth.massaudioplayer.frontend.service.AudioServiceBoundable;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 public class AudioSelectionFragment extends Fragment {
 
@@ -42,7 +30,7 @@ public class AudioSelectionFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_audio_selection, container, false);
+        return inflater.inflate(R.layout.fragment_home_audio_selection, container, false);
     }
 
     @Override
