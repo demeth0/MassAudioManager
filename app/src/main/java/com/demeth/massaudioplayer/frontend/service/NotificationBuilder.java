@@ -16,7 +16,6 @@ import androidx.core.app.NotificationCompat;
 import com.demeth.massaudioplayer.R;
 import com.demeth.massaudioplayer.backend.models.objects.Audio;
 import com.demeth.massaudioplayer.frontend.HomeActivity;
-import com.demeth.massaudioplayer.service.notification.ServiceBroadcast;
 
 public class NotificationBuilder {    public static final String CHANNEL_ID = "massaudioplayer notification channel id";
     public static final int NOTIFICATION_ID=88;
@@ -97,10 +96,12 @@ public class NotificationBuilder {    public static final String CHANNEL_ID = "m
      * @return Inflated pending intent.
      */
     private PendingIntent createPendingIntent(int requestCode,String extra){
-        Intent intent = new Intent(service, ServiceBroadcast.class);
+        //TODO add broadcast receiver
+        /*Intent intent = new Intent(service, ServiceBroadcast.class);
         //action set in broadcast receiver
         intent.setAction(extra);
-        return PendingIntent.getBroadcast(service,requestCode,intent,flags);
+        return PendingIntent.getBroadcast(service,requestCode,intent,flags);*/
+        return null;
     }
 
     /**

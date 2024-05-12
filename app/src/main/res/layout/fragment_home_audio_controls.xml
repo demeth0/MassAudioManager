@@ -103,7 +103,7 @@
         app:layout_constraintTop_toBottomOf="@+id/audio_title">
 
         <!--set or unset the loop, two mode single audio loop or queue loop-->
-        <com.demeth.massaudioplayer.ui.SquareImageButton
+        <com.demeth.massaudioplayer.frontend.components.SquareImageButton
             android:id="@+id/loop_button"
 
             android:layout_width="wrap_content"
@@ -112,7 +112,7 @@
             android:src="@drawable/loop_none"/>
 
         <!--start the previous music or restart  the music from the begining-->
-        <com.demeth.massaudioplayer.ui.SquareImageButton
+        <com.demeth.massaudioplayer.frontend.components.SquareImageButton
             android:id="@+id/previous_button"
 
             android:layout_width="wrap_content"
@@ -121,7 +121,7 @@
             android:src="@android:drawable/ic_media_previous"/>
 
         <!--play / pause the audio-->
-        <com.demeth.massaudioplayer.ui.SquareImageButton
+        <com.demeth.massaudioplayer.frontend.components.SquareImageButton
             android:id="@+id/play_button"
 
             android:layout_width="wrap_content"
@@ -130,7 +130,7 @@
             android:src="@android:drawable/ic_media_play"/>
 
         <!--go to the next music in the queue-->
-        <com.demeth.massaudioplayer.ui.SquareImageButton
+        <com.demeth.massaudioplayer.frontend.components.SquareImageButton
             android:id="@+id/next_button"
 
             android:layout_width="wrap_content"
@@ -139,7 +139,7 @@
             android:src="@android:drawable/ic_media_next"/>
 
         <!--set or unset random mode for a given queue-->
-        <com.demeth.massaudioplayer.ui.SquareImageButton
+        <com.demeth.massaudioplayer.frontend.components.SquareImageButton
             android:id="@+id/random_button"
             android:layout_width="wrap_content"
             android:layout_height="48dp"

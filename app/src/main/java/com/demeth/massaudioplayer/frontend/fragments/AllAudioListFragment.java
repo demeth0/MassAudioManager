@@ -18,11 +18,10 @@ import com.demeth.massaudioplayer.R;
 import com.demeth.massaudioplayer.backend.Dependencies;
 import com.demeth.massaudioplayer.backend.Shiraori;
 import com.demeth.massaudioplayer.backend.models.objects.Audio;
-import com.demeth.massaudioplayer.databinding.FragmentAudioEntryDisplayerBinding;
+import com.demeth.massaudioplayer.databinding.FragmentHomeAudioEntryDisplayerBinding;
 import com.demeth.massaudioplayer.frontend.HomeViewModel;
 import com.demeth.massaudioplayer.frontend.service.AudioService;
 import com.demeth.massaudioplayer.frontend.service.AudioServiceBoundable;
-import com.demeth.massaudioplayer.ui.AudioEntryRecyclerViewAdapter;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -38,7 +37,7 @@ public class AllAudioListFragment extends Fragment {
         @NonNull
         @Override
         public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            return new ViewHolder(FragmentAudioEntryDisplayerBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false), dep);
+            return new ViewHolder(FragmentHomeAudioEntryDisplayerBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false), dep);
         }
 
         @Override
@@ -60,7 +59,7 @@ public class AllAudioListFragment extends Fragment {
 
         private boolean highlighted = false;
 
-        public ViewHolder(FragmentAudioEntryDisplayerBinding binding, Dependencies dep) {
+        public ViewHolder(FragmentHomeAudioEntryDisplayerBinding binding, Dependencies dep) {
             super(binding.getRoot());
             title = binding.title;
             checkBox = binding.checkBox;
