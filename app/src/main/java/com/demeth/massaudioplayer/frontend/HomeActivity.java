@@ -42,10 +42,7 @@ import java.util.TimerTask;
  * Main activity will contain the welcome page when opening the application. Will start the audio service and display a list of playables audios.
  */
 public class HomeActivity extends AppCompatActivity implements AudioServiceBoundable {
-
-
     private static final String HOME_HANDLERS = "HOME_";
-
     private HomeViewModel viewModel;
     private final static int PERMISSION_CODE=750;
     private AudioService.ServiceBinder binder;

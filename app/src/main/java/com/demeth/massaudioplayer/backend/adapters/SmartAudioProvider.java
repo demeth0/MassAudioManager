@@ -110,16 +110,16 @@ public class SmartAudioProvider implements AudioProvider {
      */
     @Override
     public void move_to_next() {
-        if(loop_mode.equals(LoopMode.SINGLE)){
-            current_audio=current_audio;
-        }else{
+        //if(loop_mode.equals(LoopMode.SINGLE)){
+        //    current_audio=current_audio;
+        //}else{
             current_audio = queue.next();
             if(current_audio==null){
                 if(playlist!=null){
                     current_audio=playlist.next();
                 }
             }
-        }
+        //}
     }
 
     /**

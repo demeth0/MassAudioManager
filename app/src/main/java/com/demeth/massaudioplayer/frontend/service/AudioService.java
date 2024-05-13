@@ -33,22 +33,29 @@ public class AudioService extends Service {
     private ServiceBinder service_binder=new ServiceBinder();
     private NotificationBuilder notification_builder;
 
-    private Dependencies dependencies;
+    private Dependencies dependencies=null;
 
     public final static String ACTION_START_NOTIFICATION = "service start notification";
 
     /**
-     * Create the service, this should be called by an activity binding and creating the service so we then start it in forgground mode.
+     * Create the service, this should be called by an activity binding and creating the service so we then start it in foreground mode.
      */
     @Override
     public void onCreate() {
         super.onCreate();
         Log.d("[abc] AudioService","service onCreate call");
+
+        startShiraori();
+
         Intent serviceIntent = new Intent(this,getClass());
         serviceIntent.setAction(ACTION_START_NOTIFICATION);
         startForegroundService(serviceIntent);
     }
 
+    private void startShiraori(){
+        if(dependencies==null)
+            dependencies = Shiraori.openDependencies(this);
+    }
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -69,7 +76,9 @@ public class AudioService extends Service {
         if(Objects.equals(intent.getAction(), ACTION_START_NOTIFICATION)){
             /*Should call startForeground() 5seconds after starting the service.
             This call create the foreground service notification required by all foreground services*/
-            dependencies = Shiraori.openDependencies(this);
+
+            startShiraori();
+
             notification_builder = new NotificationBuilder(this);
             startForeground(NotificationBuilder.NOTIFICATION_ID,notification_builder.getNotification());
         }

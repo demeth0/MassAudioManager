@@ -127,7 +127,7 @@ public class SmartAudioProviderTest {
         audio_provider.set_audio_from_playlist(50);
         audio_provider.set_loop(LoopMode.SINGLE);
         audio_provider.move_to_next();
-        Assert.assertEquals(test_data.get(50), audio_provider.get_audio());
+        Assert.assertEquals(test_data.get(51), audio_provider.get_audio());
     }
     @Test
     public void test_loop_single_skip_end(){
@@ -135,7 +135,7 @@ public class SmartAudioProviderTest {
         audio_provider.set_audio_from_playlist(99);
         audio_provider.set_loop(LoopMode.SINGLE);
         audio_provider.move_to_next();
-        Assert.assertEquals(test_data.get(99), audio_provider.get_audio());
+        Assert.assertEquals(test_data.get(0), audio_provider.get_audio());
     }
     @Test
     public void test_loop_single_advance(){

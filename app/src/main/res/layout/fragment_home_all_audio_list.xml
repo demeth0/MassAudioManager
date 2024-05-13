@@ -19,6 +19,59 @@
         android:background="@color/background_deep"
         tools:listitem="@layout/fragment_audio_entry_displayer" />
 -->
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/selection_controls"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="4dp"
+        android:layout_marginVertical="4dp"
+        android:background="@drawable/selection_layout_background"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <CheckBox
+            android:id="@+id/global_selection_checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="48dp"
+            android:minHeight="48dp" />
+
+        <TextView
+            android:id="@+id/selection_counter"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:textColor="@color/foreground"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/selection_play_next"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="8dp"
+            android:background="@color/transparent"
+            android:minWidth="0dp"
+            android:paddingHorizontal="8dp"
+            android:text="@string/selection_play_after"
+            android:textColor="@color/foreground"
+            android:textSize="12sp" />
+
+        <Button
+            android:id="@+id/add_selection_to_playlist"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:enabled="false"
+            android:background="@color/transparent"
+            android:minWidth="0dp"
+            android:paddingHorizontal="8dp"
+            android:text="@string/selection_add_to_playlist"
+            android:textColor="@color/foreground"
+            android:textSize="12sp" />
+    </androidx.appcompat.widget.LinearLayoutCompat>
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/audio_list"
         android:layout_width="0dp"
@@ -31,5 +84,5 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toBottomOf="@+id/selection_controls"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -2,6 +2,8 @@ package com.demeth.massaudioplayer.backend.models.objects;
 
 import androidx.annotation.NonNull;
 
+import java.util.Objects;
+
 /**
  * Object that stock information related to an audio track.
  */
@@ -43,6 +45,19 @@ public class Audio implements Comparable<Audio>{
     @Override
     public int compareTo(Audio audio) {
         return this.display_name.compareTo(audio.display_name);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Audio audio = (Audio) o;
+        return type == audio.type && Objects.equals(path, audio.path) && Objects.equals(display_name, audio.display_name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(type, path, display_name);
     }
 
     @NonNull

@@ -8,6 +8,10 @@ import com.demeth.massaudioplayer.backend.models.objects.Audio;
 import com.demeth.massaudioplayer.backend.models.objects.LoopMode;
 import com.demeth.massaudioplayer.backend.models.objects.Timestamp;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * This ViewModel is responsible for updating the UI elements of the Home page of the application.<br> <br>
  * The methods preceded by <strong>get</strong> (ex: getMethodeName) are meant to be used by the UI elements of the HomeActivity.<br><br>
@@ -16,10 +20,12 @@ import com.demeth.massaudioplayer.backend.models.objects.Timestamp;
  */
 public class HomeViewModel extends ViewModel {
     private final MutableLiveData<Boolean> randomMode = new MutableLiveData<>();
+
     private final MutableLiveData<LoopMode> loopMode = new MutableLiveData<>();
 
     //This value represent the state of the diffusion only, true if an audio is being diffused and false otherwise. There is no other objectives.
     private final MutableLiveData<Boolean> pauseState = new MutableLiveData<>(false);
+
     private final MutableLiveData<Boolean> controllerVisibility = new MutableLiveData<>(false);
 
     private final MutableLiveData<String> category = new MutableLiveData<>("PISTES");
@@ -53,6 +59,7 @@ public class HomeViewModel extends ViewModel {
     public void setPlayPauseStateUI(boolean pause_state){
         pauseState.postValue(pause_state);
     }
+
     /**
      * This value represent the state of the diffusion only, true if an audio is being diffused and false otherwise. There is no other objectives.
      *A value of true mean that an audio is playing. A value of false mean the audio is not playing.
