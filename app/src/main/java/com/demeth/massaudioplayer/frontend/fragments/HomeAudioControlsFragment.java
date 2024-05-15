@@ -1,8 +1,6 @@
 package com.demeth.massaudioplayer.frontend.fragments;
 
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,14 +18,9 @@ import com.demeth.massaudioplayer.R;
 import com.demeth.massaudioplayer.backend.Dependencies;
 import com.demeth.massaudioplayer.backend.Shiraori;
 import com.demeth.massaudioplayer.backend.models.objects.LoopMode;
-import com.demeth.massaudioplayer.backend.models.objects.Timestamp;
 import com.demeth.massaudioplayer.frontend.HomeViewModel;
-import com.demeth.massaudioplayer.frontend.service.AudioServiceBoundable;
 import com.demeth.massaudioplayer.frontend.service.AudioService;
-
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.Executor;
+import com.demeth.massaudioplayer.frontend.service.AudioServiceBoundable;
 
 public class HomeAudioControlsFragment extends Fragment {
 

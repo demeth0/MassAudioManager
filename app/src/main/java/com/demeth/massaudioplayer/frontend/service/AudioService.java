@@ -12,7 +12,6 @@ import com.demeth.massaudioplayer.backend.Shiraori;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.CountDownLatch;
 
 /**
  * Foreground service that will host the playback and audio management module. Can be used from notification, activities and Broadcast.

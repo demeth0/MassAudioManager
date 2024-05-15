@@ -8,10 +8,6 @@ import com.demeth.massaudioplayer.backend.models.objects.Audio;
 import com.demeth.massaudioplayer.backend.models.objects.LoopMode;
 import com.demeth.massaudioplayer.backend.models.objects.Timestamp;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * This ViewModel is responsible for updating the UI elements of the Home page of the application.<br> <br>
  * The methods preceded by <strong>get</strong> (ex: getMethodeName) are meant to be used by the UI elements of the HomeActivity.<br><br>

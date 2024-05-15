@@ -7,9 +7,13 @@ import com.demeth.massaudioplayer.backend.models.objects.Audio;
 import com.demeth.massaudioplayer.backend.models.objects.Event;
 import com.demeth.massaudioplayer.backend.models.objects.EventCodeMap;
 import com.demeth.massaudioplayer.backend.models.objects.LoopMode;
+import com.demeth.massaudioplayer.backend.models.objects.Playlist;
 import com.demeth.massaudioplayer.backend.models.objects.Timestamp;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Backend core use cases for audio management.
@@ -92,7 +96,14 @@ public class Shiraori {
      * @param dependencies The backend dependencies.
      */
     public static void playAudio(Audio audio, Dependencies dependencies){
+        //TODO temp, create add_to_head function
+        dependencies.audio_provider.clear_queue();
         dependencies.audio_provider.add_to_queue(audio);
+        dependencies.audio_manager.play_next();
+    }
+
+    public static void playInPlaylist(Collection<Audio> audios, Dependencies dependencies){
+        dependencies.audio_provider.set_playlist(new Playlist(new ArrayList<>(audios)));
         dependencies.audio_manager.play_next();
     }
 
@@ -149,6 +160,13 @@ public class Shiraori {
             dep.audio_manager.pause();
             dep.event_manager.trigger(new Event(EventCodeMap.EVENT_AUDIO_PAUSED));
         }
+    }
 
+    public static List<Audio> viewQueue(Dependencies dependencies){
+        return dependencies.audio_provider.view_queue();
+    }
+
+    public static List<Audio> viewPlaylist(Dependencies dependencies){
+        return dependencies.audio_provider.view_playlist();
     }
 }

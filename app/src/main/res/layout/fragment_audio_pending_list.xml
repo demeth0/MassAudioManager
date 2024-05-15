@@ -5,8 +5,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_height="match_parent"
     android:background="@color/background_mid_deep"
-    tools:context=".frontend.fragments.AllAudioListFragment">
+    tools:context=".frontend.fragments.AudioPendingListFragment">
 
+    <!-- TODO: Update blank fragment layout -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="@string/hello_blank_fragment" />
     <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/selection_controls"
         android:layout_width="match_parent"
@@ -36,26 +41,14 @@
             android:textSize="16sp" />
 
         <Button
-            android:id="@+id/selection_play_next"
+            android:id="@+id/selection_remove"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_marginEnd="8dp"
             android:background="@color/transparent"
             android:minWidth="0dp"
             android:paddingHorizontal="8dp"
-            android:text="@string/selection_play_after"
-            android:textColor="@color/foreground"
-            android:textSize="12sp" />
-
-        <Button
-            android:id="@+id/add_selection_to_playlist"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:enabled="false"
-            android:background="@color/transparent"
-            android:minWidth="0dp"
-            android:paddingHorizontal="8dp"
-            android:text="@string/selection_add_to_playlist"
+            android:text="@string/selection_remove"
             android:textColor="@color/foreground"
             android:textSize="12sp" />
     </androidx.appcompat.widget.LinearLayoutCompat>
@@ -72,14 +65,4 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/selection_controls"/>
-
-    <com.demeth.massaudioplayer.frontend.components.SquareImageButton
-        android:id="@+id/play_all_random_button"
-        android:src="@android:drawable/ic_media_play"
-        android:background="@color/purple_200"
-        android:layout_width="48dp"
-        android:layout_margin="10dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

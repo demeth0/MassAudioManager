@@ -10,4 +10,5 @@
     <string name="search_bar_hint_text">search</string>
     <string name="selection_play_after">Play after</string>
     <string name="selection_add_to_playlist">Add to playlist</string>
+    <string name="selection_remove">REMOVE</string>
 </resources>

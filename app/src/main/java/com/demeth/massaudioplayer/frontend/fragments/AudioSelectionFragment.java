@@ -6,14 +6,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.content.res.AppCompatResources;
-import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -73,6 +70,7 @@ public class AudioSelectionFragment extends Fragment {
         RadioButton pistes, playlist, queue;
         pistes = addCategory("PISTES");
         playlist = addCategory("PLAYLIST");
+        playlist.setEnabled(false);
         queue = addCategory("QUEUE");
         String c = viewModel.getAudioSelectionCategory().getValue();
         if(c!=null)
@@ -101,6 +99,28 @@ public class AudioSelectionFragment extends Fragment {
         but.setText(str);
         but.setTextColor(requireContext().getColor(R.color.white));
         categories_list.addView(but);
+        categories_list.setOnCheckedChangeListener((radioGroup, i) -> {
+            RadioButton rb = radioGroup.findViewById(i);
+            //listViewModel.setActiveList(Category.valueOf());
+            Class<? extends Fragment> cat_to_load = null;
+            switch(rb.getText().toString()){
+                case "QUEUE":
+                    cat_to_load = AudioPendingListFragment.class;
+                    break;
+                case "PLAYLIST":
+                default:
+                    cat_to_load = AllAudioListFragment.class;
+                    break;
+            }
+
+            requireActivity()
+                    .getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.selection_list_fragment_container,cat_to_load,fragment_view_model_bundle)
+                    .setReorderingAllowed(true)
+                    //.addToBackStack("listing_fragments")
+                    .commit();
+        });
         return but;
     }
 
