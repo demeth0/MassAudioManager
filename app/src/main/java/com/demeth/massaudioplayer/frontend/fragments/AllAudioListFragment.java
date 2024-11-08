@@ -39,7 +39,7 @@ import java.util.stream.Collectors;
 
 public class AllAudioListFragment extends Fragment {
     @FunctionalInterface
-    private interface SelectionListEdit{
+    interface SelectionListEdit{
         void edit(Set<Audio> list);
     }
     public static class AudioSelectionViewModel extends ViewModel {

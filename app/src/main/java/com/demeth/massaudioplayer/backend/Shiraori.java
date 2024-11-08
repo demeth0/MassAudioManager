@@ -13,7 +13,6 @@ import com.demeth.massaudioplayer.backend.models.objects.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Backend core use cases for audio management.
@@ -56,7 +55,7 @@ public class Shiraori {
     /**
      * Get an array list of all the loaded audio in the database available for diffusion.
      * @param dependencies The backend dependencies.
-     * @returnA collection of all the playable audios.
+     * @return A collection of all the playable audios.
      */
     public static Collection<Audio> getDatabaseEntries(Dependencies dependencies){
         return dependencies.database.getEntries();
