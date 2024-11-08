@@ -211,6 +211,7 @@ public class AllAudioListFragment extends Fragment {
 
         viewModel.getSearchQuery().observe(requireActivity(),s -> {
             audio_list_data = Shiraori.getDatabaseEntries(dep).stream().filter(a->a.display_name.toLowerCase().contains(s.toLowerCase())).sorted().collect(Collectors.toCollection(ArrayList::new));
+            audio_list_adapter.notifyDataSetChanged();
         });
 
         viewModel.getCurrentAudioUI().observe(requireActivity(),audio -> {

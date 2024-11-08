@@ -170,6 +170,23 @@ public class SmartAudioProviderTest {
         Assert.assertEquals(test_data.get(0), audio_provider.get_audio());
     }
 
+    @Test
+    public void test_loop_single_one_audio_advance(){
+        // TODO
+        Assert.fail();
+    }
+
+    @Test
+    public void test_loop_single_one_audio_move_to_next(){
+        // TODO
+        Assert.fail();
+    }
+
+    @Test
+    public void test_loop_single_one_audio_move_to_prev(){
+        // TODO
+        Assert.fail();
+    }
 
     @Test
     public void test_loop_all_skip(){
@@ -218,6 +235,24 @@ public class SmartAudioProviderTest {
         audio_provider.set_loop(LoopMode.ALL);
         audio_provider.move_to_prev();
         Assert.assertEquals(test_data.get(99), audio_provider.get_audio());
+    }
+
+    @Test
+    public void test_loop_all_one_audio_advance(){
+        // TODO
+        Assert.fail();
+    }
+
+    @Test
+    public void test_loop_all_one_audio_move_to_next(){
+        // TODO
+        Assert.fail();
+    }
+
+    @Test
+    public void test_loop_all_one_audio_move_to_prev(){
+        // TODO
+        Assert.fail();
     }
 
     @Test

@@ -237,7 +237,7 @@ public class HomeActivity extends AppCompatActivity implements AudioServiceBound
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == PERMISSION_CODE) {
-            if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
+            if (grantResults.length>0 && grantResults[0] == PackageManager.PERMISSION_DENIED) {
                 Toast.makeText(this, "permission denied the application will not be able to read audio files", Toast.LENGTH_LONG).show();
                 finish();
             }else{

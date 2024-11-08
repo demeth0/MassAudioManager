@@ -133,11 +133,13 @@ public class Shiraori {
      * @param dependencies The backend dependencies.
      */
     public static void playAudios(Collection<Audio> audios, Dependencies dependencies){
-        dependencies.audio_provider.clear_queue();
+        //dependencies.audio_provider.clear_queue();
 
         for(Audio a : audios)
             dependencies.audio_provider.add_to_queue(a);
-        dependencies.audio_manager.play_next();
+
+        if(dependencies.audio_manager.isPaused())
+            dependencies.audio_manager.play_next();
     }
 
     public static Audio getCurrentAudio(Dependencies dependencies){
