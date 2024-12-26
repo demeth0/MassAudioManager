@@ -32,7 +32,7 @@ public class LoadedAudioPlayerFactoryTest {
         }
 
         @Override
-        public void set_progress(double progress) {
+        public void setProgress(double progress) {
 
         }
 

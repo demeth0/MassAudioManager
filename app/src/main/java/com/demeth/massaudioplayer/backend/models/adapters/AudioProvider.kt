@@ -1,100 +1,97 @@
-package com.demeth.massaudioplayer.backend.models.adapters;
+package com.demeth.massaudioplayer.backend.models.adapters
 
-import com.demeth.massaudioplayer.backend.models.objects.Audio;
-import com.demeth.massaudioplayer.backend.models.objects.LoopMode;
-import com.demeth.massaudioplayer.backend.models.objects.Playlist;
+import com.demeth.massaudioplayer.backend.models.objects.Audio
+import com.demeth.massaudioplayer.backend.models.objects.LoopMode
+import com.demeth.massaudioplayer.backend.models.objects.Playlist
 
-import java.util.List;
 
 /**
  * determine the audio to play and manage the list of audios
  */
-public interface AudioProvider {
-    /*Queue get_queue(); //TODO may be removed for better coding practices
-    Playlist get_playlist();*/
+interface AudioProvider {
 
     /**
      * Clear any actual playlist and replace it with the new given playlist.
      * @param p The new playlist to use for the audio diffusion.
      */
-    void set_playlist(Playlist p);
+    fun setPlaylist(p: Playlist?)
 
     /**
      * The random mode shuffle the playlist play order but do not affect the queue.
      * @param mode The new value of the random mode.
      */
-    void set_random(boolean mode);
+    fun setRandom(mode: Boolean)
 
     /**
      * The random mode shuffle the playlist play order but do not affect the queue.
      * @return The current value of the random mode.
      */
-    boolean get_random();
+    fun getRandom(): Boolean
 
     /**
      * Set the new loop option for audio reading.
      * @param mode Loop mode to set.
      */
-    void set_loop(LoopMode mode);
+    fun setLoop(mode: LoopMode)
 
     /**
      *
      * @return The current state of the loop option.
      */
-    LoopMode get_loop();
+    fun getLoop(): LoopMode
 
     /**
      * Add an audio in the queue.
      * @param audio Audio to add to the queue.
      */
-    void add_to_queue(Audio audio);
+    fun addToQueue(audio: Audio)
 
     /**
      * Add a list of audio to the playlist.
      * @param audios The list of audio to add.
      */
-    void add_to_playlist(List<Audio> audios);
+    fun addToPlaylist(audios: List<Audio>)
 
     /**
      * @return The queue audio content.
      */
-    List<Audio> view_queue();
+    fun viewQueue(): List<Audio>
 
     /**
      * @return The playlist audio content.
      */
-    List<Audio> view_playlist();
+    fun viewPlaylist(): List<Audio>
 
     /**
      * @return The currently selected audio.
      */
-    Audio get_audio();
+    fun getAudio(): Audio?
 
     /**
      * Use the index to select the next audio to play from the queue.
-     * @param audio_index The index in the queue audio list.
+     * @param audioIndex The index in the queue audio list.
      */
-    void set_audio_from_queue(int audio_index);
+    fun setAudioFromQueue(audioIndex: Int)
 
     /**
      * Use the index to select the next audio to play from the playlist.
-     * @param audio_index The index in the playlist audio list.
+     * @param audioIndex The index in the playlist audio list.
      */
-    void set_audio_from_playlist(int audio_index);
+    fun setAudioFromPlaylist(audioIndex: Int)
 
     /**
      * When user skip an audio.
      */
-    void move_to_next();
+    fun moveToNext()
 
     /**
      * when an audio is completed and need to load the next.
      */
-    void advance_to_next();
-    void move_to_prev();
+    fun advanceToNext()
+    fun moveToPrev()
 
     /**
      * Clear the queue of any pending audio to play.
      */
-    void clear_queue();
+    fun clearQueue()
 }

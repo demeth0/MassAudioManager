@@ -10,6 +10,8 @@ lifecycleLivedataKtxVersion = "2.8.7"
 lifecycleViewmodelKtxVersion = "2.8.7"
 materialVersion = "1.12.0"
 recyclerviewVersion = "1.3.2"
+kotlinVersion = "2.1.0"
+coreKtxVersion = "1.15.0"
 
 [libraries]
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompatVersion" }
@@ -23,6 +25,7 @@ androidx-recyclerview = { module = "androidx.recyclerview:recyclerview", version
 androidx-espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "espressoCoreVersion" }
 junit = { module = "junit:junit", version.ref = "junitVersion" }
 material = { module = "com.google.android.material:material", version.ref = "materialVersion" }
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtxVersion" }
 
 [bundles]
 androidx = [
@@ -38,3 +41,4 @@ androidx = [
 [plugins]
 android-application = {id="com.android.application", version.ref="androidGgradlePluginVersion"}
 android-library = {id="com.android.library", version.ref="androidGgradlePluginVersion"}
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlinVersion" }

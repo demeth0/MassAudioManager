@@ -1,134 +1,115 @@
-package com.demeth.massaudioplayer.backend.adapters;
+package com.demeth.massaudioplayer.backend.adapters
 
-import com.demeth.massaudioplayer.backend.models.adapters.AudioManager;
-import com.demeth.massaudioplayer.backend.models.adapters.AudioPlayer;
-import com.demeth.massaudioplayer.backend.models.adapters.AudioPlayerFactory;
-import com.demeth.massaudioplayer.backend.models.adapters.AudioProvider;
-import com.demeth.massaudioplayer.backend.models.adapters.EventManager;
-import com.demeth.massaudioplayer.backend.models.objects.Audio;
-import com.demeth.massaudioplayer.backend.models.objects.EventCodeMap;
-import com.demeth.massaudioplayer.backend.models.objects.Timestamp;
+import com.demeth.massaudioplayer.backend.models.adapters.AudioManager
+import com.demeth.massaudioplayer.backend.models.adapters.AudioPlayer
+import com.demeth.massaudioplayer.backend.models.adapters.AudioPlayerFactory
+import com.demeth.massaudioplayer.backend.models.adapters.AudioProvider
+import com.demeth.massaudioplayer.backend.models.adapters.EventManager
+import com.demeth.massaudioplayer.backend.models.adapters.PlayerNotImplementedException
+import com.demeth.massaudioplayer.backend.models.objects.EventCodeMap
+import com.demeth.massaudioplayer.backend.models.objects.Timestamp
 
 /**
- * Implement the version of the audio manager for Android application.
+ * Implement the version of the audio manager for Android applications.
+ * Create a audio manager specific for this project implementation.
+ * @param audioPlayersFactory The provider that will give correct adapters to read the audio entries.
+ * @param eventManager The event manager to react to audio player's events.
  */
-public class ApplicationAudioManager implements AudioManager {
-    private final static int PAUSED=1,PLAYING=0,INACTIVE=3;
-
-    // dependencies
-    private final AudioPlayerFactory audio_players_factory;
-    private final AudioProvider audio_provider;
+class ApplicationAudioManager(private val audioPlayersFactory: AudioPlayerFactory, private val eventManager: EventManager, private val audioProvider: AudioProvider) : AudioManager {
+    companion object {
+        private const val PAUSED=1
+        private const val PLAYING=0
+        private const val INACTIVE=3
+    }
 
     // fields
+    private var playStatus=INACTIVE
 
-    private int play_status=INACTIVE;
-
-    /**
-     * Create a audio manager specific for this project implementation.
-     * @param player_factory The provider that will give correct adapters to read the audio entries.
-     * @param event_manager The event manager to react to audio player's events.
-     */
-    public ApplicationAudioManager(AudioPlayerFactory player_factory, EventManager event_manager, AudioProvider audio_provider){
-        this.audio_players_factory=player_factory;
-        this.audio_provider=audio_provider;
-        event_manager.registerHandler("AudioManager",(event)->{
+    init{
+        eventManager.registerHandler("AudioManager"){ event->
             // handle events
-            if(event.getCode()== EventCodeMap.EVENT_AUDIO_COMPLETED){
-                audio_provider.advance_to_next();
-                if(audio_provider.get_audio()==null){
-                    set_play_status(INACTIVE);
+            if(event.code == EventCodeMap.EVENT_AUDIO_COMPLETED){
+                audioProvider.advanceToNext()
+                if(audioProvider.getAudio()==null){
+                    setPlayStatus(INACTIVE)
                 }else{
-                    play();
+                    play()
                 }
             }
-        });
-    }
-    @Override
-    public void play_previous(){
-        Timestamp stamp = this.timestamp();
-        if(stamp.getDuration()*stamp.getProgress()>4){
-            setTimestampProgress(0d);
-        }else {
-            AudioPlayer player = get_audio_player();
-            if(player!=null) player.stop();
-            set_play_status(INACTIVE);
-            audio_provider.move_to_prev();
         }
-        play();
     }
 
+    override fun playPrevious(){
+        val stamp = this.timestamp()
+        if(stamp.duration*stamp.progress>4){
+            setTimestampProgress(0.0)
+        }else {
+            val player = getAudioPlayer()
+            player?.stop()
+            setPlayStatus(INACTIVE)
+            audioProvider.moveToPrev()
+        }
+        play()
+    }
 
-    @Override
-    public void play_next(){
-        AudioPlayer player = get_audio_player();
-        if(player!=null) player.stop();
-        set_play_status(INACTIVE);
-        audio_provider.move_to_next();
-        play();
+    override fun playNext(){
+        val player = getAudioPlayer()
+        player?.stop()
+        setPlayStatus(INACTIVE)
+        audioProvider.moveToNext()
+        play()
     }
 
     /**
      * @return The audio player compatible with the current audio file. TODO Or crash the app for now.
      */
-    private AudioPlayer get_audio_player(){
-        Audio audio = audio_provider.get_audio();
-        if(audio==null)
-            return null;
+    private fun getAudioPlayer(): AudioPlayer? {
+        val audio = audioProvider.getAudio() ?: return null
         try {
-            return this.audio_players_factory.provide(audio.type);
-        } catch (AudioPlayerFactory.PlayerNotImplementedException e) {
-            throw new RuntimeException(e);
+            return this.audioPlayersFactory.provide(audio.type)
+        } catch (e: PlayerNotImplementedException) {
+            throw RuntimeException(e)
         }
     }
 
-    @Override
-    public Timestamp timestamp() {
-        AudioPlayer audio_player = get_audio_player();
-        if(audio_player==null)
-            return new Timestamp(0,0);
-        return new Timestamp(audio_player.duration(),audio_player.progress()/audio_player.duration());
+    override fun timestamp(): Timestamp {
+        val audioPlayer = getAudioPlayer() ?: return Timestamp(0,0.0)
+        return Timestamp(audioPlayer.duration(),audioPlayer.progress()/audioPlayer.duration())
     }
 
-    @Override
-    public void setTimestampProgress(double progress) {
-        AudioPlayer audio_player = get_audio_player();
-        if(audio_player==null)
-            return;
-        audio_player.set_progress(progress);
+    override fun setTimestampProgress(progress: Double) {
+        val audioPlayer = getAudioPlayer()
+        audioPlayer?.setProgress(progress)
     }
 
-    @Override
-    public void play() {
-        Audio audio = audio_provider.get_audio();
-        AudioPlayer audio_player = get_audio_player();
+    override fun play() {
+        val audio = audioProvider.getAudio()
+        val audioPlayer = getAudioPlayer()
 
-        if(play_status==PAUSED){
-            audio_player.resume();
+        if(playStatus==PAUSED){
+            audioPlayer?.resume()
         }else{
             if(audio == null)
-                return;
-            audio_player.play(audio);
+                return
+            audioPlayer?.play(audio)
         }
-        set_play_status(PLAYING); // Event handler will change this value in case of exceptions
+        setPlayStatus(PLAYING) // Event handler will change this value in case of exceptions
     }
 
-    @Override
-    public void pause() {
-        if(play_status!=PLAYING)
-            return;
+    override fun pause() {
+        if(playStatus!=PLAYING)
+            return
 
-        AudioPlayer audio_player = get_audio_player();
-        if(audio_player==null) return;
-        audio_player.pause();
-        set_play_status(PAUSED);
+        val audioPlayer = getAudioPlayer() ?: return
+        audioPlayer.pause()
+        setPlayStatus(PAUSED)
     }
 
-    @Override
-    public boolean isPaused() {
-        return this.play_status!=PLAYING;
+    override fun isPaused() : Boolean {
+        return this.playStatus!=PLAYING
     }
 
-    private void set_play_status(int status){
-        play_status = status;
+    private fun setPlayStatus(status: Int){
+        playStatus = status
     }
 }

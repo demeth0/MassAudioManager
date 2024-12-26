@@ -1,28 +1,24 @@
-package com.demeth.massaudioplayer.backend.adapters;
+package com.demeth.massaudioplayer.backend.adapters
 
-import com.demeth.massaudioplayer.backend.models.adapters.AudioPlayer;
-import com.demeth.massaudioplayer.backend.models.adapters.AudioPlayerFactory;
-import com.demeth.massaudioplayer.backend.models.objects.AudioType;
+import com.demeth.massaudioplayer.backend.models.adapters.AudioPlayer
+import com.demeth.massaudioplayer.backend.models.adapters.AudioPlayerFactory
+import com.demeth.massaudioplayer.backend.models.adapters.PlayerNotImplementedException
+import com.demeth.massaudioplayer.backend.models.objects.AudioType
 
-import java.util.HashMap;
+import java.util.HashMap
+import kotlin.jvm.Throws
 
-public class LoadedAudioPlayerFactory implements AudioPlayerFactory {
-    private HashMap<AudioType, AudioPlayer> registered_dependencies;
+class LoadedAudioPlayerFactory : AudioPlayerFactory {
+    private val registeredDependencies=HashMap<AudioType, AudioPlayer>()
 
-    public LoadedAudioPlayerFactory(){
-
-        registered_dependencies=new HashMap<>();
+    override fun register(type: AudioType,player: AudioPlayer){
+        registeredDependencies[type] = player
     }
 
-    @Override
-    public void register(AudioType type,AudioPlayer player){
-        registered_dependencies.put(type,player);
-    }
-
-    @Override
-    public AudioPlayer provide(AudioType type) throws PlayerNotImplementedException{
-        if(registered_dependencies.containsKey(type))
-            return this.registered_dependencies.get(type);
-        throw new PlayerNotImplementedException(type.toString());
+    @Throws(PlayerNotImplementedException::class)
+    override fun  provide(type: AudioType): AudioPlayer {
+        if(registeredDependencies.containsKey(type))
+            return this.registeredDependencies[type]!!
+        throw PlayerNotImplementedException(type.toString())
     }
 }

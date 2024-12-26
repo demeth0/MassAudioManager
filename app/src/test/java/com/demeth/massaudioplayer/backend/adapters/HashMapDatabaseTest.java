@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import android.content.Context;
 import android.net.Uri;
 
+import com.demeth.massaudioplayer.backend.models.adapters.Content;
 import com.demeth.massaudioplayer.backend.models.adapters.Database;
 import com.demeth.massaudioplayer.backend.models.adapters.DatabaseContentProvider;
 import com.demeth.massaudioplayer.backend.models.objects.Audio;

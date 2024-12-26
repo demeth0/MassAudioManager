@@ -18,7 +18,7 @@ public class SearchFieldAutoCompleteArrayAdapter extends ArrayAdapter<String> {
 
     /**
      * @param context context de l'application
-     * @param resource layout des view pour résultat du filtre
+     * @param resource view's layout for filter results
 
      */
     public SearchFieldAutoCompleteArrayAdapter(@NonNull Context context, int resource) {
@@ -30,7 +30,7 @@ public class SearchFieldAutoCompleteArrayAdapter extends ArrayAdapter<String> {
                 if(charSequence!=null && SearchFieldAutoCompleteArrayAdapter.this.list!=null){
                     res = new FilterResults();
                     String filter = charSequence.toString().toLowerCase();
-                    List<String> filtered = SearchFieldAutoCompleteArrayAdapter.this.list.stream().map(a -> a.display_name).filter(name -> name.toLowerCase().contains(filter)).collect(Collectors.toList());
+                    List<String> filtered = SearchFieldAutoCompleteArrayAdapter.this.list.stream().map(Audio::getDisplayName).filter(name -> name.toLowerCase().contains(filter)).collect(Collectors.toList());
                     res.values = filtered;
                     res.count = filtered.size();
                 }

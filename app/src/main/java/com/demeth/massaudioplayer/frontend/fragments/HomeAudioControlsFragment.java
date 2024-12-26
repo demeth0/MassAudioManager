@@ -59,7 +59,7 @@ public class HomeAudioControlsFragment extends Fragment {
             if(audio==null) {
                 title.setText("");
             }else{
-                title.setText(audio.display_name);
+                title.setText(audio.displayName);
             }
         });
     }

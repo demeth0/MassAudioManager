@@ -1,9 +1,9 @@
-package com.demeth.massaudioplayer.backend.models.objects;
+package com.demeth.massaudioplayer.backend.models.objects
 
 /**
  * The {@link com.demeth.massaudioplayer.backend.models.adapters.AudioProvider AudioProvider}
  */
-public enum LoopMode {
+enum class LoopMode {
     /**
      * In the playlist the current audio will be repeated endlessly.
      */
