@@ -1,0 +1,40 @@
+[versions]
+androidGgradlePluginVersion = "8.7.3"
+appcompatVersion = "1.7.0"
+constraintlayoutVersion = "2.2.0"
+espressoCoreVersion = "3.6.1"
+junit = "1.2.1"
+junitVersion = "4.13.2"
+legacySupportV4Version = "1.0.0"
+lifecycleLivedataKtxVersion = "2.8.7"
+lifecycleViewmodelKtxVersion = "2.8.7"
+materialVersion = "1.12.0"
+recyclerviewVersion = "1.3.2"
+
+[libraries]
+androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompatVersion" }
+androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "constraintlayoutVersion" }
+androidx-junit = { module = "androidx.test.ext:junit", version.ref = "junit" }
+androidx-legacy-support-v4 = { module = "androidx.legacy:legacy-support-v4", version.ref = "legacySupportV4Version" }
+androidx-lifecycle-livedata-ktx = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "lifecycleLivedataKtxVersion" }
+androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtxVersion" }
+androidx-recyclerview = { module = "androidx.recyclerview:recyclerview", version.ref = "recyclerviewVersion" }
+
+androidx-espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "espressoCoreVersion" }
+junit = { module = "junit:junit", version.ref = "junitVersion" }
+material = { module = "com.google.android.material:material", version.ref = "materialVersion" }
+
+[bundles]
+androidx = [
+    "androidx-appcompat",
+    "androidx-constraintlayout",
+    "androidx-junit",
+    "androidx-legacy-support-v4",
+    "androidx-lifecycle-livedata-ktx",
+    "androidx-lifecycle-viewmodel-ktx",
+    "androidx-recyclerview"
+]
+
+[plugins]
+android-application = {id="com.android.application", version.ref="androidGgradlePluginVersion"}
+android-library = {id="com.android.library", version.ref="androidGgradlePluginVersion"}
