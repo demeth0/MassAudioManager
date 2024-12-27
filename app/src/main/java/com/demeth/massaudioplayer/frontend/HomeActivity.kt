@@ -71,7 +71,7 @@ class HomeActivity : AppCompatActivity(), AudioServiceBoundable {
         supportFragmentManager.beginTransaction().replace(R.id.controller_fragment_container, HomeAudioControlsFragment::class.java,bun).setReorderingAllowed(true).commit()
 
         val controller: FragmentContainerView = findViewById(R.id.controller_fragment_container)
-        viewModel.controllerVisibility.observe(this) {
+        viewModel.getControllerVisibility().observe(this) {
             if (it) {
                 controller.visibility = View.VISIBLE
             } else {
@@ -99,16 +99,16 @@ class HomeActivity : AppCompatActivity(), AudioServiceBoundable {
                                 }else if(it.code ==EventCodeMap.EVENT_AUDIO_COMPLETED){
                                     ping("Event audio completed")
                                 }}
-                            , service!!.dependencies)
+                            , service!!.getDependencies())
                     loadFragments()
-                    bindViewModel(service!!.dependencies)
+                    bindViewModel(service!!.getDependencies())
                 }
             }
 
             override fun onServiceDisconnected(componentName: ComponentName) {
                 Log.d("[abc]","HomeActivity disconnected from service")
                 service?.apply {
-                    unbindViewModel(dependencies)
+                    unbindViewModel(getDependencies())
                 }
             }
         }
@@ -243,7 +243,7 @@ class HomeActivity : AppCompatActivity(), AudioServiceBoundable {
                 Toast.makeText(this, "permission denied the application will not be able to read audio files", Toast.LENGTH_LONG).show()
                 finish()
             }else{
-                service?.dependencies?.let { Shiraori.reloadDatabase(this, it) }
+                service?.getDependencies()?.let { Shiraori.reloadDatabase(this, it) }
             }
         }
     }

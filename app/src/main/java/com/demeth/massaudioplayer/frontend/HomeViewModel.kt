@@ -1,12 +1,12 @@
-package com.demeth.massaudioplayer.frontend;
+package com.demeth.massaudioplayer.frontend
 
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 
-import com.demeth.massaudioplayer.backend.models.objects.Audio;
-import com.demeth.massaudioplayer.backend.models.objects.LoopMode;
-import com.demeth.massaudioplayer.backend.models.objects.Timestamp;
+import com.demeth.massaudioplayer.backend.models.objects.Audio
+import com.demeth.massaudioplayer.backend.models.objects.LoopMode
+import com.demeth.massaudioplayer.backend.models.objects.Timestamp
 
 /**
  * This ViewModel is responsible for updating the UI elements of the Home page of the application.<br> <br>
@@ -14,93 +14,93 @@ import com.demeth.massaudioplayer.backend.models.objects.Timestamp;
  * The methode preceded by <strong>set</strong> (ex: setMethodeName) are supposed to be called by the
  * backend system when a value is updated.
  */
-public class HomeViewModel extends ViewModel {
-    private final MutableLiveData<Boolean> randomMode = new MutableLiveData<>();
+class HomeViewModel : ViewModel() {
+    private val randomMode = MutableLiveData<Boolean>()
 
-    private final MutableLiveData<LoopMode> loopMode = new MutableLiveData<>();
+    private val loopMode = MutableLiveData<LoopMode>()
 
     //This value represent the state of the diffusion only, true if an audio is being diffused and false otherwise. There is no other objectives.
-    private final MutableLiveData<Boolean> pauseState = new MutableLiveData<>(false);
+    private val pauseState = MutableLiveData(false)
 
-    private final MutableLiveData<Boolean> controllerVisibility = new MutableLiveData<>(false);
+    private val controllerVisibility = MutableLiveData(false)
 
-    private final MutableLiveData<String> category = new MutableLiveData<>("PISTES");
+    private val category = MutableLiveData("PISTES")
 
-    private final MutableLiveData<String> validated_search_query = new MutableLiveData<>("");
+    private val validatedSearchQuery = MutableLiveData("")
 
-    private final MutableLiveData<Audio> current_audio = new MutableLiveData<>(null);
+    private val currentAudio = MutableLiveData<Audio?>(null)
 
-    private final MutableLiveData<Timestamp> audio_timestamp = new MutableLiveData<>(new Timestamp(0,0));
+    private val audioTimestamp = MutableLiveData(Timestamp(0,0.0))
 
-    public void setRandomModeUI(boolean random_mode){
-        randomMode.postValue(random_mode);
+    fun setRandomModeUI(randomMode1: Boolean){
+        randomMode.postValue(randomMode1)
     }
 
-    public LiveData<Boolean> getRandomModeUI(){
-        return randomMode;
+    fun getRandomModeUI(): LiveData<Boolean>{
+        return randomMode
     }
 
-    public void setLoopModeUI(LoopMode loop_mode){
-        loopMode.postValue(loop_mode);
+    fun setLoopModeUI(loopMode1: LoopMode){
+        loopMode.postValue(loopMode1)
     }
 
-    public LiveData<LoopMode> getLoopModeUI(){
-        return loopMode;
+    fun getLoopModeUI(): LiveData<LoopMode>{
+        return loopMode
     }
 
     /**
      * A value of true mean that an audio is playing. A value of false mean the audio is not playing.
-     * @param pause_state
+     * @param pauseState1
      */
-    public void setPlayPauseStateUI(boolean pause_state){
-        pauseState.postValue(pause_state);
+    fun setPlayPauseStateUI(pauseState1: Boolean){
+        pauseState.postValue(pauseState1)
     }
 
     /**
      * This value represent the state of the diffusion only, true if an audio is being diffused and false otherwise. There is no other objectives.
      *A value of true mean that an audio is playing. A value of false mean the audio is not playing.
      */
-    public LiveData<Boolean> getPlayPauseStateUI(){
-        return pauseState;
+    fun getPlayPauseStateUI(): LiveData<Boolean>{
+        return pauseState
     }
 
-    public void setControllerVisibility(boolean controller_visible) {
-        this.controllerVisibility.postValue(controller_visible);
+    fun setControllerVisibility(controllerVisible: Boolean) {
+        this.controllerVisibility.postValue(controllerVisible)
     }
 
-    public LiveData<Boolean> getControllerVisibility() {
-        return controllerVisibility;
+    fun getControllerVisibility(): LiveData<Boolean> {
+        return controllerVisibility
     }
 
-    public void setAudioSelectionCategory(String category){
-        this.category.postValue(category);
+    fun setAudioSelectionCategory(category: String){
+        this.category.postValue(category)
     }
 
-    public LiveData<String> getAudioSelectionCategory(){
-        return category;
+    fun getAudioSelectionCategory(): LiveData<String>{
+        return category
     }
 
-    public void setSearchQuery(String filter){
-        validated_search_query.postValue(filter);
+    fun setSearchQuery(filter: String){
+        validatedSearchQuery.postValue(filter)
     }
 
-    public LiveData<String> getSearchQuery(){
-        return validated_search_query;
+    fun getSearchQuery(): LiveData<String>{
+        return validatedSearchQuery
     }
 
-    public void setCurrentAudioUI(Audio audio){
-        current_audio.postValue(audio);
+    fun setCurrentAudioUI(audio: Audio?){
+        currentAudio.postValue(audio)
     }
 
-    public LiveData<Audio> getCurrentAudioUI(){
-        return  current_audio;
+    fun getCurrentAudioUI(): LiveData<Audio?>{
+        return  currentAudio
     }
 
-    public void setAudioTimestamp(Timestamp stamp){
-        audio_timestamp.postValue(stamp);
+    fun setAudioTimestamp(stamp: Timestamp){
+        audioTimestamp.postValue(stamp)
     }
 
-    public LiveData<Timestamp> getAudioTimestamp(){
-        return audio_timestamp;
+    fun getAudioTimestamp(): LiveData<Timestamp>{
+        return audioTimestamp
     }
 }

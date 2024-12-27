@@ -154,7 +154,7 @@ public class AllAudioListFragment extends Fragment {
             audio = new_entry;
 
             //text box
-            title.setText(audio.displayName);
+            title.setText(audio.getDisplayName());
             checkHighlighted();
             //album cover
             //album.setImageBitmap(AlbumLoader.getDefaultCover());
@@ -210,7 +210,7 @@ public class AllAudioListFragment extends Fragment {
         audio_list.setAdapter(audio_list_adapter);
 
         viewModel.getSearchQuery().observe(requireActivity(),s -> {
-            audio_list_data = Shiraori.getDatabaseEntries(dep).stream().filter(a->a.display_name.toLowerCase().contains(s.toLowerCase())).sorted().collect(Collectors.toCollection(ArrayList::new));
+            audio_list_data = Shiraori.getDatabaseEntries(dep).stream().filter(a->a.getDisplayName().toLowerCase().contains(s.toLowerCase())).sorted().collect(Collectors.toCollection(ArrayList::new));
             audio_list_adapter.notifyDataSetChanged();
         });
 

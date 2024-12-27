@@ -7,6 +7,7 @@ import static org.junit.Assert.fail;
 
 import com.demeth.massaudioplayer.backend.models.adapters.EventManager;
 import com.demeth.massaudioplayer.backend.models.objects.Event;
+import com.demeth.massaudioplayer.backend.models.objects.EventCodeMap;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -22,28 +23,30 @@ public class SequentialEventManagerTest {
         triggered2 = false;
     }
 
+    private final static EventCodeMap code = EventCodeMap.EVENT_AUDIO_COMPLETED;
+
     @Test
     public void register_handler() {
 
         manager.registerHandler("test",(event)->{
-            if(event.getCode()==10)
+            if(event.getCode()== code)
                 triggered1=true;
         });
-        manager.trigger(new Event(10));
+        manager.trigger(new Event(code));
         assertTrue(triggered1);
     }
 
     @Test
     public void register_multiple_handler_same_event() {
         manager.registerHandler("test1",(event)->{
-            if(event.getCode()==10)
+            if(event.getCode()==code)
                 triggered1=true;
         });
         manager.registerHandler("test2",(event)->{
-            if(event.getCode()==10)
+            if(event.getCode()==code)
                 triggered2=true;
         });
-        manager.trigger(new Event(10));
+        manager.trigger(new Event(code));
         assertTrue(triggered1);
         assertTrue(triggered2);
     }
@@ -51,14 +54,14 @@ public class SequentialEventManagerTest {
     @Test
     public void register_multiple_handler() {
         manager.registerHandler("test",(event)->{
-            if(event.getCode()==10)
+            if(event.getCode()==code)
                 triggered1=true;
         });
         manager.registerHandler("test",(event)->{
-            if(event.getCode()==15)
+            if(event.getCode()==EventCodeMap.EVENT_AUDIO_PAUSED)
                 triggered2=true;
         });
-        manager.trigger(new Event(15));
+        manager.trigger(new Event(EventCodeMap.EVENT_AUDIO_PAUSED));
         assertFalse(triggered1);
         assertTrue(triggered2);
     }
@@ -67,12 +70,12 @@ public class SequentialEventManagerTest {
     public void register_handler_pass_data() {
         final Object data = new Object();
         manager.registerHandler("test",(event)->{
-            if(event.getCode()==10){
+            if(event.getCode()==code){
                 triggered1=true;
                 assertEquals(data, event.getData());
             }
         });
-        manager.trigger(new Event(10,data));
+        manager.trigger(new Event(code,data));
         assertTrue(triggered1);
     }
 
@@ -80,12 +83,12 @@ public class SequentialEventManagerTest {
     public void remove_handler_pass_data() {
         triggered2=false;
         manager.registerHandler("test",(event)->{
-            if(event.getCode()==10){
+            if(event.getCode()==code){
                 triggered1=true;
                 triggered2=!triggered2;
             }
         });
-        manager.trigger(new Event(10,null));
+        manager.trigger(new Event(code,null));
         assertTrue(triggered1);
 
         manager.removeHandler(("test"));

@@ -8,51 +8,49 @@ import com.demeth.massaudioplayer.backend.models.objects.Audio;
 import com.demeth.massaudioplayer.backend.models.objects.LoopMode;
 import com.demeth.massaudioplayer.backend.models.objects.Timestamp;
 
-import java.util.List;
+class AudioViewModel : ViewModel() {
+    private val loop_mode = MutableLiveData<LoopMode>();
+    private val random_mode = MutableLiveData<Boolean>();
+    private val paused = MutableLiveData<Boolean>();
 
-public class AudioViewModel extends ViewModel {
-    final MutableLiveData<LoopMode> loop_mode = new MutableLiveData<>();
-    final MutableLiveData<Boolean> random_mode = new MutableLiveData<>();
-    final MutableLiveData<Boolean> paused = new MutableLiveData<>();
-
-    final MutableLiveData<List<Audio>> playlist = new MutableLiveData<List<Audio>>();
-    final MutableLiveData<List<Audio>> queue = new MutableLiveData<List<Audio>>();
-    final MutableLiveData<List<Audio>> list_all_audios = new MutableLiveData<List<Audio>>();
+    private val playlist = MutableLiveData<List<Audio>>();
+    private val queue = MutableLiveData<List<Audio>>();
+    private val list_all_audios = MutableLiveData<List<Audio>>();
 
 
-    final MutableLiveData<Timestamp> audio_timestamp = new MutableLiveData<>();
-    final MutableLiveData<Audio> current_audio = new MutableLiveData<>();
+    private val audio_timestamp = MutableLiveData<Timestamp>();
+    private val current_audio = MutableLiveData<Audio>();
 
 
-    public LiveData<LoopMode> get_loop_mode(){
+    fun get_loop_mode():LiveData<LoopMode>{
         return loop_mode;
     }
 
-    public LiveData<Boolean> get_random_mode(){
+    fun get_random_mode(): LiveData<Boolean>{
         return random_mode;
     }
 
-    public LiveData<Boolean> get_paused(){
+    fun get_paused(): LiveData<Boolean>{
         return paused;
     }
 
-    public LiveData<List<Audio>> get_playlist(){
+    fun get_playlist(): LiveData<List<Audio>>{
         return playlist;
     }
 
-    public LiveData<List<Audio>> get_queue(){
+    fun get_queue(): LiveData<List<Audio>>{
         return queue;
     }
 
-    public LiveData<List<Audio>> get_list_all_audios(){
+    fun get_list_all_audios(): LiveData<List<Audio>>{
         return list_all_audios;
     }
 
-    public LiveData<Timestamp> get_audio_timestamp(){
+    fun get_audio_timestamp(): LiveData<Timestamp>{
         return audio_timestamp;
     }
 
-    public LiveData<Audio> get_current_audio(){
+    fun get_current_audio(): LiveData<Audio>{
         return current_audio;
     }
 }

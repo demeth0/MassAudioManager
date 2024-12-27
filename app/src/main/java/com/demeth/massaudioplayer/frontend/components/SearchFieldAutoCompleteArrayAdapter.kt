@@ -1,67 +1,60 @@
-package com.demeth.massaudioplayer.frontend.components;
+package com.demeth.massaudioplayer.frontend.components
 
-import android.content.Context;
-import android.widget.ArrayAdapter;
-import android.widget.Filter;
+import android.content.Context
+import android.widget.ArrayAdapter
+import android.widget.Filter
+import com.demeth.massaudioplayer.backend.models.objects.Audio
+import java.util.Locale
 
-import androidx.annotation.NonNull;
+/**
+ * @param context context de l'application
+ * @param resource view's layout for filter results
+ */
+class SearchFieldAutoCompleteArrayAdapter(context: Context, resource: Int) : ArrayAdapter<String>(context, resource) {
+    private val customFilter: Filter
+    private var list: Collection<Audio>? = null
 
-import com.demeth.massaudioplayer.backend.models.objects.Audio;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
-
-public class SearchFieldAutoCompleteArrayAdapter extends ArrayAdapter<String> {
-    private final Filter customFilter;
-    private Collection<? extends Audio> list=null;
-
-    /**
-     * @param context context de l'application
-     * @param resource view's layout for filter results
-
-     */
-    public SearchFieldAutoCompleteArrayAdapter(@NonNull Context context, int resource) {
-        super(context, resource);
-        customFilter = new Filter() {
-            @Override
-            protected FilterResults performFiltering(CharSequence charSequence) {
-                FilterResults res=null;
-                if(charSequence!=null && SearchFieldAutoCompleteArrayAdapter.this.list!=null){
-                    res = new FilterResults();
-                    String filter = charSequence.toString().toLowerCase();
-                    List<String> filtered = SearchFieldAutoCompleteArrayAdapter.this.list.stream().map(Audio::getDisplayName).filter(name -> name.toLowerCase().contains(filter)).collect(Collectors.toList());
-                    res.values = filtered;
-                    res.count = filtered.size();
+    init {
+        customFilter = object: Filter() {
+            override fun performFiltering(charSequence: CharSequence): FilterResults {
+                val res = FilterResults()
+                if(this@SearchFieldAutoCompleteArrayAdapter.list!=null){
+                    val filter = charSequence.toString().lowercase(Locale.getDefault())
+                    lateinit var filtered : List<String>
+                    this@SearchFieldAutoCompleteArrayAdapter.list?.apply {
+                        filtered = map(Audio::displayName).filter {
+                            it.lowercase(Locale.getDefault()).contains(filter)
+                        }.toList()
+                        res.values = filtered
+                        res.count = filtered.size
+                    }
                 }
-                return res;
+                return res
             }
 
-            @SuppressWarnings("unchecked")
-            @Override
-            protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
-                if(filterResults != null && filterResults.count >0){
-                    SearchFieldAutoCompleteArrayAdapter.this.clear();
-                    SearchFieldAutoCompleteArrayAdapter.this.addAll((List<String>)filterResults.values);
-                    SearchFieldAutoCompleteArrayAdapter.this.notifyDataSetChanged();
+            override fun publishResults(charSequence: CharSequence, filterResults: FilterResults) {
+                if(filterResults.count >0){
+                    this@SearchFieldAutoCompleteArrayAdapter.apply {
+                        clear()
+                        addAll(filterResults.values as List<String>)
+                        notifyDataSetChanged()
+                    }
                 }
             }
-        };
+        }
     }
 
     /**
      * @return the filter created
      */
-    @NonNull
-    @Override
-    public Filter getFilter() {
-        return customFilter;
+    override fun getFilter():Filter {
+        return customFilter
     }
 
     /**
-     * @return the content from whom we need to filter
+     * @param list the content from whom we need to filter
      */
-    public void setContent(Collection<? extends Audio> list){
-        this.list=list;
+    fun setContent(list: Collection<Audio>){
+        this.list=list
     }
 }

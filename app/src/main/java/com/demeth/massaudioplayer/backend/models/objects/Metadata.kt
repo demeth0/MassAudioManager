@@ -1,6 +1,6 @@
-package com.demeth.massaudioplayer.backend.models.objects;
+package com.demeth.massaudioplayer.backend.models.objects
 
-import android.net.Uri;
+import android.net.Uri
 
 /**
  * This object is used to save data specific to each {@link Audio} that could be used to for example load the album cover or get the streaming data...
@@ -8,39 +8,17 @@ import android.net.Uri;
  *
  * @see FileAudioMetadata
  */
-public class Metadata {
+open class Metadata {
     /**
      * {@link Metadata} used with an audio of the type {@link AudioType#LOCAL}.
+     * Create a local audio file metadata object that will stock the uri to the file for loading the audio and album cover.
+     * @param uri Uri of the audio file following Android path convention.
      */
-    public static class FileAudioMetadata extends Metadata{
-        // private String display_name;
-        private Uri uri;
-
-        /**
-         * Create a local audio file metadata object that will stock the uri to the file for loading the audio and album cover.
-         * @param uri Uri of the audio file following Android path convention.
-         */
-        public FileAudioMetadata(Uri uri){
-            this.uri=uri;
-        }
+     data class FileAudioMetadata(var uri :Uri?) : Metadata(){
 
         /**
          * Create a local file metadata object uninitialized.
          */
-        public FileAudioMetadata(){}
-
-        /**
-         * @param uri New uri of the audio file.
-         */
-        public void setUri(Uri uri) {
-            this.uri = uri;
-        }
-
-        /**
-         * @return The uri saved in this metadata that should point to an audio file.
-         */
-        public Uri getUri() {
-            return uri;
-        }
+        constructor():this(null)
     }
 }

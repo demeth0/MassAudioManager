@@ -59,7 +59,7 @@ public class HomeAudioControlsFragment extends Fragment {
             if(audio==null) {
                 title.setText("");
             }else{
-                title.setText(audio.displayName);
+                title.setText(audio.getDisplayName());
             }
         });
     }
@@ -132,9 +132,7 @@ public class HomeAudioControlsFragment extends Fragment {
             }
         });
 
-        play_pause_button.setOnClickListener(v -> {
-            Shiraori.pauseAudio(dep);
-        });
+        play_pause_button.setOnClickListener(v -> Shiraori.pauseAudio(dep));
     }
 
     private void setup_next_button(Dependencies dep){
@@ -145,9 +143,7 @@ public class HomeAudioControlsFragment extends Fragment {
     }
 
     private void setup_previous_button(Dependencies dep){
-        previous_button.setOnClickListener(v -> {
-            Shiraori.skipToPreviousAudio(dep);
-        });
+        previous_button.setOnClickListener(v -> Shiraori.skipToPreviousAudio(dep));
     }
 
     private void setup_timestamp(Dependencies dependencies){

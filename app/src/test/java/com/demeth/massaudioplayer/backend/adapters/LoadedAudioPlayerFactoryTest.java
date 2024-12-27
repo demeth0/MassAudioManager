@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import com.demeth.massaudioplayer.backend.adapters.LoadedAudioPlayerFactory;
 import com.demeth.massaudioplayer.backend.models.adapters.AudioPlayer;
 import com.demeth.massaudioplayer.backend.models.adapters.AudioPlayerFactory;
+import com.demeth.massaudioplayer.backend.models.adapters.PlayerNotImplementedException;
 import com.demeth.massaudioplayer.backend.models.objects.Audio;
 import com.demeth.massaudioplayer.backend.models.objects.AudioType;
 
@@ -66,6 +67,6 @@ public class LoadedAudioPlayerFactoryTest {
 
     @Test
     public void fail_provide() {
-        assertThrows(AudioPlayerFactory.PlayerNotImplementedException.class,()->factory.provide(AudioType.SPOTIFY));
+        assertThrows(PlayerNotImplementedException.class,()->factory.provide(AudioType.SPOTIFY));
     }
 }

@@ -1,63 +1,81 @@
-package com.demeth.massaudioplayer.frontend.service;
+package com.demeth.massaudioplayer.frontend.service
 
-import static androidx.core.app.NotificationCompat.VISIBILITY_PUBLIC;
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
+import android.util.Log
+import android.widget.RemoteViews
 
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.Context;
-import android.content.Intent;
-import android.util.Log;
-import android.widget.RemoteViews;
+import androidx.core.app.NotificationCompat
 
-import androidx.core.app.NotificationCompat;
+import com.demeth.massaudioplayer.R
+import com.demeth.massaudioplayer.backend.models.objects.Audio
+import com.demeth.massaudioplayer.frontend.HomeActivity
 
-import com.demeth.massaudioplayer.R;
-import com.demeth.massaudioplayer.backend.models.objects.Audio;
-import com.demeth.massaudioplayer.frontend.HomeActivity;
 
-public class NotificationBuilder {    public static final String CHANNEL_ID = "massaudioplayer notification channel id";
-    public static final int NOTIFICATION_ID=88;
+class NotificationBuilder(private val service: AudioService ) {
+    companion object{
+        const val CHANNEL_ID = "massaudioplayer notification channel id"
+        const val NOTIFICATION_ID=88
 
+        /**
+         * create the notification channel for the audio player
+         */
+        fun createNotificationChannel(context: Context) {
+            // Create the NotificationChannel, but only on API 26+ because
+            // the NotificationChannel class is new and not in the support library
+            val name = context.getString(R.string.channel_name)
+            val description = context.getString(R.string.channel_description)
+            val importance = NotificationManager.IMPORTANCE_HIGH //want to be oin top but no sound
+            val channel = NotificationChannel(CHANNEL_ID, name, importance)
+
+            channel.enableVibration(false)
+            channel.description = description
+            channel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+            channel.setSound(null,null)
+
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            val notificationManager = context.getSystemService(NotificationManager::class.java)
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
     /**
      * flags for the notification : cancel current notification and unchanging over time
      */
-    private final int flags = PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE;
-
-    /**
-     * reference to the service bound to this notification
-     */
-    private final AudioService service;
+    private val flags = PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
 
     /**
      * notification manager used to create notification builder and edit current notification
      */
-    private NotificationManager manager;
+    private lateinit var manager: NotificationManager
 
     /**
      * the inflated notification view
      */
-    private RemoteViews notificationView;
+    private lateinit var notificationView: RemoteViews
 
     /**
      * the builder that instantiate a notification from the view
      */
-    private NotificationCompat.Builder notification_builder;
+    private lateinit var notification_builder: NotificationCompat.Builder
 
     /** to change the pause button texture */
-    private int pauseButtonResource = android.R.drawable.ic_media_play;
+    private var pauseButtonResource: Int = android.R.drawable.ic_media_play
 
-    public NotificationBuilder(AudioService service){
-        this.service = service;
-        createNotificationBuilder();
+    init {
+        createNotificationBuilder()
     }
-    private void createNotificationBuilder(){
+
+    private fun createNotificationBuilder(){
         /*get the notification manager from the app context*/
-        manager = (NotificationManager) service.getSystemService(Context.NOTIFICATION_SERVICE);
+        manager = service.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         /*inflate notification view*/
-        notificationView = new RemoteViews(service.getPackageName(), R.layout.notification_dummy_layout);
+        notificationView = RemoteViews(service.packageName, R.layout.notification_dummy_layout)
 
 
         /*init pending intent*/
@@ -76,17 +94,16 @@ public class NotificationBuilder {    public static final String CHANNEL_ID = "m
         //notificationView.setImageViewResource(R.id.notification_pause,pauseButtonResource);
 
         /*make the notification builder*/
-        notification_builder = new NotificationCompat.Builder(service, CHANNEL_ID);
+        notification_builder = NotificationCompat.Builder(service, CHANNEL_ID)
 
         notification_builder.setCustomContentView(notificationView)
-                .setSmallIcon(android.R.drawable.ic_media_play);
+                .setSmallIcon(android.R.drawable.ic_media_play)
 
 
         /*when clicking on the notification open the app main activity*/
-        Intent start_activity = new Intent(service, HomeActivity.class);
-        PendingIntent start_activity_pending_intent = PendingIntent.getActivity(service,4,start_activity, flags);
-        notification_builder.setContentIntent(start_activity_pending_intent);
-
+        val startActivity = Intent(service, HomeActivity::class.java)
+        val startActivityPendingIntent = PendingIntent.getActivity(service,4,startActivity, flags)
+        notification_builder.setContentIntent(startActivityPendingIntent)
     }
 
     /**
@@ -95,21 +112,21 @@ public class NotificationBuilder {    public static final String CHANNEL_ID = "m
      * @param extra Command to run.
      * @return Inflated pending intent.
      */
-    private PendingIntent createPendingIntent(int requestCode,String extra){
+    private fun createPendingIntent(requestCode: Int,extra: String): PendingIntent?{
         //TODO add broadcast receiver
         /*Intent intent = new Intent(service, ServiceBroadcast.class);
         //action set in broadcast receiver
         intent.setAction(extra);
         return PendingIntent.getBroadcast(service,requestCode,intent,flags);*/
-        return null;
+        return null
     }
 
     /**
      * Make builder to create the notification.
      * /@param file la track qui défini l'affichage de la notification
      */
-    private void prepareBuilder(Audio tr){ //TODO add update to notification
-        createNotificationBuilder();
+    private fun prepareBuilder(tr: Audio?){ //TODO add update to notification
+        createNotificationBuilder()
         // String title="aaaa";
         // if(tr != null){
         //     title = tr.display_name;
@@ -121,7 +138,7 @@ public class NotificationBuilder {    public static final String CHANNEL_ID = "m
 
         // notificationView.setTextViewText(R.id.notification_title,title);
 
-        notification_builder.setVisibility(VISIBILITY_PUBLIC);
+        notification_builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
     }
 
     /**
@@ -129,52 +146,32 @@ public class NotificationBuilder {    public static final String CHANNEL_ID = "m
      * /@param file le fichier de base de la construction
      * @return la notification créer
      */
-    public Notification getNotification(){
-        prepareBuilder(null);
-        Log.d("[abc] NotificationBuilder", "create notification !");
-        return notification_builder.build();
+    fun getNotification(): Notification{
+        prepareBuilder(null)
+        Log.d("[abc] NotificationBuilder", "create notification !")
+        return notification_builder.build()
     }
 
     /**
      * met a jour la notification avec la nouvelle track
      * /@param file la nouvelle donnée a utiliser pour construire la notification
      */
-    public void updateNotification(Audio tr){
-        prepareBuilder(tr);
-        manager.notify(NOTIFICATION_ID, notification_builder.build());
+    fun updateNotification(tr: Audio){
+        prepareBuilder(tr)
+        manager.notify(NOTIFICATION_ID, notification_builder.build())
     }
 
     /**
      * met a jour les boutons de la notification lors de mises en pause
      * @param paused le nouvel état du bouton pause de la notification
      */
-    public void setPauseButtonPaused(boolean paused){
-        if(!paused){
-            pauseButtonResource=android.R.drawable.ic_media_pause;
+    fun setPauseButtonPaused(paused: Boolean){
+        pauseButtonResource = if(!paused){
+            android.R.drawable.ic_media_pause
         }else{
-            pauseButtonResource= android.R.drawable.ic_media_play;
+            android.R.drawable.ic_media_play
         }
     }
 
-    /**
-     * create the notification channel for the audio player
-     */
-    public static void createNotificationChannel(Context context) {
-        // Create the NotificationChannel, but only on API 26+ because
-        // the NotificationChannel class is new and not in the support library
-        CharSequence name = context.getString(R.string.channel_name);
-        String description = context.getString(R.string.channel_description);
-        int importance = NotificationManager.IMPORTANCE_HIGH; //want to be oin top but no sound
-        NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
 
-        channel.enableVibration(false);
-        channel.setDescription(description);
-        channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
-        channel.setSound(null,null);
-
-        // Register the channel with the system; you can't change the importance
-        // or other notification behaviors after this
-        NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
-        notificationManager.createNotificationChannel(channel);
-    }
 }

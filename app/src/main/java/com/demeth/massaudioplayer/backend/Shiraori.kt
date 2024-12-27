@@ -32,6 +32,7 @@ class Shiraori {
          * @param handler Callback to run on event triggered.
          * @param dependencies The backend dependencies.
          */
+        @JvmStatic
         fun setHandler(id: String, handler: EventHandler, dependencies: Dependencies){
             dependencies.eventManager.registerHandler(id,handler)
         }
@@ -41,10 +42,12 @@ class Shiraori {
          * @param id Unique handler identifier.
          * @param dependencies The backend dependencies.
          */
+        @JvmStatic
         fun unsetHandler(id: String, dependencies: Dependencies){
             dependencies.eventManager.removeHandler(id)
         }
 
+        @JvmStatic
         fun reloadDatabase(context: Context,dependencies: Dependencies){
             dependencies.database.reload(context)
             dependencies.eventManager.trigger(Event(EventCodeMap.EVENT_DATABASE_RELOADED))
@@ -55,6 +58,7 @@ class Shiraori {
          * @param dependencies The backend dependencies.
          * @return A collection of all the playable audios.
          */
+        @JvmStatic
         fun getDatabaseEntries(dependencies: Dependencies): Collection<Audio> {
             return dependencies.database.getEntries()
         }
@@ -64,26 +68,28 @@ class Shiraori {
          * @param dependencies The backend dependencies.
          * @return True if the random mode is enabled.
          */
+        @JvmStatic
         fun isRandomModeEnabled(dependencies: Dependencies): Boolean{
             return dependencies.audioProvider.getRandom()
         }
-
-
 
         /**
          * Set or unset the reading of the playlist audios in random mode.
          * @param value True to enabled random mode, False to disable.
          * @param dependencies The backend dependencies.
          */
+        @JvmStatic
         fun setRandomModeEnabled(value: Boolean, dependencies: Dependencies){
             dependencies.audioProvider.setRandom(value)
             dependencies.eventManager.trigger(Event(EventCodeMap.EVENT_RANDOM_MODE_CHANGED,dependencies.audioProvider.getRandom()))
         }
 
+        @JvmStatic
         fun getLoopMode(dependencies: Dependencies): LoopMode {
             return dependencies.audioProvider.getLoop()
         }
 
+        @JvmStatic
         fun setLoopMode(loopMode: LoopMode, dependencies: Dependencies){
             dependencies.audioProvider.setLoop(loopMode)
             dependencies.eventManager.trigger(Event(EventCodeMap.EVENT_LOOP_MODE_CHANGED, loopMode))
@@ -94,6 +100,7 @@ class Shiraori {
          * @param audio Th audio to add to the queue and start instantly.
          * @param dependencies The backend dependencies.
          */
+        @JvmStatic
         fun playAudio(audio: Audio, dependencies: Dependencies){
             //TODO temp, create add_to_head function
             dependencies.audioProvider.clearQueue()
@@ -101,6 +108,7 @@ class Shiraori {
             dependencies.audioManager.playNext()
         }
 
+        @JvmStatic
         fun playInPlaylist(audios: Collection<Audio>, dependencies: Dependencies){
             dependencies.audioProvider.setPlaylist(Playlist(ArrayList(audios)))
             dependencies.audioManager.playNext()
@@ -110,18 +118,22 @@ class Shiraori {
          * Skip to the next audio in the waiting list and play it.
          * @param dependencies The backend dependencies.
          */
+        @JvmStatic
         fun skipToNextAudio(dependencies: Dependencies){
             dependencies.audioManager.playNext()
         }
 
+        @JvmStatic
         fun skipToPreviousAudio(dependencies: Dependencies){
             dependencies.audioManager.playPrevious()
         }
 
+        @JvmStatic
         fun getTimestamp(dependencies: Dependencies): Timestamp {
             return dependencies.audioManager.timestamp()
         }
 
+        @JvmStatic
         fun setTimestamp(timestampProgress: Double, dependencies: Dependencies){
             dependencies.audioManager.setTimestampProgress(timestampProgress)
         }
@@ -131,6 +143,7 @@ class Shiraori {
          * @param audios A collection of audio to add to the queue and start immediately.
          * @param dependencies The backend dependencies.
          */
+        @JvmStatic
         fun playAudios(audios: Collection<Audio>, dependencies: Dependencies){
             //dependencies.audio_provider.clear_queue();
 
@@ -142,6 +155,7 @@ class Shiraori {
                 dependencies.audioManager.playNext()
         }
 
+        @JvmStatic
         fun getCurrentAudio(dependencies: Dependencies): Audio? = dependencies.audioProvider.getAudio()
 
 
@@ -149,6 +163,7 @@ class Shiraori {
          * This function pause the audio. If the audio is paused or completed, will resume diffusion anyway or start from beginning.
          * @param dep The backend dependencies.
          */
+        @JvmStatic
         fun pauseAudio(dep: Dependencies){
             if(dep.audioManager.isPaused()){
                 // TODO Temporary ? If the audio is null with the current implementation that mean that the audio is finished and is not paused.
@@ -162,10 +177,12 @@ class Shiraori {
             }
         }
 
+        @JvmStatic
         fun viewQueue(dependencies: Dependencies): List<Audio>{
             return dependencies.audioProvider.viewQueue()
         }
 
+        @JvmStatic
         fun viewPlaylist(dependencies: Dependencies): List<Audio>{
             return dependencies.audioProvider.viewPlaylist()
         }

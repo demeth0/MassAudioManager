@@ -1,95 +1,90 @@
-package com.demeth.massaudioplayer.frontend.service;
+package com.demeth.massaudioplayer.frontend.service
 
-import android.app.Service;
-import android.content.Intent;
-import android.os.Binder;
-import android.os.IBinder;
-import android.util.Log;
-
-import com.demeth.massaudioplayer.backend.Dependencies;
-import com.demeth.massaudioplayer.backend.Shiraori;
-
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import android.app.Service
+import android.content.Intent
+import android.os.Binder
+import android.os.IBinder
+import android.util.Log
+import com.demeth.massaudioplayer.backend.Dependencies
+import com.demeth.massaudioplayer.backend.Shiraori
+import java.util.Objects
 
 /**
  * Foreground service that will host the playback and audio management module. Can be used from notification, activities and Broadcast.
  */
-public class AudioService extends Service {
-    public class ServiceBinder extends Binder {
+class AudioService : Service() {
+    inner class ServiceBinder : Binder() {
         /**
          * @param client the client that is binding to the service
          * @return the current service instance
          */
-        public AudioService getService(AudioServiceBoundable client){
-            clients.add(client);
-            return AudioService.this;
+        fun getService(client: AudioServiceBoundable): AudioService{
+            clients.add(client)
+            return this@AudioService
         }
     }
-    private boolean service_started = false;
-    private Set<AudioServiceBoundable> clients = new HashSet<>();
-    private ServiceBinder service_binder=new ServiceBinder();
-    private NotificationBuilder notification_builder;
+    private var serviceStarted = false
+    private val clients = HashSet<AudioServiceBoundable>()
+    private val serviceBinder= ServiceBinder()
+    private lateinit var notificationBuilder: NotificationBuilder
 
-    private Dependencies dependencies=null;
+    private var dependencies: Dependencies? = null
 
-    public final static String ACTION_START_NOTIFICATION = "service start notification";
+
+
+    companion object {
+        const val ACTION_START_NOTIFICATION = "service start notification"
+    }
 
     /**
      * Create the service, this should be called by an activity binding and creating the service so we then start it in foreground mode.
      */
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        Log.d("[abc] AudioService","service onCreate call");
+    override fun onCreate() {
+        super.onCreate()
+        Log.d("[abc] AudioService","service onCreate call")
 
-        startShiraori();
+        startShiraori()
 
-        Intent serviceIntent = new Intent(this,getClass());
-        serviceIntent.setAction(ACTION_START_NOTIFICATION);
-        startForegroundService(serviceIntent);
+        val serviceIntent = Intent(this,javaClass)
+        serviceIntent.setAction(ACTION_START_NOTIFICATION)
+        startForegroundService(serviceIntent)
     }
 
-    private void startShiraori(){
+    private fun startShiraori(){
         if(dependencies==null)
-            dependencies = Shiraori.openDependencies(this);
+            dependencies = Shiraori.openDependencies(this)
     }
 
-    @Override
-    public IBinder onBind(Intent intent) {
-        Log.d("[abc] AudioService","service onBind call");
+    override fun onBind(intent: Intent): IBinder {
+        Log.d("[abc] AudioService","service onBind call")
 
-        return service_binder;
+        return serviceBinder
     }
 
     /**
      * Is not called by onBind directly. In case the action is ACTION_START_NOTIFICATION the service will open a notification to prevent the
      * service to be closed by the system when the activity close (Foreground Service). Also load dependencies for Audio playback and management.
      */
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d("[abc] AudioService","service onStartCommand call");
-        if(intent==null)
-            return START_STICKY;
-        if(Objects.equals(intent.getAction(), ACTION_START_NOTIFICATION)){
+    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
+        Log.d("[abc] AudioService","service onStartCommand call")
+        if(Objects.equals(intent.action, ACTION_START_NOTIFICATION)){
             /*Should call startForeground() 5seconds after starting the service.
             This call create the foreground service notification required by all foreground services*/
 
-            startShiraori();
+            startShiraori()
 
-            notification_builder = new NotificationBuilder(this);
-            startForeground(NotificationBuilder.NOTIFICATION_ID,notification_builder.getNotification());
+            notificationBuilder = NotificationBuilder(this)
+            startForeground(NotificationBuilder.NOTIFICATION_ID,notificationBuilder.getNotification())
         }
 
-        return START_STICKY;
+        return START_STICKY
     }
 
     /**
      *
      * @return The playback configuration and resources to control the music.
      */
-    public Dependencies getDependencies(){
-        return dependencies;
+    fun getDependencies(): Dependencies{
+        return dependencies!!
     }
 }

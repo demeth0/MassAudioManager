@@ -155,7 +155,7 @@ public class AudioPendingListFragment extends Fragment {
             audio = new_entry;
 
             //text box
-            title.setText(audio.displayName);
+            title.setText(audio.getDisplayName());
             checkHighlighted();
             //album cover
             //album.setImageBitmap(AlbumLoader.getDefaultCover());

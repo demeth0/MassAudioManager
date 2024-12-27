@@ -45,7 +45,7 @@ class FileAudioPlayer(private val eventManager: EventManager, private val databa
             timestampAccessOk = false
             mp.reset()
             val metadata = database.getMetadata(audio) as Metadata.FileAudioMetadata
-            mp.setDataSource(this.context, metadata.uri) //TODO find solution maybe Database
+            metadata.uri?.let { mp.setDataSource(this.context, it) } //TODO find solution maybe Database
             mp.prepareAsync()
         } catch (e: IOException) {
             throw RuntimeException(e)
