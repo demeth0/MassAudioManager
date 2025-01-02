@@ -93,13 +93,14 @@ class HomeActivity : AppCompatActivity(), AudioServiceBoundable {
                 service = binder!!.getService(this@HomeActivity)
                 //TODO bind too fast, service don't have time to init dependencies sometimes.
                 service?.let {
-                    Shiraori.setHandler("MainUI", {
-                                if(it.code == EventCodeMap.EVENT_AUDIO_START){
-                                    ping("Event audio started")
-                                }else if(it.code ==EventCodeMap.EVENT_AUDIO_COMPLETED){
-                                    ping("Event audio completed")
-                                }}
-                            , service!!.getDependencies())
+                    Shiraori.setHandler("MainUI",service!!.getDependencies()) {
+                        if(it.code == EventCodeMap.EVENT_AUDIO_START){
+                            ping("Event audio started")
+                        }else if(it.code ==EventCodeMap.EVENT_AUDIO_COMPLETED){
+                            ping("Event audio completed")
+                        }
+                    }
+
                     loadFragments()
                     bindViewModel(service!!.getDependencies())
                 }
@@ -117,45 +118,45 @@ class HomeActivity : AppCompatActivity(), AudioServiceBoundable {
     }
 
     private fun bindViewModel(dep: Dependencies){
-        Shiraori.setHandler(HOME_HANDLERS+"random",{
+        Shiraori.setHandler(HOME_HANDLERS+"random",dep){
             if(it.code == EventCodeMap.EVENT_RANDOM_MODE_CHANGED){
                 if(it.data !=null)
                     viewModel.setRandomModeUI(it.data as Boolean)
             }
-        }, dep)
+        }
 
         viewModel.setRandomModeUI(Shiraori.isRandomModeEnabled(dep))
 
-        Shiraori.setHandler(HOME_HANDLERS+"loop",{
+        Shiraori.setHandler(HOME_HANDLERS+"loop",dep){
             if(it.code == EventCodeMap.EVENT_LOOP_MODE_CHANGED){
                 if(it.data !=null)
                     viewModel.setLoopModeUI(it.data as LoopMode)
             }
-        },dep)
+        }
 
         viewModel.setLoopModeUI(Shiraori.getLoopMode(dep))
 
-        Shiraori.setHandler(HOME_HANDLERS+"controller_visibility",{
+        Shiraori.setHandler(HOME_HANDLERS+"controller_visibility",dep){
             if(it.code == EventCodeMap.EVENT_AUDIO_START){
                 viewModel.setControllerVisibility(true)
                 Shiraori.unsetHandler(HOME_HANDLERS+"controller_visibility",dep)
             }
-        },dep)
+        }
         //TODO if currently music is playing enable visibility !
 
-        Shiraori.setHandler(HOME_HANDLERS+"play_pause_state",{
+        Shiraori.setHandler(HOME_HANDLERS+"play_pause_state",dep){
             if(it.code == EventCodeMap.EVENT_AUDIO_START || it.code == EventCodeMap.EVENT_AUDIO_RESUME){
                 viewModel.setPlayPauseStateUI(true)
             }else if(it.code == EventCodeMap.EVENT_AUDIO_COMPLETED || it.code == EventCodeMap.EVENT_AUDIO_PAUSED){
                 viewModel.setPlayPauseStateUI(false)
             }
-        },dep)
+        }
 
-        Shiraori.setHandler(HOME_HANDLERS+"update_current_audio_info",{
+        Shiraori.setHandler(HOME_HANDLERS+"update_current_audio_info",dep){
             if(it.code == EventCodeMap.EVENT_AUDIO_START){
                 viewModel.setCurrentAudioUI(Shiraori.getCurrentAudio(dep))
             }
-        },dep)
+        }
 
         setupSearchBar(dep)
         initTimestampTimer(dep)

@@ -33,7 +33,7 @@ class Shiraori {
          * @param dependencies The backend dependencies.
          */
         @JvmStatic
-        fun setHandler(id: String, handler: EventHandler, dependencies: Dependencies){
+        fun setHandler(id: String, dependencies: Dependencies, handler: EventHandler){
             dependencies.eventManager.registerHandler(id,handler)
         }
 
@@ -59,7 +59,7 @@ class Shiraori {
          * @return A collection of all the playable audios.
          */
         @JvmStatic
-        fun getDatabaseEntries(dependencies: Dependencies): Collection<Audio> {
+        fun getDatabaseEntries(dependencies: Dependencies): List<Audio> {
             return dependencies.database.getEntries()
         }
 

@@ -20,7 +20,7 @@
         android:theme="@style/Theme.MassAudioPlayer"
         tools:targetApi="31">
         <activity
-            android:name=".frontend.HomeActivity"
+            android:name=".frontend.HomeActivityCompose"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -28,7 +28,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".frontend.HomeActivityCompose"/>
+        <activity android:name=".frontend.HomeActivity"/>
 
         <service
             android:name=".frontend.service.AudioService"

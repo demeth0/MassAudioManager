@@ -61,7 +61,7 @@ class NotificationBuilder(private val service: AudioService ) {
     /**
      * the builder that instantiate a notification from the view
      */
-    private lateinit var notification_builder: NotificationCompat.Builder
+    private lateinit var notificationBuilder: NotificationCompat.Builder
 
     /** to change the pause button texture */
     private var pauseButtonResource: Int = android.R.drawable.ic_media_play
@@ -94,16 +94,16 @@ class NotificationBuilder(private val service: AudioService ) {
         //notificationView.setImageViewResource(R.id.notification_pause,pauseButtonResource);
 
         /*make the notification builder*/
-        notification_builder = NotificationCompat.Builder(service, CHANNEL_ID)
+        notificationBuilder = NotificationCompat.Builder(service, CHANNEL_ID)
 
-        notification_builder.setCustomContentView(notificationView)
+        notificationBuilder.setCustomContentView(notificationView)
                 .setSmallIcon(android.R.drawable.ic_media_play)
 
 
         /*when clicking on the notification open the app main activity*/
         val startActivity = Intent(service, HomeActivity::class.java)
         val startActivityPendingIntent = PendingIntent.getActivity(service,4,startActivity, flags)
-        notification_builder.setContentIntent(startActivityPendingIntent)
+        notificationBuilder.setContentIntent(startActivityPendingIntent)
     }
 
     /**
@@ -138,7 +138,7 @@ class NotificationBuilder(private val service: AudioService ) {
 
         // notificationView.setTextViewText(R.id.notification_title,title);
 
-        notification_builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+        notificationBuilder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
     }
 
     /**
@@ -149,7 +149,7 @@ class NotificationBuilder(private val service: AudioService ) {
     fun getNotification(): Notification{
         prepareBuilder(null)
         Log.d("[abc] NotificationBuilder", "create notification !")
-        return notification_builder.build()
+        return notificationBuilder.build()
     }
 
     /**
@@ -158,7 +158,7 @@ class NotificationBuilder(private val service: AudioService ) {
      */
     fun updateNotification(tr: Audio){
         prepareBuilder(tr)
-        manager.notify(NOTIFICATION_ID, notification_builder.build())
+        manager.notify(NOTIFICATION_ID, notificationBuilder.build())
     }
 
     /**

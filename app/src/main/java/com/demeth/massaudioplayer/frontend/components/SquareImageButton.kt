@@ -1,8 +1,7 @@
-package com.demeth.massaudioplayer.frontend.components;
+package com.demeth.massaudioplayer.frontend.components
 
 import android.content.Context
 import android.util.AttributeSet
-import androidx.annotation.Nullable
 import androidx.appcompat.widget.AppCompatImageButton
 
 
@@ -18,9 +17,9 @@ class SquareImageButton(context: Context, attrs: AttributeSet?) : AppCompatImage
      * @param heightMeasureSpec height measured
      */
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        val maxes = Math.max(widthMeasureSpec,heightMeasureSpec);
+        val maxes = widthMeasureSpec.coerceAtLeast(heightMeasureSpec)
 
         //super.onMeasure(maxes,maxes);
-        setMeasuredDimension(maxes, maxes);
+        setMeasuredDimension(maxes, maxes)
     }
 }

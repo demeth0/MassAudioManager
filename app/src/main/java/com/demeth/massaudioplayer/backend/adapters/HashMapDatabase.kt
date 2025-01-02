@@ -68,7 +68,7 @@ class HashMapDatabase(context: Context,vararg contentProviders: DatabaseContentP
         }
     }
 
-    override fun getEntries(): Collection<Audio> = audioEntries.values
+    override fun getEntries(): List<Audio> = audioEntries.values.toList()
 
     override fun getEntries(filter: (Audio)->Boolean): Collection<Audio> = audioEntries.values.filter(filter).toList()
 

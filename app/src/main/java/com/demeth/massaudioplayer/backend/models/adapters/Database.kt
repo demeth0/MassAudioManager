@@ -18,7 +18,7 @@ interface Database {
      *
      * @return All the audio entries in the database.
      */
-    fun getEntries(): Collection<Audio>
+    fun getEntries(): List<Audio>
 
     /**
      * Get the entries filtered.

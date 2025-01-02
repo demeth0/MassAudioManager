@@ -1,4 +1,4 @@
-package com.demeth.massaudioplayer.frontend.service;
+package com.demeth.massaudioplayer.frontend.service
 
 /**
  * This interface should be implemented by all activity requiring the service functionalities.
