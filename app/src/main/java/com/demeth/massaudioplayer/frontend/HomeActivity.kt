@@ -21,8 +21,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentContainerView
 import androidx.lifecycle.ViewModelProvider
 import com.demeth.massaudioplayer.R
-import com.demeth.massaudioplayer.backend.Dependencies
-import com.demeth.massaudioplayer.backend.Shiraori
+import com.demeth.massaudioplayer.backend.IShiraori
 import com.demeth.massaudioplayer.backend.models.objects.EventCodeMap
 import com.demeth.massaudioplayer.backend.models.objects.LoopMode
 import com.demeth.massaudioplayer.frontend.components.SearchFieldAutoCompleteArrayAdapter
@@ -45,7 +44,7 @@ class HomeActivity : AppCompatActivity(), AudioServiceBoundable {
 
     private lateinit var viewModel: HomeViewModel
     private var binder: AudioService.ServiceBinder? = null
-    private var service: AudioService? = null
+    private var shiraori: IShiraori? = null
     private lateinit var connection: ServiceConnection
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -87,13 +86,13 @@ class HomeActivity : AppCompatActivity(), AudioServiceBoundable {
         connection = object: ServiceConnection {
             override fun onServiceConnected(componentName: ComponentName, iBinder: IBinder?) {
                 binder = iBinder as AudioService.ServiceBinder
+                shiraori = AudioService.asInterface(iBinder)
                 Log.d("[abc]","HomeActivity bound to service")
 
                 //pre init
-                service = binder!!.getService(this@HomeActivity)
                 //TODO bind too fast, service don't have time to init dependencies sometimes.
-                service?.let {
-                    Shiraori.setHandler("MainUI",service!!.getDependencies()) {
+                shiraori?.apply {
+                    setHandler("MainUI") {
                         if(it.code == EventCodeMap.EVENT_AUDIO_START){
                             ping("Event audio started")
                         }else if(it.code ==EventCodeMap.EVENT_AUDIO_COMPLETED){
@@ -102,89 +101,89 @@ class HomeActivity : AppCompatActivity(), AudioServiceBoundable {
                     }
 
                     loadFragments()
-                    bindViewModel(service!!.getDependencies())
+                    bindViewModel()
                 }
             }
 
             override fun onServiceDisconnected(componentName: ComponentName) {
                 Log.d("[abc]","HomeActivity disconnected from service")
-                service?.apply {
-                    unbindViewModel(getDependencies())
-                }
+                unbindViewModel()
             }
         }
         Log.d("[abc]","binding to service")
         bindService(Intent(this,AudioService::class.java),connection, Context.BIND_AUTO_CREATE)
     }
 
-    private fun bindViewModel(dep: Dependencies){
-        Shiraori.setHandler(HOME_HANDLERS+"random",dep){
-            if(it.code == EventCodeMap.EVENT_RANDOM_MODE_CHANGED){
-                if(it.data !=null)
-                    viewModel.setRandomModeUI(it.data as Boolean)
+    private fun bindViewModel(){
+        shiraori!!.apply {
+            setHandler(HOME_HANDLERS+"random"){
+                if(it.code == EventCodeMap.EVENT_RANDOM_MODE_CHANGED){
+                    if(it.data !=null)
+                        viewModel.setRandomModeUI(it.data as Boolean)
+                }
+            }
+
+            viewModel.setRandomModeUI(isRandomModeEnabled())
+
+            setHandler(HOME_HANDLERS+"loop"){
+                if(it.code == EventCodeMap.EVENT_LOOP_MODE_CHANGED){
+                    if(it.data !=null)
+                        viewModel.setLoopModeUI(it.data as LoopMode)
+                }
+            }
+
+            viewModel.setLoopModeUI(getLoopMode())
+
+            setHandler(HOME_HANDLERS+"controller_visibility"){
+                if(it.code == EventCodeMap.EVENT_AUDIO_START){
+                    viewModel.setControllerVisibility(true)
+                    unsetHandler(HOME_HANDLERS+"controller_visibility")
+                }
+            }
+            //TODO if currently music is playing enable visibility !
+
+            setHandler(HOME_HANDLERS+"play_pause_state"){
+                if(it.code == EventCodeMap.EVENT_AUDIO_START || it.code == EventCodeMap.EVENT_AUDIO_RESUME){
+                    viewModel.setPlayPauseStateUI(true)
+                }else if(it.code == EventCodeMap.EVENT_AUDIO_COMPLETED || it.code == EventCodeMap.EVENT_AUDIO_PAUSED){
+                    viewModel.setPlayPauseStateUI(false)
+                }
+            }
+
+            setHandler(HOME_HANDLERS+"update_current_audio_info"){
+                if(it.code == EventCodeMap.EVENT_AUDIO_START){
+                    viewModel.setCurrentAudioUI(getCurrentAudio())
+                }
             }
         }
 
-        viewModel.setRandomModeUI(Shiraori.isRandomModeEnabled(dep))
-
-        Shiraori.setHandler(HOME_HANDLERS+"loop",dep){
-            if(it.code == EventCodeMap.EVENT_LOOP_MODE_CHANGED){
-                if(it.data !=null)
-                    viewModel.setLoopModeUI(it.data as LoopMode)
-            }
-        }
-
-        viewModel.setLoopModeUI(Shiraori.getLoopMode(dep))
-
-        Shiraori.setHandler(HOME_HANDLERS+"controller_visibility",dep){
-            if(it.code == EventCodeMap.EVENT_AUDIO_START){
-                viewModel.setControllerVisibility(true)
-                Shiraori.unsetHandler(HOME_HANDLERS+"controller_visibility",dep)
-            }
-        }
-        //TODO if currently music is playing enable visibility !
-
-        Shiraori.setHandler(HOME_HANDLERS+"play_pause_state",dep){
-            if(it.code == EventCodeMap.EVENT_AUDIO_START || it.code == EventCodeMap.EVENT_AUDIO_RESUME){
-                viewModel.setPlayPauseStateUI(true)
-            }else if(it.code == EventCodeMap.EVENT_AUDIO_COMPLETED || it.code == EventCodeMap.EVENT_AUDIO_PAUSED){
-                viewModel.setPlayPauseStateUI(false)
-            }
-        }
-
-        Shiraori.setHandler(HOME_HANDLERS+"update_current_audio_info",dep){
-            if(it.code == EventCodeMap.EVENT_AUDIO_START){
-                viewModel.setCurrentAudioUI(Shiraori.getCurrentAudio(dep))
-            }
-        }
-
-        setupSearchBar(dep)
-        initTimestampTimer(dep)
+        setupSearchBar()
+        initTimestampTimer()
     }
 
     private var timestampTimer: Timer? = null
     private lateinit var timestampTimerTask: TimerTask
 
-    private fun initTimestampTimer(dep: Dependencies){
+    private fun initTimestampTimer(){
         timestampTimerTask = object: TimerTask() {
             override fun run() {
-                viewModel.setAudioTimestamp(Shiraori.getTimestamp(dep))
+                viewModel.setAudioTimestamp(shiraori!!.getTimestamp())
             }
         }
         timestampTimer = Timer(false)
         timestampTimer!!.schedule(timestampTimerTask,0,1000/15)
     }
 
-    private fun unbindViewModel(dep: Dependencies){
-        Shiraori.unsetHandler(HOME_HANDLERS+"random",dep)
+    private fun unbindViewModel(){
+        shiraori?.unsetHandler(HOME_HANDLERS+"random")
     }
 
-    private fun setupSearchBar(dep: Dependencies){
+    private fun setupSearchBar(){
         val searchField: AutoCompleteTextView = findViewById(R.id.search_bar)
         val searchFieldAutoCompleter  = SearchFieldAutoCompleteArrayAdapter(this,android.R.layout.simple_list_item_1)
         searchField.setAdapter(searchFieldAutoCompleter)
         searchField.threshold = 1
-        searchFieldAutoCompleter.setContent(Shiraori.getDatabaseEntries(dep)) //TODO use MVVM
+        searchFieldAutoCompleter.setContent(shiraori!!.getDatabaseEntries()) //TODO use MVVM
 
         val searchButton: ImageButton = findViewById(R.id.search_button)
         searchButton.setOnClickListener {
@@ -244,7 +243,9 @@ class HomeActivity : AppCompatActivity(), AudioServiceBoundable {
                 Toast.makeText(this, "permission denied the application will not be able to read audio files", Toast.LENGTH_LONG).show()
                 finish()
             }else{
-                service?.getDependencies()?.let { Shiraori.reloadDatabase(this, it) }
+                shiraori?.apply {
+                    reloadDatabase(this@HomeActivity)
+                }
             }
         }
     }

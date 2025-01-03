@@ -12,26 +12,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.requiredHeight
-import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Button
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.Slider
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
-import androidx.compose.material.TextField
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -50,16 +35,16 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.demeth.massaudioplayer.R
-import com.demeth.massaudioplayer.backend.Shiraori
+import com.demeth.massaudioplayer.backend.IShiraori
 import com.demeth.massaudioplayer.backend.models.objects.Audio
 import com.demeth.massaudioplayer.backend.models.objects.EventCodeMap
 import com.demeth.massaudioplayer.backend.models.objects.LoopMode
 import com.demeth.massaudioplayer.frontend.HomeActivityCompose.States
 import com.demeth.massaudioplayer.frontend.service.AudioService
 import com.demeth.massaudioplayer.frontend.service.AudioServiceBoundable
-import java.util.Locale
+import java.util.*
 
-private var service: AudioService? = null
+private var shiraori: IShiraori? = null
 
 class HomeActivityCompose : ComponentActivity(), AudioServiceBoundable {
     data object States {
@@ -87,18 +72,19 @@ class HomeActivityCompose : ComponentActivity(), AudioServiceBoundable {
         connection = object : ServiceConnection {
             override fun onServiceConnected(componentName: ComponentName, iBinder: IBinder?) {
                 val binder = iBinder as AudioService.ServiceBinder
+                shiraori = AudioService.asInterface(iBinder)
+
                 Log.d("[abc]", "HomeActivity bound to service")
 
                 //pre init
-                service = binder.getService(this@HomeActivityCompose)
-                //TODO bind too fast, service don't have time to init dependencies sometimes.
                 registerForEvents()
                 States.serviceTrigger.value = true
-                States.audioList.value = Shiraori.getDatabaseEntries(service!!.getDependencies())
+                States.audioList.value = shiraori!!.getDatabaseEntries()
             }
 
             override fun onServiceDisconnected(componentName: ComponentName) {
                 Log.d("[abc]", "HomeActivity disconnected from service")
+                shiraori = null
             }
         }
 
@@ -107,10 +93,10 @@ class HomeActivityCompose : ComponentActivity(), AudioServiceBoundable {
     }
 
     fun registerForEvents() {
-        service!!.apply {
-            Shiraori.setHandler("main_activity_on_database_reload", getDependencies()) {
+        shiraori!!.apply {
+            setHandler("main_activity_on_database_reload") {
                 if (it.code == EventCodeMap.EVENT_DATABASE_RELOADED) {
-                    States.audioList.value = Shiraori.getDatabaseEntries(getDependencies())
+                    States.audioList.value = getDatabaseEntries()
                 }
             }
         }
@@ -169,10 +155,10 @@ fun Body(states: States) {
 @Composable
 fun PlayAll(modifier: Modifier) {
     IconButton({
-        Shiraori.setRandomModeEnabled(true, service!!.getDependencies())
-        Shiraori.playInPlaylist(
-            Shiraori.getDatabaseEntries(service!!.getDependencies()), service!!.getDependencies()
-        )
+        shiraori!!.apply {
+            setRandomModeEnabled(true)
+            playInPlaylist(getDatabaseEntries())
+        }
     }, modifier.background(Color.LightGray)) {
         Icon(painter = painterResource(R.drawable.play_all_random),
             contentDescription = "",
@@ -254,7 +240,9 @@ fun ContentList(audioList: List<Audio>) {
             audioList[it].hashCode()
         }, itemContent = {
             TextButton({
-                Shiraori.playAudio(audioList[it], service!!.getDependencies())
+                shiraori!!.apply {
+                    playAudio(audioList[it])
+                }
             }){
                 Text(audioList[it].displayName)
             }
