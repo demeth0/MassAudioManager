@@ -9,6 +9,28 @@ import com.demeth.massaudioplayer.backend.models.objects.LoopMode
 import com.demeth.massaudioplayer.backend.models.objects.Playlist
 import com.demeth.massaudioplayer.backend.models.objects.Timestamp
 
+interface IShiraori {
+    fun setHandler(id: String, handler: EventHandler)
+    fun unsetHandler(id: String)
+    fun reloadDatabase(context: Context)
+    fun getDatabaseEntries(): List<Audio>
+    fun isRandomModeEnabled(): Boolean
+    fun setRandomModeEnabled(value: Boolean)
+    fun getLoopMode(): LoopMode
+    fun setLoopMode(loopMode: LoopMode)
+    fun playAudio(audio: Audio)
+    fun playInPlaylist(audios: Collection<Audio>)
+    fun skipToNextAudio()
+    fun skipToPreviousAudio()
+    fun getTimestamp(): Timestamp
+    fun setTimestamp(timestampProgress: Double)
+    fun playAudios(audios: Collection<Audio>)
+    fun getCurrentAudio(): Audio?
+    fun pauseAudio()
+    fun viewQueue(): List<Audio>
+    fun viewPlaylist(): List<Audio>
+}
+
 /**
  * Backend core use cases for audio management.
  */
