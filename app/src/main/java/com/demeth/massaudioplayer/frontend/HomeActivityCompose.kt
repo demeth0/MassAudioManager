@@ -14,8 +14,8 @@ import android.view.Window
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -26,8 +26,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
@@ -35,6 +33,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
+import androidx.compose.material.Checkbox
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Slider
@@ -61,10 +60,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.core.content.ContextCompat
 import com.demeth.massaudioplayer.R
 import com.demeth.massaudioplayer.backend.IShiraori
 import com.demeth.massaudioplayer.backend.models.objects.Audio
@@ -74,7 +73,9 @@ import com.demeth.massaudioplayer.backend.models.objects.Timestamp
 import com.demeth.massaudioplayer.frontend.HomeActivityCompose.States
 import com.demeth.massaudioplayer.frontend.service.AudioService
 import com.demeth.massaudioplayer.frontend.service.AudioServiceBoundable
-import java.util.*
+import java.util.Locale
+import java.util.Timer
+import java.util.TimerTask
 
 private var shiraori: IShiraori? = null
 
@@ -197,7 +198,7 @@ class HomeActivityCompose : ComponentActivity(), AudioServiceBoundable {
 
         setContent {
             CreateStates(States)
-            Body(States)
+            Body(States,homeViewModel)
             connectActivityToService()
         }
     }
@@ -210,7 +211,6 @@ class HomeActivityCompose : ComponentActivity(), AudioServiceBoundable {
     private fun connectActivityToService() {/* Connect this activity to the service */
         connection = object : ServiceConnection {
             override fun onServiceConnected(componentName: ComponentName, iBinder: IBinder?) {
-                val binder = iBinder as AudioService.ServiceBinder
                 shiraori = AudioService.asInterface(iBinder)
 
                 Log.d("[abc]", "HomeActivity bound to service")
@@ -302,7 +302,7 @@ fun CreateStates(states: States) {
 fun Body(states: States,viewModel: HomeActivityViewModel) {
     val serviceTrigger by viewModel.serviceTrigger.observeAsState(false)
 
-    Log.i("compose", "recomposing with serviceTrigger: ${serviceTrigger}")
+    Log.i("compose", "recomposing with serviceTrigger: $serviceTrigger")
     if (!serviceTrigger) {
         Text("ERROR: Could not connect to service.")
         return
@@ -312,7 +312,7 @@ fun Body(states: States,viewModel: HomeActivityViewModel) {
             ToolBar(states.searchFilter)
             ListSelectionBar()
             Box(Modifier.weight(1.0f)){
-                ContentList(states.displayedAudioList.value)
+                ContentList(states.displayedAudioList.value, viewModel)
 
                 PlayAll(
                     Modifier
@@ -320,7 +320,7 @@ fun Body(states: States,viewModel: HomeActivityViewModel) {
                         .padding(10.dp)
                 )
             }
-            PlayManager()
+            PlayManager(viewModel)
         }
     }
 }
