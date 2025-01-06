@@ -136,6 +136,20 @@ class HomeActivityCompose : ComponentActivity(), AudioServiceBoundable {
 
     private lateinit var connection: ServiceConnection
 
+    private val requestPermLauncher by lazy{
+        registerForActivityResult(ActivityResultContracts.RequestPermission()){ granted->
+            if (!granted) {
+                Toast.makeText(this, "permission denied the application will not be able to read audio files", Toast.LENGTH_LONG).show()
+                finish()
+            }else{
+                shiraori?.apply {
+                    reloadDatabase(this@HomeActivityCompose)
+                    States.audioList.value = getDatabaseEntries()
+                }
+            }
+        }
+    }
+
     private val homeViewModel by viewModels<HomeActivityViewModel>()
 
     private val timestampTimer by lazy {
@@ -149,20 +163,6 @@ class HomeActivityCompose : ComponentActivity(), AudioServiceBoundable {
                     homeViewModel.setTimestamp(
                         getTimestamp()
                     )
-                }
-            }
-        }
-    }
-
-    private val requestPermLauncher by lazy{
-        registerForActivityResult(ActivityResultContracts.RequestPermission()){ granted->
-            if (!granted) {
-                Toast.makeText(this, "permission denied the application will not be able to read audio files", Toast.LENGTH_LONG).show()
-                finish()
-            }else{
-                shiraori?.apply {
-                    reloadDatabase(this@HomeActivityCompose)
-                    States.audioList.value = getDatabaseEntries()
                 }
             }
         }
