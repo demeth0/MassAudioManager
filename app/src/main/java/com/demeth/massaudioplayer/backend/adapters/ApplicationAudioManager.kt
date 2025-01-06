@@ -1,5 +1,6 @@
 package com.demeth.massaudioplayer.backend.adapters
 
+import android.util.Log
 import com.demeth.massaudioplayer.backend.models.adapters.AudioManager
 import com.demeth.massaudioplayer.backend.models.adapters.AudioPlayer
 import com.demeth.massaudioplayer.backend.models.adapters.AudioPlayerFactory
@@ -41,7 +42,7 @@ class ApplicationAudioManager(private val audioPlayersFactory: AudioPlayerFactor
 
     override fun playPrevious(){
         val stamp = this.timestamp()
-        if(stamp.duration*stamp.progress>4){
+        if(stamp.duration*stamp.progress>4000){
             setTimestampProgress(0.0)
         }else {
             val player = getAudioPlayer()

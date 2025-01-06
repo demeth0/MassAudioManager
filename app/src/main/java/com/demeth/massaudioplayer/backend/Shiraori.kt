@@ -26,6 +26,7 @@ interface IShiraori {
     fun setTimestamp(timestampProgress: Double)
     fun playAudios(audios: Collection<Audio>)
     fun getCurrentAudio(): Audio?
+    fun isPaused(): Boolean
     fun pauseAudio()
     fun viewQueue(): List<Audio>
     fun viewPlaylist(): List<Audio>
@@ -180,6 +181,8 @@ class Shiraori {
         @JvmStatic
         fun getCurrentAudio(dependencies: Dependencies): Audio? = dependencies.audioProvider.getAudio()
 
+
+        fun isPaused(dep: Dependencies) = dep.audioManager.isPaused()
 
         /**
          * This function pause the audio. If the audio is paused or completed, will resume diffusion anyway or start from beginning.

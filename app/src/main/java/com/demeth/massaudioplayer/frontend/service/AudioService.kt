@@ -56,6 +56,7 @@ class AudioService : Service() {
         override fun setTimestamp(timestampProgress: Double) = Shiraori.setTimestamp(timestampProgress, getDeps())
         override fun playAudios(audios: Collection<Audio>) = Shiraori.playAudios(audios, getDeps())
         override fun getCurrentAudio(): Audio? = Shiraori.getCurrentAudio(getDeps())
+        override fun isPaused(): Boolean = Shiraori.isPaused(getDeps())
         override fun pauseAudio() = Shiraori.pauseAudio(getDeps())
         override fun viewQueue(): List<Audio> = Shiraori.viewQueue(getDeps())
         override fun viewPlaylist(): List<Audio> = Shiraori.viewPlaylist(getDeps())
