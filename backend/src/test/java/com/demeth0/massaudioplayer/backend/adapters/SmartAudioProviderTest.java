@@ -1,10 +1,11 @@
-package com.demeth.massaudioplayer.backend.adapters;
+package com.demeth0.massaudioplayer.backend.adapters;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
+import com.demeth.massaudioplayer.backend.adapters.SmartAudioProvider;
 import com.demeth.massaudioplayer.backend.models.objects.Audio;
 import com.demeth.massaudioplayer.backend.models.objects.AudioType;
 import com.demeth.massaudioplayer.backend.models.objects.LoopMode;

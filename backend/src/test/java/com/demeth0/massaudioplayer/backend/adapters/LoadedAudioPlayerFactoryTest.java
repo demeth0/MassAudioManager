@@ -1,10 +1,10 @@
-package com.demeth.massaudioplayer.backend.adapters;
+package com.demeth0.massaudioplayer.backend.adapters;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
 import com.demeth.massaudioplayer.backend.adapters.LoadedAudioPlayerFactory;
 import com.demeth.massaudioplayer.backend.models.adapters.AudioPlayer;
-import com.demeth.massaudioplayer.backend.models.adapters.AudioPlayerFactory;
 import com.demeth.massaudioplayer.backend.models.adapters.PlayerNotImplementedException;
 import com.demeth.massaudioplayer.backend.models.objects.Audio;
 import com.demeth.massaudioplayer.backend.models.objects.AudioType;
