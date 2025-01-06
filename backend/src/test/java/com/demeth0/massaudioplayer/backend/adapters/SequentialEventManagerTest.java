@@ -1,10 +1,11 @@
-package com.demeth.massaudioplayer.backend.adapters;
+package com.demeth0.massaudioplayer.backend.adapters;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import com.demeth.massaudioplayer.backend.adapters.SequentialEventManager;
 import com.demeth.massaudioplayer.backend.models.adapters.EventManager;
 import com.demeth.massaudioplayer.backend.models.objects.Event;
 import com.demeth.massaudioplayer.backend.models.objects.EventCodeMap;

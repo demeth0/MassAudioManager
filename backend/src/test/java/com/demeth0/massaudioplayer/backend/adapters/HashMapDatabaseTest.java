@@ -1,6 +1,10 @@
-package com.demeth.massaudioplayer.backend.adapters;
+package com.demeth0.massaudioplayer.backend.adapters;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -30,19 +34,15 @@ import android.view.Display;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.demeth.massaudioplayer.backend.adapters.HashMapDatabase;
 import com.demeth.massaudioplayer.backend.models.adapters.Content;
-import com.demeth.massaudioplayer.backend.models.adapters.Database;
 import com.demeth.massaudioplayer.backend.models.adapters.DatabaseContentProvider;
 import com.demeth.massaudioplayer.backend.models.objects.Audio;
 import com.demeth.massaudioplayer.backend.models.objects.AudioType;
 import com.demeth.massaudioplayer.backend.models.objects.Metadata;
-import com.demeth.massaudioplayer.backend.models.objects.Metadata.FileAudioMetadata;
-
-import junit.framework.TestCase;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import java.io.File;
 import java.io.FileInputStream;

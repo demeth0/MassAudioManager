@@ -40,6 +40,8 @@ android {
 }
 
 dependencies {
+    implementation(project(":backend"))
+
     implementation(libs.bundles.androidx)
     implementation(libs.material)
     implementation(libs.androidx.core.ktx)
