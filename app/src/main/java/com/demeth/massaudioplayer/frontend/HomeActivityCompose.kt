@@ -1,25 +1,45 @@
 package com.demeth.massaudioplayer.frontend
 
+import android.Manifest
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
 import android.view.Window
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
+import androidx.compose.material.Button
+import androidx.compose.material.Checkbox
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.Slider
+import androidx.compose.material.Text
+import androidx.compose.material.TextButton
+import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -37,8 +57,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -51,7 +73,9 @@ import com.demeth.massaudioplayer.backend.models.objects.Timestamp
 import com.demeth.massaudioplayer.frontend.HomeActivityCompose.States
 import com.demeth.massaudioplayer.frontend.service.AudioService
 import com.demeth.massaudioplayer.frontend.service.AudioServiceBoundable
-import java.util.*
+import java.util.Locale
+import java.util.Timer
+import java.util.TimerTask
 
 private var shiraori: IShiraori? = null
 
@@ -103,6 +127,7 @@ class HomeActivityViewModel : ViewModel() {
 
 class HomeActivityCompose : ComponentActivity(), AudioServiceBoundable {
     data object States {
+        lateinit var serviceTrigger: MutableState<Boolean>
         lateinit var audioList: MutableState<List<Audio>>
 
         lateinit var searchFilter: MutableState<String>
@@ -110,6 +135,20 @@ class HomeActivityCompose : ComponentActivity(), AudioServiceBoundable {
     }
 
     private lateinit var connection: ServiceConnection
+
+    private val requestPermLauncher by lazy{
+        registerForActivityResult(ActivityResultContracts.RequestPermission()){ granted->
+            if (!granted) {
+                Toast.makeText(this, "permission denied the application will not be able to read audio files", Toast.LENGTH_LONG).show()
+                finish()
+            }else{
+                shiraori?.apply {
+                    reloadDatabase(this@HomeActivityCompose)
+                    States.audioList.value = getDatabaseEntries()
+                }
+            }
+        }
+    }
 
     private val homeViewModel by viewModels<HomeActivityViewModel>()
 
@@ -131,6 +170,11 @@ class HomeActivityCompose : ComponentActivity(), AudioServiceBoundable {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        /* Manage permissions */
+        requestExternalStoragePermission()
+        if(Build.VERSION.SDK_INT>=33)
+            askPermissions(Manifest.permission.POST_NOTIFICATIONS)
+
         requestWindowFeature(Window.FEATURE_NO_TITLE)
 
         homeViewModel.playPauseState.observe(this) {
@@ -154,7 +198,7 @@ class HomeActivityCompose : ComponentActivity(), AudioServiceBoundable {
 
         setContent {
             CreateStates(States)
-            Body(States, homeViewModel)
+            Body(States,homeViewModel)
             connectActivityToService()
         }
     }
@@ -210,6 +254,25 @@ class HomeActivityCompose : ComponentActivity(), AudioServiceBoundable {
         }
     }
 
+    /**
+     * ask for permission
+     */
+    private fun askPermissions(permission: String){
+        if(ContextCompat.checkSelfPermission(applicationContext, permission) ==
+            PackageManager.PERMISSION_DENIED){
+            requestPermLauncher.launch(permission)
+        }
+    }
+
+    private fun requestExternalStoragePermission(){
+        // we need to start the service first before asking for storage permission
+        if(Build.VERSION.SDK_INT>=33){
+            askPermissions(Manifest.permission.READ_MEDIA_AUDIO)
+        }else{
+            askPermissions(Manifest.permission.READ_EXTERNAL_STORAGE)
+        }
+    }
+
     override fun disconnect() {
         unbindService(connection)
         finish()
@@ -219,6 +282,7 @@ class HomeActivityCompose : ComponentActivity(), AudioServiceBoundable {
 @Composable
 fun CreateStates(states: States) {
     states.apply {
+        serviceTrigger = remember { mutableStateOf(false) }
         audioList = remember { mutableStateOf(listOf()) }
 
         searchFilter = remember { mutableStateOf("") }
@@ -238,7 +302,7 @@ fun CreateStates(states: States) {
 fun Body(states: States,viewModel: HomeActivityViewModel) {
     val serviceTrigger by viewModel.serviceTrigger.observeAsState(false)
 
-    Log.i("compose", "recomposing with serviceTrigger: ${serviceTrigger}")
+    Log.i("compose", "recomposing with serviceTrigger: $serviceTrigger")
     if (!serviceTrigger) {
         Text("ERROR: Could not connect to service.")
         return
@@ -246,8 +310,8 @@ fun Body(states: States,viewModel: HomeActivityViewModel) {
     Box {
         Column(modifier = Modifier.fillMaxSize()) {
             ToolBar(states.searchFilter)
-            // ListSelectionBar()
-            Box(Modifier.weight(1.0f)) {
+            ListSelectionBar()
+            Box(Modifier.weight(1.0f)){
                 ContentList(states.displayedAudioList.value, viewModel)
 
                 PlayAll(
@@ -472,8 +536,17 @@ fun ContentList(audioList: List<Audio>, viewModel: HomeActivityViewModel) {
 
 @Composable
 fun ListSelectionBar() {
-    Row {
-        TODO("Radio buttons Piste, Playlist...")
+    val radioOptions = listOf("ALL", "PLAYLIST", "QUEUE")
+    val (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions[0]) }
+
+    Row(Modifier.selectableGroup()) {
+        radioOptions.forEach{ text ->
+            Text(text,Modifier.selectable(
+                selected = selectedOption==text,
+                onClick = { onOptionSelected(text) },
+                role = Role.RadioButton
+            ))
+        }
     }
 }
 
