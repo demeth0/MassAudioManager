@@ -21,9 +21,9 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentContainerView
 import androidx.lifecycle.ViewModelProvider
 import com.demeth.massaudioplayer.R
-import com.demeth.massaudioplayer.backend.IShiraori
-import com.demeth.massaudioplayer.backend.models.objects.EventCodeMap
-import com.demeth.massaudioplayer.backend.models.objects.LoopMode
+import com.demeth0.massaudioplayer.backend.IShiraori
+import com.demeth0.massaudioplayer.backend.models.objects.EventCodeMap
+import com.demeth0.massaudioplayer.backend.models.objects.LoopMode
 import com.demeth.massaudioplayer.frontend.components.SearchFieldAutoCompleteArrayAdapter
 import com.demeth.massaudioplayer.frontend.fragments.AudioSelectionFragment
 import com.demeth.massaudioplayer.frontend.fragments.HomeAudioControlsFragment
@@ -95,7 +95,7 @@ class HomeActivity : AppCompatActivity(), AudioServiceBoundable {
                     setHandler("MainUI") {
                         if(it.code == EventCodeMap.EVENT_AUDIO_START){
                             ping("Event audio started")
-                        }else if(it.code ==EventCodeMap.EVENT_AUDIO_COMPLETED){
+                        }else if(it.code == EventCodeMap.EVENT_AUDIO_COMPLETED){
                             ping("Event audio completed")
                         }
                     }

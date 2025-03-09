@@ -1,10 +1,10 @@
-package com.demeth.massaudioplayer.backend.adapters
+package com.demeth0.massaudioplayer.backend.adapters
 
 import android.content.Context
-import com.demeth.massaudioplayer.backend.models.adapters.Content
-import com.demeth.massaudioplayer.backend.models.adapters.DatabaseContentProvider
+import com.demeth0.massaudioplayer.backend.models.adapters.Content
+import com.demeth0.massaudioplayer.backend.models.adapters.DatabaseContentProvider
 
-class SpotifyDatabaseContentProvider : DatabaseContentProvider{
+class SpotifyDatabaseContentProvider : DatabaseContentProvider {
     override fun next(): Content {
         TODO("Not yet implemented")
     }

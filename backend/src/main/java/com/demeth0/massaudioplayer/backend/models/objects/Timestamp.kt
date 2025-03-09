@@ -1,4 +1,4 @@
-package com.demeth.massaudioplayer.backend.models.objects
+package com.demeth0.massaudioplayer.backend.models.objects
 
 /**
  * Timestamp is an object structure that represent a progression of an audio track. The total duration is

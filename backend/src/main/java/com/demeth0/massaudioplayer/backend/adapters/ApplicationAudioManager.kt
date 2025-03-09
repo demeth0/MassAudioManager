@@ -1,14 +1,13 @@
-package com.demeth.massaudioplayer.backend.adapters
+package com.demeth0.massaudioplayer.backend.adapters
 
-import android.util.Log
-import com.demeth.massaudioplayer.backend.models.adapters.AudioManager
-import com.demeth.massaudioplayer.backend.models.adapters.AudioPlayer
-import com.demeth.massaudioplayer.backend.models.adapters.AudioPlayerFactory
-import com.demeth.massaudioplayer.backend.models.adapters.AudioProvider
-import com.demeth.massaudioplayer.backend.models.adapters.EventManager
-import com.demeth.massaudioplayer.backend.models.adapters.PlayerNotImplementedException
-import com.demeth.massaudioplayer.backend.models.objects.EventCodeMap
-import com.demeth.massaudioplayer.backend.models.objects.Timestamp
+import com.demeth0.massaudioplayer.backend.models.adapters.AudioManager
+import com.demeth0.massaudioplayer.backend.models.adapters.AudioPlayer
+import com.demeth0.massaudioplayer.backend.models.adapters.AudioPlayerFactory
+import com.demeth0.massaudioplayer.backend.models.adapters.AudioProvider
+import com.demeth0.massaudioplayer.backend.models.adapters.EventManager
+import com.demeth0.massaudioplayer.backend.models.adapters.PlayerNotImplementedException
+import com.demeth0.massaudioplayer.backend.models.objects.EventCodeMap
+import com.demeth0.massaudioplayer.backend.models.objects.Timestamp
 
 /**
  * Implement the version of the audio manager for Android applications.
@@ -16,7 +15,8 @@ import com.demeth.massaudioplayer.backend.models.objects.Timestamp
  * @param audioPlayersFactory The provider that will give correct adapters to read the audio entries.
  * @param eventManager The event manager to react to audio player's events.
  */
-class ApplicationAudioManager(private val audioPlayersFactory: AudioPlayerFactory, private val eventManager: EventManager, private val audioProvider: AudioProvider) : AudioManager {
+class ApplicationAudioManager(private val audioPlayersFactory: AudioPlayerFactory, private val eventManager: EventManager, private val audioProvider: AudioProvider) :
+    AudioManager {
     companion object {
         private const val PAUSED=1
         private const val PLAYING=0
@@ -24,7 +24,7 @@ class ApplicationAudioManager(private val audioPlayersFactory: AudioPlayerFactor
     }
 
     // fields
-    private var playStatus=INACTIVE
+    private var playStatus= INACTIVE
 
     init{
         eventManager.registerHandler("AudioManager"){ event->
@@ -87,7 +87,7 @@ class ApplicationAudioManager(private val audioPlayersFactory: AudioPlayerFactor
         val audio = audioProvider.getAudio()
         val audioPlayer = getAudioPlayer()
 
-        if(playStatus==PAUSED){
+        if(playStatus== PAUSED){
             audioPlayer?.resume()
         }else{
             if(audio == null)
@@ -98,7 +98,7 @@ class ApplicationAudioManager(private val audioPlayersFactory: AudioPlayerFactor
     }
 
     override fun pause() {
-        if(playStatus!=PLAYING)
+        if(playStatus!= PLAYING)
             return
 
         val audioPlayer = getAudioPlayer() ?: return
@@ -107,7 +107,7 @@ class ApplicationAudioManager(private val audioPlayersFactory: AudioPlayerFactor
     }
 
     override fun isPaused() : Boolean {
-        return this.playStatus!=PLAYING
+        return this.playStatus!= PLAYING
     }
 
     private fun setPlayStatus(status: Int){

@@ -1,13 +1,13 @@
-package com.demeth.massaudioplayer.backend
+package com.demeth0.massaudioplayer.backend
 
 import android.content.Context
-import com.demeth.massaudioplayer.backend.models.adapters.EventHandler
-import com.demeth.massaudioplayer.backend.models.objects.Audio
-import com.demeth.massaudioplayer.backend.models.objects.Event
-import com.demeth.massaudioplayer.backend.models.objects.EventCodeMap
-import com.demeth.massaudioplayer.backend.models.objects.LoopMode
-import com.demeth.massaudioplayer.backend.models.objects.Playlist
-import com.demeth.massaudioplayer.backend.models.objects.Timestamp
+import com.demeth0.massaudioplayer.backend.models.adapters.EventHandler
+import com.demeth0.massaudioplayer.backend.models.objects.Audio
+import com.demeth0.massaudioplayer.backend.models.objects.Event
+import com.demeth0.massaudioplayer.backend.models.objects.EventCodeMap
+import com.demeth0.massaudioplayer.backend.models.objects.LoopMode
+import com.demeth0.massaudioplayer.backend.models.objects.Playlist
+import com.demeth0.massaudioplayer.backend.models.objects.Timestamp
 
 interface IShiraori {
     fun setHandler(id: String, handler: EventHandler)
@@ -44,7 +44,7 @@ class Shiraori {
          * @return The dependencies of the library used for every operations.
          */
         @JvmStatic
-        fun openDependencies(context: Context) : Dependencies{
+        fun openDependencies(context: Context) : Dependencies {
             val dep = Dependencies.injectDependencies(context)
             return dep
         }
@@ -134,7 +134,8 @@ class Shiraori {
         @JvmStatic
         fun playInPlaylist(audios: Collection<Audio>, dependencies: Dependencies){
             dependencies.audioProvider.setPlaylist(Playlist(ArrayList(audios)))
-            dependencies.audioManager.playNext()
+            dependencies.audioProvider.setAudioFromPlaylist(0)
+            dependencies.audioManager.play()
         }
 
         /**

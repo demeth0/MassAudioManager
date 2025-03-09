@@ -1,6 +1,6 @@
-package com.demeth.massaudioplayer.backend.models.adapters
+package com.demeth0.massaudioplayer.backend.models.adapters
 
-import com.demeth.massaudioplayer.backend.models.objects.AudioType
+import com.demeth0.massaudioplayer.backend.models.objects.AudioType
 import kotlin.jvm.Throws
 
 class PlayerNotImplementedException(details : String) : Exception("This audio player isn't currently supported : $details")

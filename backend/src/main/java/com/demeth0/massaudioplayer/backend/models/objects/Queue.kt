@@ -1,4 +1,4 @@
-package com.demeth.massaudioplayer.backend.models.objects
+package com.demeth0.massaudioplayer.backend.models.objects
 
 import java.util.ArrayList
 

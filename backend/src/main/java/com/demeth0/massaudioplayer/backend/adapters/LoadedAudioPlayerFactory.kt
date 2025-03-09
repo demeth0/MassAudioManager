@@ -1,9 +1,9 @@
-package com.demeth.massaudioplayer.backend.adapters
+package com.demeth0.massaudioplayer.backend.adapters
 
-import com.demeth.massaudioplayer.backend.models.adapters.AudioPlayer
-import com.demeth.massaudioplayer.backend.models.adapters.AudioPlayerFactory
-import com.demeth.massaudioplayer.backend.models.adapters.PlayerNotImplementedException
-import com.demeth.massaudioplayer.backend.models.objects.AudioType
+import com.demeth0.massaudioplayer.backend.models.adapters.AudioPlayer
+import com.demeth0.massaudioplayer.backend.models.adapters.AudioPlayerFactory
+import com.demeth0.massaudioplayer.backend.models.adapters.PlayerNotImplementedException
+import com.demeth0.massaudioplayer.backend.models.objects.AudioType
 
 import java.util.HashMap
 import kotlin.jvm.Throws
@@ -11,7 +11,7 @@ import kotlin.jvm.Throws
 class LoadedAudioPlayerFactory : AudioPlayerFactory {
     private val registeredDependencies=HashMap<AudioType, AudioPlayer>()
 
-    override fun register(type: AudioType,player: AudioPlayer){
+    override fun register(type: AudioType, player: AudioPlayer){
         registeredDependencies[type] = player
     }
 

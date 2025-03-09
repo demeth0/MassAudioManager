@@ -34,12 +34,11 @@ import android.view.Display;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.demeth.massaudioplayer.backend.adapters.HashMapDatabase;
-import com.demeth.massaudioplayer.backend.models.adapters.Content;
-import com.demeth.massaudioplayer.backend.models.adapters.DatabaseContentProvider;
-import com.demeth.massaudioplayer.backend.models.objects.Audio;
-import com.demeth.massaudioplayer.backend.models.objects.AudioType;
-import com.demeth.massaudioplayer.backend.models.objects.Metadata;
+import com.demeth0.massaudioplayer.backend.models.adapters.Content;
+import com.demeth0.massaudioplayer.backend.models.adapters.DatabaseContentProvider;
+import com.demeth0.massaudioplayer.backend.models.objects.Audio;
+import com.demeth0.massaudioplayer.backend.models.objects.AudioType;
+import com.demeth0.massaudioplayer.backend.models.objects.Metadata;
 
 import org.junit.Before;
 import org.junit.Test;

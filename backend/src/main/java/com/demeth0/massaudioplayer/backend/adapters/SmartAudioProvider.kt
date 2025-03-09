@@ -1,17 +1,17 @@
-package com.demeth.massaudioplayer.backend.adapters
+package com.demeth0.massaudioplayer.backend.adapters
 
-import com.demeth.massaudioplayer.backend.models.adapters.AudioProvider
-import com.demeth.massaudioplayer.backend.models.objects.Audio
-import com.demeth.massaudioplayer.backend.models.objects.LoopMode
-import com.demeth.massaudioplayer.backend.models.objects.Playlist
-import com.demeth.massaudioplayer.backend.models.objects.Queue
+import com.demeth0.massaudioplayer.backend.models.adapters.AudioProvider
+import com.demeth0.massaudioplayer.backend.models.objects.Audio
+import com.demeth0.massaudioplayer.backend.models.objects.LoopMode
+import com.demeth0.massaudioplayer.backend.models.objects.Playlist
+import com.demeth0.massaudioplayer.backend.models.objects.Queue
 
 import java.util.Collections
 
 class SmartAudioProvider : AudioProvider {
     private var queue: Queue = Queue()
     private var playlist: Playlist?
-    private var loopMode: LoopMode=LoopMode.NONE
+    private var loopMode: LoopMode = LoopMode.NONE
     private var randomMode =false
     private var currentAudio: Audio? =null
 

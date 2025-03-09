@@ -1,4 +1,4 @@
-package com.demeth.massaudioplayer.backend.models.objects
+package com.demeth0.massaudioplayer.backend.models.objects
 
 /**
  * List of Constants that are used to identify all [Event] that can be triggered.
@@ -28,7 +28,7 @@ enum class EventCodeMap(v : Int) {
     EVENT_AUDIO_PAUSED(7)
 }
 /**
- * The event class represent a bundle that can be passed through the {@link com.demeth.massaudioplayer.backend.models.adapters.EventManager EventManager} when an event
+ * The event class represent a bundle that can be passed through the {@link com.demeth0.massaudioplayer.backend.models.adapters.EventManager EventManager} when an event
  * is triggered. It is used to identify the type of event triggered and to pass data that could be relevant for the corresponding handlers.
  * Create an event with an identification code and a data bundle.
  * @param code The unique identifier used to designate the event to process.
@@ -36,6 +36,6 @@ enum class EventCodeMap(v : Int) {
  */
 data class Event(val code: EventCodeMap, val data: Any? = null) {
 
-    //TODO temporatry for java porting
+    //TODO temporary for java porting
     constructor(eventCodeMap: EventCodeMap) : this(eventCodeMap, null)
 }

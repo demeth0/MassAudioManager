@@ -1,7 +1,7 @@
-package com.demeth.massaudioplayer.backend.models.objects
+package com.demeth0.massaudioplayer.backend.models.objects
 
 /**
- * The {@link com.demeth.massaudioplayer.backend.models.adapters.AudioProvider AudioProvider}
+ * The {@link com.demeth0.massaudioplayer.backend.models.adapters.AudioProvider AudioProvider}
  */
 enum class LoopMode {
     /**

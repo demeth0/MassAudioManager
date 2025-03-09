@@ -3,7 +3,7 @@ package com.demeth.massaudioplayer.frontend.components
 import android.content.Context
 import android.widget.ArrayAdapter
 import android.widget.Filter
-import com.demeth.massaudioplayer.backend.models.objects.Audio
+import com.demeth0.massaudioplayer.backend.models.objects.Audio
 import java.util.Locale
 
 /**
@@ -36,6 +36,7 @@ class SearchFieldAutoCompleteArrayAdapter(context: Context, resource: Int) : Arr
                 if(filterResults.count >0){
                     this@SearchFieldAutoCompleteArrayAdapter.apply {
                         clear()
+                        @Suppress("UNCHECKED_CAST")
                         addAll(filterResults.values as List<String>)
                         notifyDataSetChanged()
                     }

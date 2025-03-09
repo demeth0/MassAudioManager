@@ -12,7 +12,7 @@ import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 
 import com.demeth.massaudioplayer.R
-import com.demeth.massaudioplayer.backend.models.objects.Audio
+import com.demeth0.massaudioplayer.backend.models.objects.Audio
 import com.demeth.massaudioplayer.frontend.HomeActivity
 
 

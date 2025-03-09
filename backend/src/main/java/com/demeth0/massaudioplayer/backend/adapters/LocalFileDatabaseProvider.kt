@@ -1,14 +1,14 @@
-package com.demeth.massaudioplayer.backend.adapters
+package com.demeth0.massaudioplayer.backend.adapters
 
 import android.content.Context
 import android.database.Cursor
 import android.provider.MediaStore
 
-import com.demeth.massaudioplayer.backend.models.adapters.Content
-import com.demeth.massaudioplayer.backend.models.adapters.DatabaseContentProvider
-import com.demeth.massaudioplayer.backend.models.objects.Audio
-import com.demeth.massaudioplayer.backend.models.objects.AudioType
-import com.demeth.massaudioplayer.backend.models.objects.Metadata
+import com.demeth0.massaudioplayer.backend.models.adapters.Content
+import com.demeth0.massaudioplayer.backend.models.adapters.DatabaseContentProvider
+import com.demeth0.massaudioplayer.backend.models.objects.Audio
+import com.demeth0.massaudioplayer.backend.models.objects.AudioType
+import com.demeth0.massaudioplayer.backend.models.objects.Metadata
 
 fun removeExtension(name: String): String = name.substring(0,name.lastIndexOf("."))
 

@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
@@ -18,18 +17,22 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
@@ -37,9 +40,8 @@ import androidx.compose.material.Checkbox
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Slider
+import androidx.compose.material.SliderDefaults
 import androidx.compose.material.Text
-import androidx.compose.material.TextButton
-import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -51,6 +53,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -58,99 +61,51 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import com.demeth.massaudioplayer.R
-import com.demeth.massaudioplayer.backend.IShiraori
-import com.demeth.massaudioplayer.backend.models.objects.Audio
-import com.demeth.massaudioplayer.backend.models.objects.EventCodeMap
-import com.demeth.massaudioplayer.backend.models.objects.LoopMode
-import com.demeth.massaudioplayer.backend.models.objects.Timestamp
 import com.demeth.massaudioplayer.frontend.HomeActivityCompose.States
 import com.demeth.massaudioplayer.frontend.service.AudioService
 import com.demeth.massaudioplayer.frontend.service.AudioServiceBoundable
+import com.demeth0.massaudioplayer.backend.IShiraori
+import com.demeth0.massaudioplayer.backend.models.objects.Audio
+import com.demeth0.massaudioplayer.backend.models.objects.LoopMode
+import com.demeth0.massaudioplayer.backend.models.objects.Timestamp
 import java.util.Locale
 import java.util.Timer
 import java.util.TimerTask
 
-private var shiraori: IShiraori? = null
-
-class HomeActivityViewModel : ViewModel() {
-    private val _serviceTrigger = MutableLiveData(false)
-    private val _playPauseState = MutableLiveData(false)
-    private val _currentAudio = MutableLiveData<Audio?>(null)
-    private val _randomMode = MutableLiveData(false)
-    private val _loopMode = MutableLiveData(LoopMode.NONE)
-    private val _timestamp = MutableLiveData(Timestamp(0, 0.0))
-
-    val playPauseState: LiveData<Boolean>
-        get() = _playPauseState
-    val currentAudio: LiveData<Audio?>
-        get() = _currentAudio
-    val randomMode: LiveData<Boolean>
-        get() = _randomMode
-    val loopMode: LiveData<LoopMode>
-        get() = _loopMode
-    val timestamp: LiveData<Timestamp>
-        get() = _timestamp
-    val serviceTrigger: LiveData<Boolean>
-        get() = _serviceTrigger
-
-    fun triggerServiceConnected(){
-        _serviceTrigger.value = true
-    }
-
-    fun setPlayState(value: Boolean) {
-        _playPauseState.value = value
-    }
-
-    fun setCurrentAudio(value: Audio?) {
-        _currentAudio.value = value
-    }
-
-    fun setRandomMode(mode: Boolean) {
-        _randomMode.value = mode
-    }
-
-    fun setLoopMode(loopMode: LoopMode) {
-        _loopMode.value = loopMode
-    }
-
-    fun setTimestamp(timestamp: Timestamp) {
-        _timestamp.postValue(timestamp)
-    }
+enum class ListCategories {
+    ALL, PLAYLIST, QUEUE
 }
 
 class HomeActivityCompose : ComponentActivity(), AudioServiceBoundable {
     data object States {
-        lateinit var serviceTrigger: MutableState<Boolean>
-        lateinit var audioList: MutableState<List<Audio>>
-
         lateinit var searchFilter: MutableState<String>
         lateinit var displayedAudioList: MutableState<List<Audio>>
+
+        lateinit var category: MutableState<ListCategories>
     }
 
     private lateinit var connection: ServiceConnection
 
-    private val requestPermLauncher by lazy{
-        registerForActivityResult(ActivityResultContracts.RequestPermission()){ granted->
+    private val requestPermLauncher by lazy {
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
             if (!granted) {
-                Toast.makeText(this, "permission denied the application will not be able to read audio files", Toast.LENGTH_LONG).show()
-                finish()
-            }else{
-                shiraori?.apply {
-                    reloadDatabase(this@HomeActivityCompose)
-                    States.audioList.value = getDatabaseEntries()
-                }
+                Toast.makeText(
+                    this,
+                    "permission denied the application will not be able to read audio files",
+                    Toast.LENGTH_LONG
+                ).show()
+            } else {
+                homeViewModel.reloadAudioList(this@HomeActivityCompose)
             }
         }
     }
 
-    private val homeViewModel by viewModels<HomeActivityViewModel>()
+    private val homeViewModel by viewModels<ShiraoriViewModel>()
 
     private val timestampTimer by lazy {
         Timer(false)
@@ -159,46 +114,24 @@ class HomeActivityCompose : ComponentActivity(), AudioServiceBoundable {
     private val timestampTimerTask by lazy {
         object : TimerTask() {
             override fun run() {
-                shiraori?.apply {
-                    homeViewModel.setTimestamp(
-                        getTimestamp()
-                    )
-                }
+                homeViewModel.updateTimestamp()
             }
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        /* Manage permissions */
-        requestExternalStoragePermission()
-        if(Build.VERSION.SDK_INT>=33)
-            askPermissions(Manifest.permission.POST_NOTIFICATIONS)
+        super.onCreate(savedInstanceState)/* Manage permissions */
+        // we need to start the service first before asking for storage permission
+        askPermissions(Manifest.permission.READ_MEDIA_AUDIO)
+        askPermissions(Manifest.permission.POST_NOTIFICATIONS)
 
         requestWindowFeature(Window.FEATURE_NO_TITLE)
-
-        homeViewModel.playPauseState.observe(this) {
-            shiraori?.apply {
-                if (isPaused() != it)
-                    pauseAudio()
-            }
-        }
-        homeViewModel.randomMode.observe(this) {
-            shiraori?.apply {
-                if (isRandomModeEnabled() != it)
-                    setRandomModeEnabled(it)
-            }
-        }
-
-        homeViewModel.loopMode.observe(this) {
-            shiraori?.setLoopMode(it)
-        }
 
         timestampTimer.schedule(timestampTimerTask, 0, 1000 / 15)
 
         setContent {
-            CreateStates(States)
-            Body(States,homeViewModel)
+            CreateStates(States, homeViewModel)
+            Body(States, homeViewModel)
             connectActivityToService()
         }
     }
@@ -209,6 +142,7 @@ class HomeActivityCompose : ComponentActivity(), AudioServiceBoundable {
     }
 
     private fun connectActivityToService() {/* Connect this activity to the service */
+        var shiraori: IShiraori?
         connection = object : ServiceConnection {
             override fun onServiceConnected(componentName: ComponentName, iBinder: IBinder?) {
                 shiraori = AudioService.asInterface(iBinder)
@@ -216,11 +150,7 @@ class HomeActivityCompose : ComponentActivity(), AudioServiceBoundable {
                 Log.d("[abc]", "HomeActivity bound to service")
 
                 //pre init
-                registerForEvents()
-                homeViewModel.setPlayState(shiraori!!.isPaused())
-                homeViewModel.setRandomMode(shiraori!!.isRandomModeEnabled())
-                States.audioList.value = shiraori!!.getDatabaseEntries()
-                homeViewModel.triggerServiceConnected()
+                homeViewModel.connectService(shiraori!!, this@HomeActivityCompose)
             }
 
             override fun onServiceDisconnected(componentName: ComponentName) {
@@ -233,43 +163,15 @@ class HomeActivityCompose : ComponentActivity(), AudioServiceBoundable {
         bindService(Intent(this, AudioService::class.java), connection, Context.BIND_AUTO_CREATE)
     }
 
-    fun registerForEvents() {
-        shiraori!!.apply {
-            setHandler("main_activity_on_database_reload") {
-                when (it.code) {
-                    EventCodeMap.EVENT_DATABASE_RELOADED -> {
-                        States.audioList.value = getDatabaseEntries()
-                    }
-
-                    EventCodeMap.EVENT_AUDIO_START -> {
-                        homeViewModel.setPlayState(false)
-                        shiraori?.apply {
-                            homeViewModel.setCurrentAudio(getCurrentAudio())
-                        }
-                    }
-
-                    else -> Unit
-                }
-            }
-        }
-    }
-
     /**
      * ask for permission
      */
-    private fun askPermissions(permission: String){
-        if(ContextCompat.checkSelfPermission(applicationContext, permission) ==
-            PackageManager.PERMISSION_DENIED){
+    private fun askPermissions(permission: String) {
+        if (ContextCompat.checkSelfPermission(
+                applicationContext, permission
+            ) == PackageManager.PERMISSION_DENIED
+        ) {
             requestPermLauncher.launch(permission)
-        }
-    }
-
-    private fun requestExternalStoragePermission(){
-        // we need to start the service first before asking for storage permission
-        if(Build.VERSION.SDK_INT>=33){
-            askPermissions(Manifest.permission.READ_MEDIA_AUDIO)
-        }else{
-            askPermissions(Manifest.permission.READ_EXTERNAL_STORAGE)
         }
     }
 
@@ -280,26 +182,42 @@ class HomeActivityCompose : ComponentActivity(), AudioServiceBoundable {
 }
 
 @Composable
-fun CreateStates(states: States) {
+fun CreateStates(states: States, viewModel: ShiraoriViewModel) {
+    val randomMode by viewModel.randomMode.observeAsState()
+    val audioList by viewModel.audioList.observeAsState()
+
     states.apply {
-        serviceTrigger = remember { mutableStateOf(false) }
-        audioList = remember { mutableStateOf(listOf()) }
+
+        category = remember { mutableStateOf(ListCategories.ALL) }
 
         searchFilter = remember { mutableStateOf("") }
         displayedAudioList = remember { mutableStateOf(listOf()) }
 
-        LaunchedEffect(audioList.value, searchFilter.value) {
-            displayedAudioList.value = audioList.value.filter {
-                it.displayName.lowercase(
-                    Locale.getDefault()
-                ).contains(searchFilter.value.lowercase(Locale.getDefault()))
+        LaunchedEffect(audioList, searchFilter.value, category.value, randomMode) {
+            when (category.value) {
+                ListCategories.ALL -> {
+                    Log.i("aaa", "$audioList")
+                    displayedAudioList.value = audioList!!.filter {
+                        it.displayName.lowercase(
+                            Locale.getDefault()
+                        ).contains(searchFilter.value.lowercase(Locale.getDefault()))
+                    }.sorted()
+                }
+
+                ListCategories.PLAYLIST -> {
+                    displayedAudioList.value = listOf()
+                }
+
+                ListCategories.QUEUE -> {
+                    displayedAudioList.value = viewModel.getWaitingList() ?: emptyList()
+                }
             }
         }
     }
 }
 
 @Composable
-fun Body(states: States,viewModel: HomeActivityViewModel) {
+fun Body(states: States, viewModel: ShiraoriViewModel) {
     val serviceTrigger by viewModel.serviceTrigger.observeAsState(false)
 
     Log.i("compose", "recomposing with serviceTrigger: $serviceTrigger")
@@ -308,16 +226,20 @@ fun Body(states: States,viewModel: HomeActivityViewModel) {
         return
     }
     Box {
-        Column(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(colorResource(R.color.background_mid_deep))
+        ) {
             ToolBar(states.searchFilter)
-            ListSelectionBar()
-            Box(Modifier.weight(1.0f)){
+            ListSelectionBar(states.category)
+            Box(Modifier.weight(1.0f)) {
                 ContentList(states.displayedAudioList.value, viewModel)
 
                 PlayAll(
                     Modifier
                         .align(Alignment.BottomEnd)
-                        .padding(10.dp)
+                        .padding(10.dp), viewModel
                 )
             }
             PlayManager(viewModel)
@@ -326,12 +248,9 @@ fun Body(states: States,viewModel: HomeActivityViewModel) {
 }
 
 @Composable
-fun PlayAll(modifier: Modifier) {
+fun PlayAll(modifier: Modifier, viewModel: ShiraoriViewModel) {
     IconButton({
-        shiraori!!.apply {
-            setRandomModeEnabled(true)
-            playInPlaylist(getDatabaseEntries())
-        }
+        viewModel.playAllAudio()
     }, modifier.background(Color.LightGray)) {
         Icon(
             painter = painterResource(R.drawable.play_all_random),
@@ -356,7 +275,7 @@ fun ControlButton(resource: Int, action: () -> Unit) {
 }
 
 @Composable
-fun PlayManager(viewModel: HomeActivityViewModel) {
+fun PlayManager(viewModel: ShiraoriViewModel) {
     val playState: Boolean by viewModel.playPauseState.observeAsState(false)
     val randomState: Boolean by viewModel.randomMode.observeAsState(false)
     val audio: Audio? by viewModel.currentAudio.observeAsState()
@@ -368,19 +287,18 @@ fun PlayManager(viewModel: HomeActivityViewModel) {
 
     val context = LocalContext.current
     LaunchedEffect(timestamp) {
-        if(!sliderSeeking){
+        if (!sliderSeeking) {
             val slFutureValue = timestamp.progress.toFloat()
-            if (!slFutureValue.isNaN())
-                sliderPosition = slFutureValue
+            if (!slFutureValue.isNaN()) sliderPosition = slFutureValue
         }
-
 
 
         val current: Int = (timestamp.duration * timestamp.progress).toInt()
         timestampText = context.getString(
             R.string.timestamp,
             (current / 60000),
-            (current / 1000) % 60, timestamp.duration / 60000,
+            (current / 1000) % 60,
+            timestamp.duration / 60000,
             (timestamp.duration / 1000) % 60
         )
     }
@@ -391,15 +309,11 @@ fun PlayManager(viewModel: HomeActivityViewModel) {
         LoopMode.NONE -> R.drawable.loop_none
     }
 
-    val playButtonRes: Int = if (!playState)
-        android.R.drawable.ic_media_pause
-    else
-        android.R.drawable.ic_media_play
+    val playButtonRes: Int = if (!playState) android.R.drawable.ic_media_pause
+    else android.R.drawable.ic_media_play
 
-    val randomButtonRes: Int = if (randomState)
-        R.drawable.random_enabled
-    else
-        R.drawable.random_none
+    val randomButtonRes: Int = if (randomState) R.drawable.random_enabled
+    else R.drawable.random_none
 
     Column(
         modifier = Modifier
@@ -412,9 +326,7 @@ fun PlayManager(viewModel: HomeActivityViewModel) {
                 .padding(8.dp)
         ) {
             Text(
-                audio?.displayName ?: "Nothing selected",
-                Modifier.weight(1.0f),
-                color = Color.White
+                audio?.displayName ?: "Nothing selected", Modifier.weight(1.0f), color = Color.White
             )
             Text(timestampText, color = Color.White)
         }
@@ -450,9 +362,7 @@ fun PlayManager(viewModel: HomeActivityViewModel) {
                     }
                     ControlButton(android.R.drawable.ic_media_previous) {
                         Log.i("PlayManager", "prev")
-                        shiraori?.apply {
-                            skipToPreviousAudio()
-                        }
+                        viewModel.skipToPrevAudio()
                     }
                     ControlButton(playButtonRes) {
                         Log.i("PlayManager", "Play")
@@ -461,26 +371,25 @@ fun PlayManager(viewModel: HomeActivityViewModel) {
                     ControlButton(android.R.drawable.ic_media_next) {
                         Log.i("PlayManager", "next")
                         viewModel.setCurrentAudio(null)
-                        shiraori?.apply {
-                            skipToNextAudio()
-                        }
+                        viewModel.skipToNextAudio()
                     }
                     ControlButton(randomButtonRes) {
                         Log.i("PlayManager", "random")
                         viewModel.setRandomMode(!randomState)
                     }
                 }
-                Slider(
-                    value = sliderPosition,
-                    valueRange = 0f..1.0f,
-                    onValueChange = {
-                        sliderSeeking=true
-                        sliderPosition = it
-                    },
-                    onValueChangeFinished = {
-                        shiraori?.setTimestamp(sliderPosition.toDouble())
-                        sliderSeeking = false
-                    }
+                Slider(value = sliderPosition, valueRange = 0f..1.0f, onValueChange = {
+                    sliderSeeking = true
+                    sliderPosition = it
+                }, onValueChangeFinished = {
+                    viewModel.setTimestamp(sliderPosition.toDouble())
+
+                    sliderSeeking = false
+                }, colors = SliderDefaults.colors(
+                    thumbColor = Color.Transparent,
+                    inactiveTickColor = colorResource(R.color.background_mid_deep),
+                    activeTrackColor = colorResource(R.color.foreground)
+                )
                 )
             }
         }
@@ -488,16 +397,17 @@ fun PlayManager(viewModel: HomeActivityViewModel) {
 }
 
 @Composable
-fun AudioEntry(audio: Audio, curAudio: Audio?) {
+fun AudioEntry(audio: Audio, curAudio: Audio?, viewModel: ShiraoriViewModel) {
     var checked by remember { mutableStateOf(false) }
-    Row(
-        verticalAlignment = Alignment.CenterVertically, modifier = Modifier
-            .background(colorResource(R.color.background_light),  RoundedCornerShape(6.dp))
-            .fillMaxWidth()
-    ) {
-        if (checked)
-            Checkbox(checked, { checked = it })
-
+    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier
+        .background(
+            colorResource(R.color.background_light), RoundedCornerShape(6.dp)
+        )
+        .fillMaxWidth()
+        .clickable {
+            viewModel.playAudio(audio)
+        }) {
+        if (checked) Checkbox(checked, { checked = it })
         Image(
             painter = painterResource(R.drawable.no_album),
             contentDescription = "",
@@ -505,47 +415,77 @@ fun AudioEntry(audio: Audio, curAudio: Audio?) {
                 .requiredSize(44.dp)
                 .padding(4.dp)
         )
-        TextButton({
-            shiraori!!.apply {
-                playAudio(audio)
-            }
-        }) {
-            if (audio == curAudio)
-                Text(audio.displayName, maxLines = 2, color = colorResource(R.color.foreground))
-            else
-                Text(audio.displayName, maxLines = 2, color = Color.White)
+
+        if (audio == curAudio) {
+            Text(
+                audio.displayName, maxLines = 2, color = colorResource(R.color.foreground)
+            )
+        } else {
+            Text(audio.displayName, maxLines = 2, color = Color.White)
         }
+
     }
 }
 
 @Composable
-fun ContentList(audioList: List<Audio>, viewModel: HomeActivityViewModel) {
+fun ContentList(audioList: List<Audio>, viewModel: ShiraoriViewModel) {
     val curAudio by viewModel.currentAudio.observeAsState()
 
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(2.dp),
-        modifier = Modifier.background(colorResource(R.color.background))
+        modifier = Modifier
+            .background(colorResource(R.color.background))
+            .padding(2.dp)
     ) {
         items(audioList.size, key = {
             audioList[it].hashCode()
         }, itemContent = {
-            AudioEntry(audioList[it], curAudio)
+            AudioEntry(audioList[it], curAudio, viewModel)
         })
     }
 }
 
 @Composable
-fun ListSelectionBar() {
-    val radioOptions = listOf("ALL", "PLAYLIST", "QUEUE")
-    val (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions[0]) }
+fun Modifier.radioButtonSelectBackground(selected: Boolean): Modifier {
+    return if (selected) this.background(
+        Brush.verticalGradient(
+            listOf(
+                colorResource(R.color.foreground),
+                colorResource(R.color.background_light),
+                colorResource(R.color.foreground)
+            )
+        ), RoundedCornerShape(5.dp)
+    )
+    else this.background(
+        colorResource(R.color.background_very_light), RoundedCornerShape(5.dp)
+    )
+}
 
-    Row(Modifier.selectableGroup()) {
-        radioOptions.forEach{ text ->
-            Text(text,Modifier.selectable(
-                selected = selectedOption==text,
-                onClick = { onOptionSelected(text) },
-                role = Role.RadioButton
-            ))
+@Composable
+fun ListSelectionBar(selectedOption: MutableState<ListCategories>) {
+    Row(
+        Modifier
+            .selectableGroup()
+            .padding(4.dp)
+    ) {
+        ListCategories.entries.forEach { cat ->
+
+            Text(
+                text = cat.name,
+                fontWeight = FontWeight.Bold,
+                color = Color.White,
+                modifier = Modifier
+                    .selectable(
+                        selected = selectedOption.value == cat,
+                        onClick = { selectedOption.value = cat },
+                        role = Role.RadioButton,
+                    )
+                    .radioButtonSelectBackground(selectedOption.value == cat)
+                    .padding(
+                        horizontal = 8.dp, vertical = 8.dp
+                    )
+            )
+            Spacer(Modifier.padding(horizontal = 1.dp))
         }
     }
 }
@@ -560,26 +500,42 @@ fun ToolBar(searchFilter: MutableState<String>) {
     }
 
     Row(
-        Modifier.fillMaxWidth(),
+        Modifier
+            .fillMaxWidth()
+            .padding(4.dp, 8.dp, 4.dp, 0.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        TextField(
-            value = searchText,
+        BasicTextField(value = searchText,
             onValueChange = { searchText = it },
-            modifier = Modifier.padding(horizontal = 2.dp),
-            placeholder = { Text("search") },
+            modifier = Modifier
+                .padding(horizontal = 2.dp)
+                .padding(0.dp, 0.dp, 4.dp, 0.dp)
+                .background(Color.White, RoundedCornerShape(6.dp))
+                .height(36.dp)
+                .weight(1.0f),
+            // placeholder = { Text("search") },
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
             keyboardActions = KeyboardActions(onSearch = {
                 filterContent()
                 keyboardController?.hide()
             }),
-            maxLines = 1
-        )
+            maxLines = 1,
+            decorationBox = { innerTextField ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(4.dp, 0.dp, 4.dp, 0.dp),
+                    contentAlignment = Alignment.CenterStart
+                ) {
+                    if (searchText.isEmpty()) Text("search", color = Color.LightGray)
+                    innerTextField()
+                }
+            })
         Button(
             filterContent, modifier = Modifier
-                .requiredSize(48.dp)
-                .padding(0.dp)
+                .requiredSize(48.dp, 40.dp)
+                .padding(horizontal = 4.dp)
         ) {
             Image(
                 painter = painterResource(android.R.drawable.ic_menu_search),
@@ -593,8 +549,8 @@ fun ToolBar(searchFilter: MutableState<String>) {
             {
                 TODO("Open settings screen")
             }, modifier = Modifier
-                .requiredSize(48.dp)
-                .padding(0.dp)
+                .requiredSize(48.dp, 40.dp)
+                .padding(horizontal = 4.dp)
         ) {
             Image(
                 painter = painterResource(android.R.drawable.ic_menu_manage),

@@ -6,13 +6,13 @@ import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
 import android.util.Log
-import com.demeth.massaudioplayer.backend.Dependencies
-import com.demeth.massaudioplayer.backend.IShiraori
-import com.demeth.massaudioplayer.backend.Shiraori
-import com.demeth.massaudioplayer.backend.models.adapters.EventHandler
-import com.demeth.massaudioplayer.backend.models.objects.Audio
-import com.demeth.massaudioplayer.backend.models.objects.LoopMode
-import com.demeth.massaudioplayer.backend.models.objects.Timestamp
+import com.demeth0.massaudioplayer.backend.Dependencies
+import com.demeth0.massaudioplayer.backend.IShiraori
+import com.demeth0.massaudioplayer.backend.Shiraori
+import com.demeth0.massaudioplayer.backend.models.adapters.EventHandler
+import com.demeth0.massaudioplayer.backend.models.objects.Audio
+import com.demeth0.massaudioplayer.backend.models.objects.LoopMode
+import com.demeth0.massaudioplayer.backend.models.objects.Timestamp
 
 /**
  * Foreground service that will host the playback and audio management module. Can be used from notification, activities and Broadcast.
@@ -70,6 +70,7 @@ class AudioService : Service() {
     private var dependencies: Dependencies? = null
 
     private fun getDeps() : Dependencies {
+        startShiraori()
         return dependencies!!
     }
 
@@ -125,7 +126,7 @@ class AudioService : Service() {
      * @return The playback configuration and resources to control the music.
      */
     @Deprecated("Replaced with IShiraori interface provided through onBind")
-    fun getDependencies(): Dependencies{
+    fun getDependencies(): Dependencies {
         return dependencies!!
     }
 }

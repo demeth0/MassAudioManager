@@ -1,9 +1,9 @@
-package com.demeth.massaudioplayer.backend.models.adapters
+package com.demeth0.massaudioplayer.backend.models.adapters
 
 
 import android.content.Context
-import com.demeth.massaudioplayer.backend.models.objects.Audio
-import com.demeth.massaudioplayer.backend.models.objects.Metadata
+import com.demeth0.massaudioplayer.backend.models.objects.Audio
+import com.demeth0.massaudioplayer.backend.models.objects.Metadata
 
 
 interface Database {

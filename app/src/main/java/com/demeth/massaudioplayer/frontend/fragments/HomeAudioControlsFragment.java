@@ -15,9 +15,9 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.demeth.massaudioplayer.R;
-import com.demeth.massaudioplayer.backend.Dependencies;
-import com.demeth.massaudioplayer.backend.Shiraori;
-import com.demeth.massaudioplayer.backend.models.objects.LoopMode;
+import com.demeth0.massaudioplayer.backend.Dependencies;
+import com.demeth0.massaudioplayer.backend.Shiraori;
+import com.demeth0.massaudioplayer.backend.models.objects.LoopMode;
 import com.demeth.massaudioplayer.frontend.HomeViewModel;
 import com.demeth.massaudioplayer.frontend.service.AudioService;
 import com.demeth.massaudioplayer.frontend.service.AudioServiceBoundable;

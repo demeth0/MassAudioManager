@@ -1,10 +1,10 @@
-package com.demeth.massaudioplayer.backend.models.objects
+package com.demeth0.massaudioplayer.backend.models.objects
 
 /**
  * differentiate between all the type of audio track implementation available for different audio players.
  * @see Audio
  *
- * @see com.demeth.massaudioplayer.backend.models.adapters.AudioPlayer AudioPlayer
+ * @see com.demeth0.massaudioplayer.backend.models.adapters.AudioPlayer AudioPlayer
  */
 enum class AudioType {
     /**

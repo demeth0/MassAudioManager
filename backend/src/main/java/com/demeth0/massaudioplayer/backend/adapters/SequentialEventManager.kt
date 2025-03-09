@@ -1,8 +1,8 @@
-package com.demeth.massaudioplayer.backend.adapters
+package com.demeth0.massaudioplayer.backend.adapters
 
-import com.demeth.massaudioplayer.backend.models.adapters.EventHandler
-import com.demeth.massaudioplayer.backend.models.adapters.EventManager
-import com.demeth.massaudioplayer.backend.models.objects.Event
+import com.demeth0.massaudioplayer.backend.models.adapters.EventHandler
+import com.demeth0.massaudioplayer.backend.models.adapters.EventManager
+import com.demeth0.massaudioplayer.backend.models.objects.Event
 
 import java.util.concurrent.ConcurrentHashMap
 

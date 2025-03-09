@@ -10,8 +10,8 @@ android {
 
     defaultConfig {
         applicationId = "com.demeth.massaudioplayer"
-        minSdk = 30
-        targetSdk = 34
+        minSdk = 33
+        targetSdk = 35
         versionCode = 2
         versionName = "5.0"
 
@@ -31,7 +31,6 @@ android {
     }
     buildFeatures {
         viewBinding = true
-        dataBinding = true
         compose = true
     }
     kotlinOptions {

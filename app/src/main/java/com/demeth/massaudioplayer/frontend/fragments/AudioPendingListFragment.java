@@ -24,9 +24,9 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.demeth.massaudioplayer.R;
-import com.demeth.massaudioplayer.backend.Dependencies;
-import com.demeth.massaudioplayer.backend.Shiraori;
-import com.demeth.massaudioplayer.backend.models.objects.Audio;
+import com.demeth0.massaudioplayer.backend.Dependencies;
+import com.demeth0.massaudioplayer.backend.Shiraori;
+import com.demeth0.massaudioplayer.backend.models.objects.Audio;
 import com.demeth.massaudioplayer.databinding.FragmentHomeAudioEntryDisplayerBinding;
 import com.demeth.massaudioplayer.frontend.HomeViewModel;
 import com.demeth.massaudioplayer.frontend.service.AudioService;

@@ -5,11 +5,10 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
-import com.demeth.massaudioplayer.backend.adapters.SmartAudioProvider;
-import com.demeth.massaudioplayer.backend.models.objects.Audio;
-import com.demeth.massaudioplayer.backend.models.objects.AudioType;
-import com.demeth.massaudioplayer.backend.models.objects.LoopMode;
-import com.demeth.massaudioplayer.backend.models.objects.Playlist;
+import com.demeth0.massaudioplayer.backend.models.objects.Audio;
+import com.demeth0.massaudioplayer.backend.models.objects.AudioType;
+import com.demeth0.massaudioplayer.backend.models.objects.LoopMode;
+import com.demeth0.massaudioplayer.backend.models.objects.Playlist;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -17,6 +16,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class SmartAudioProviderTest {
@@ -363,7 +363,7 @@ public class SmartAudioProviderTest {
         audio_provider.setPlaylist(new Playlist(test_data));
         audio_provider.addToQueue(test_queue);
 
-        audio_provider.addToPlaylist(Arrays.asList(new Audio[]{test_queue2}));
+        audio_provider.addToPlaylist(Collections.singletonList(test_queue2));
         Assert.assertEquals(1, audio_provider.viewQueue().size());
 
         test_data.add(test_queue2);

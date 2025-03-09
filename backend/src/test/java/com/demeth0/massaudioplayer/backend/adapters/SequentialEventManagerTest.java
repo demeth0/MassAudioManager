@@ -5,10 +5,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import com.demeth.massaudioplayer.backend.adapters.SequentialEventManager;
-import com.demeth.massaudioplayer.backend.models.adapters.EventManager;
-import com.demeth.massaudioplayer.backend.models.objects.Event;
-import com.demeth.massaudioplayer.backend.models.objects.EventCodeMap;
+import com.demeth0.massaudioplayer.backend.models.adapters.EventManager;
+import com.demeth0.massaudioplayer.backend.models.objects.Event;
+import com.demeth0.massaudioplayer.backend.models.objects.EventCodeMap;
 
 import org.junit.Before;
 import org.junit.Test;

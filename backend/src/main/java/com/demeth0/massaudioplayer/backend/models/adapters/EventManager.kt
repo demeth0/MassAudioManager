@@ -1,6 +1,6 @@
-package com.demeth.massaudioplayer.backend.models.adapters
+package com.demeth0.massaudioplayer.backend.models.adapters
 
-import com.demeth.massaudioplayer.backend.models.objects.Event
+import com.demeth0.massaudioplayer.backend.models.objects.Event
 
 /**
  * This class is used to stock callbacks created for UI or system updates.

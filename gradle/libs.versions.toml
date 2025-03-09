@@ -17,6 +17,7 @@ composeBomVersion = "2024.12.01"
 activityComposeVersion = "1.9.3"
 uiToolingPreviewAndroidVersion = "1.7.6"
 runtimeLivedataVersion = "1.7.6"
+lifecycleRuntimeKtxVersion = "2.8.7"
 
 [libraries]
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompatVersion" }
@@ -41,6 +42,12 @@ compose-ui = {group="androidx.compose.ui", name="ui"}
 activity-compose = {group = "androidx.activity", name="activity-compose", version.ref="activityComposeVersion"}
 androidx-ui-tooling-preview-android = { group = "androidx.compose.ui", name = "ui-tooling-preview-android", version.ref = "uiToolingPreviewAndroidVersion" }
 androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedataVersion" }
+androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtxVersion" }
+androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
+androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
+androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
+androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
+androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 
 [bundles]
 androidx = [

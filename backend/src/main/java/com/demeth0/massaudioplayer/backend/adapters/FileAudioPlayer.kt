@@ -1,20 +1,21 @@
-package com.demeth.massaudioplayer.backend.adapters
+package com.demeth0.massaudioplayer.backend.adapters
 
 import android.content.Context
 import android.media.AudioAttributes
 import android.media.MediaPlayer
 
-import com.demeth.massaudioplayer.backend.models.adapters.AudioPlayer
-import com.demeth.massaudioplayer.backend.models.adapters.Database
-import com.demeth.massaudioplayer.backend.models.adapters.EventManager
-import com.demeth.massaudioplayer.backend.models.objects.Audio
-import com.demeth.massaudioplayer.backend.models.objects.Event
-import com.demeth.massaudioplayer.backend.models.objects.EventCodeMap
-import com.demeth.massaudioplayer.backend.models.objects.Metadata
+import com.demeth0.massaudioplayer.backend.models.adapters.AudioPlayer
+import com.demeth0.massaudioplayer.backend.models.adapters.Database
+import com.demeth0.massaudioplayer.backend.models.adapters.EventManager
+import com.demeth0.massaudioplayer.backend.models.objects.Audio
+import com.demeth0.massaudioplayer.backend.models.objects.Event
+import com.demeth0.massaudioplayer.backend.models.objects.EventCodeMap
+import com.demeth0.massaudioplayer.backend.models.objects.Metadata
 
 import java.io.IOException
 
-class FileAudioPlayer(private val eventManager: EventManager, private val database: Database, private val context: Context) : AudioPlayer {
+class FileAudioPlayer(private val eventManager: EventManager, private val database: Database, private val context: Context) :
+    AudioPlayer {
     private var mp: MediaPlayer = MediaPlayer()
 
     private var timestampAccessOk = false

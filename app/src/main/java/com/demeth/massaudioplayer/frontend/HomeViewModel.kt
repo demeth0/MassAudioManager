@@ -4,9 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
-import com.demeth.massaudioplayer.backend.models.objects.Audio
-import com.demeth.massaudioplayer.backend.models.objects.LoopMode
-import com.demeth.massaudioplayer.backend.models.objects.Timestamp
+import com.demeth0.massaudioplayer.backend.models.objects.Audio
+import com.demeth0.massaudioplayer.backend.models.objects.LoopMode
+import com.demeth0.massaudioplayer.backend.models.objects.Timestamp
 
 /**
  * This ViewModel is responsible for updating the UI elements of the Home page of the application.<br> <br>
