@@ -56,7 +56,7 @@ class SmartAudioProvider : AudioProvider {
     override fun getAudio(): Audio? = currentAudio
 
     override fun setAudioFromQueue(audioIndex: Int) {
-        for(i in 0..audioIndex)
+        for(i in 0..<audioIndex)
             currentAudio = queue.next()
     }
 

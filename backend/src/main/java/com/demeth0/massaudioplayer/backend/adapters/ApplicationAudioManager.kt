@@ -75,7 +75,7 @@ class ApplicationAudioManager(private val audioPlayersFactory: AudioPlayerFactor
 
     override fun timestamp(): Timestamp {
         val audioPlayer = getAudioPlayer() ?: return Timestamp(0,0.0)
-        return Timestamp(audioPlayer.duration(),audioPlayer.progress()/audioPlayer.duration())
+        return Timestamp(audioPlayer.duration(),audioPlayer.progress().toDouble()/audioPlayer.duration())
     }
 
     override fun setTimestampProgress(progress: Double) {

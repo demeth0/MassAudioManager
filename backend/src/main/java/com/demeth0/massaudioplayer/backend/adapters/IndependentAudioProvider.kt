@@ -6,7 +6,10 @@ import com.demeth0.massaudioplayer.backend.models.objects.LoopMode
 import com.demeth0.massaudioplayer.backend.models.objects.Playlist
 import kotlin.math.max
 
-class IndependentAudioProvider: AudioProvider {
+/**
+ * Newer implementation using simpler logic than SmartAudioProvider
+ */
+class IndependentAudioProvider : AudioProvider {
     private val queue: MutableList<Audio> = mutableListOf()
     private var playlist: List<Audio> = emptyList()
     private var playlistShuffled: List<Audio> = emptyList()
@@ -22,7 +25,7 @@ class IndependentAudioProvider: AudioProvider {
         playlistShuffled = p?.view()?.shuffled() ?: emptyList()
 
         // move to next and advance to next would skip first track if start at 0
-        index=-1
+        index = -1
     }
 
     override fun setRandom(mode: Boolean) {
@@ -46,8 +49,8 @@ class IndependentAudioProvider: AudioProvider {
     }
 
     override fun addToPlaylist(audios: List<Audio>) {
-        playlist = playlist+audios
-        playlistShuffled = playlistShuffled+audios
+        playlist = playlist + audios
+        playlistShuffled = playlistShuffled + audios
     }
 
     override fun viewQueue(): List<Audio> {
@@ -55,18 +58,22 @@ class IndependentAudioProvider: AudioProvider {
     }
 
     override fun viewPlaylist(): List<Audio> {
-        return if(random) playlistShuffled else playlist
+        return if (random) playlistShuffled else playlist
     }
 
     override fun getAudio(): Audio? {
         return audio
     }
 
-    private fun selectNextAudio(useQueue : Boolean = true){
+    private fun selectNextAudio(useQueue: Boolean = true) {
         audio = when {
             useQueue && queue.isNotEmpty() -> queue.removeAt(0)
             playlist.isEmpty() -> null
             index >= playlist.size -> null
+            index < 0 -> {
+                // TODO Logs
+                null
+            }
             !random -> playlist[index]
             random -> playlistShuffled[index]
             else -> null
@@ -74,9 +81,10 @@ class IndependentAudioProvider: AudioProvider {
     }
 
     override fun setAudioFromQueue(audioIndex: Int) {
-        if(audioIndex<queue.size){
-            for(i in 0..audioIndex)
+        if (audioIndex < queue.size) {
+            for (i in 0..<audioIndex){
                 queue.removeAt(0)
+            }
 
             selectNextAudio()
         } else
@@ -84,21 +92,20 @@ class IndependentAudioProvider: AudioProvider {
     }
 
     override fun setAudioFromPlaylist(audioIndex: Int) {
-        if(audioIndex<playlist.size){
-            index=audioIndex
+        if (audioIndex < playlist.size) {
+            index = audioIndex
             selectNextAudio(false)
-        }
-        else
+        } else
             throw IndexOutOfBoundsException("Index $audioIndex is above playlist size")
     }
 
     override fun moveToNext() {
-        if(queue.isEmpty()) {
+        if (queue.isEmpty()) {
             index = when (loopMode) {
-                LoopMode.SINGLE -> index + 1
-                LoopMode.NONE -> index + 1
+                LoopMode.SINGLE -> incrIndex()
+                LoopMode.NONE -> incrIndex()
                 LoopMode.ALL -> {
-                    if (index == playlist.size) playlistShuffled = playlistShuffled.shuffled()
+                    if (index == playlist.size-1) playlistShuffled = playlistShuffled.shuffled()
                     (index + 1) % playlist.size
                 }
             }
@@ -107,12 +114,12 @@ class IndependentAudioProvider: AudioProvider {
     }
 
     override fun advanceToNext() {
-        if(queue.isEmpty()) {
+        if (queue.isEmpty()) {
             index = when (loopMode) {
                 LoopMode.SINGLE -> index
-                LoopMode.NONE -> index + 1
+                LoopMode.NONE -> incrIndex()
                 LoopMode.ALL -> {
-                    if (index == playlist.size) playlistShuffled = playlistShuffled.shuffled()
+                    if (index == playlist.size-1) playlistShuffled = playlistShuffled.shuffled()
                     (index + 1) % playlist.size
                 }
             }
@@ -120,14 +127,20 @@ class IndependentAudioProvider: AudioProvider {
         selectNextAudio()
     }
 
+    private fun incrIndex(): Int{
+        return index + 1
+    }
+
     override fun moveToPrev() {
-        index = when(loopMode){
-            LoopMode.SINGLE -> index
+        index = when (loopMode) {
+            LoopMode.SINGLE -> max(0, index) // if index is -1 then set to first audio
             LoopMode.NONE -> {
-                max(0, index-1) // only go to prev if not first audio
+                max(0, index - 1) // only go to prev if not first audio
             }
+
             LoopMode.ALL -> {
-                (index-1+playlist.size)%playlist.size
+                // We born index to -1, because -1 is the un-initialized state
+                (max(-1, index - 1) + playlist.size) % playlist.size
             }
         }
         selectNextAudio(false)

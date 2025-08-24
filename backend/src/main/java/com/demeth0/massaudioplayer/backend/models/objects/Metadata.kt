@@ -8,13 +8,13 @@ import android.net.Uri
  *
  * @see FileAudioMetadata
  */
-open class Metadata {
+sealed interface Metadata {
     /**
      * {@link Metadata} used with an audio of the type {@link AudioType#LOCAL}.
      * Create a local audio file metadata object that will stock the uri to the file for loading the audio and album cover.
      * @param uri Uri of the audio file following Android path convention.
      */
-     data class FileAudioMetadata(var uri :Uri?) : Metadata(){
+    data class FileAudioMetadata(var uri :Uri?) : Metadata {
 
         /**
          * Create a local file metadata object uninitialized.

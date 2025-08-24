@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
+import com.demeth0.massaudioplayer.backend.models.adapters.AudioProvider;
 import com.demeth0.massaudioplayer.backend.models.objects.Audio;
 import com.demeth0.massaudioplayer.backend.models.objects.AudioType;
 import com.demeth0.massaudioplayer.backend.models.objects.LoopMode;
@@ -15,19 +16,18 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class SmartAudioProviderTest {
+public class AudioProviderTest {
     List<Audio> test_data;
     Audio test_queue = new Audio("quick quick","file://ok",AudioType.LOCAL);
     Audio test_queue2 = new Audio("quick quick 2","file://ok2",AudioType.LOCAL);
 
-    SmartAudioProvider audio_provider;
+    AudioProvider audio_provider;
     @Before
     public void setUp() {
-        audio_provider = new SmartAudioProvider();
+        audio_provider = new IndependentAudioProvider();
         test_data = new ArrayList<>();
         for(int i = 0; i<100 ; i++){
             test_data.add(new Audio("bbb "+i,"aaa "+i, AudioType.LOCAL));
@@ -62,12 +62,23 @@ public class SmartAudioProviderTest {
     }
 
     @Test
-    public void test_skip_to_next_end(){
+    public void test_skip_to_next_end_loop_none(){
+        audio_provider.setLoop(LoopMode.NONE);
+        audio_provider.setPlaylist(new Playlist(test_data));
+        audio_provider.setAudioFromPlaylist(99);
+        audio_provider.moveToNext();
+        Assert.assertNull(audio_provider.getAudio());
+    }
+
+    @Test
+    public void test_skip_to_next_end_loop_all(){
+        audio_provider.setLoop(LoopMode.ALL);
         audio_provider.setPlaylist(new Playlist(test_data));
         audio_provider.setAudioFromPlaylist(99);
         audio_provider.moveToNext();
         Assert.assertEquals(test_data.get(0), audio_provider.getAudio());
     }
+
     @Test
     public void test_advance_toNext(){
         audio_provider.setPlaylist(new Playlist(test_data));
@@ -95,10 +106,19 @@ public class SmartAudioProviderTest {
     }
 
     @Test
-    public void test_previous_start(){
+    public void test_previous_start_loop_all(){
+        audio_provider.setLoop(LoopMode.ALL);
         audio_provider.setPlaylist(new Playlist(test_data));
         audio_provider.moveToPrev();
         Assert.assertEquals(test_data.get(99), audio_provider.getAudio());
+    }
+
+    @Test
+    public void test_previous_start_loop_none(){
+        audio_provider.setLoop(LoopMode.NONE);
+        audio_provider.setPlaylist(new Playlist(test_data));
+        audio_provider.moveToPrev();
+        Assert.assertEquals(test_data.get(0), audio_provider.getAudio());
     }
 
     @Test
@@ -132,7 +152,7 @@ public class SmartAudioProviderTest {
         audio_provider.setAudioFromPlaylist(99);
         audio_provider.setLoop(LoopMode.SINGLE);
         audio_provider.moveToNext();
-        Assert.assertEquals(test_data.get(0), audio_provider.getAudio());
+        Assert.assertNull(audio_provider.getAudio());
     }
     @Test
     public void test_loop_single_advance(){
@@ -269,10 +289,11 @@ public class SmartAudioProviderTest {
     }
     @Test
     public void test_random_skip_reset(){
+        audio_provider.setLoop(LoopMode.ALL);
         audio_provider.setPlaylist(new Playlist(test_data));
         audio_provider.setRandom(true);
         List<Audio> test = audio_provider.viewPlaylist();
-        audio_provider.setAudioFromPlaylist(99);
+        audio_provider.setAudioFromPlaylist(test_data.size()-1);
         audio_provider.moveToNext();
         assertNotEquals(test,audio_provider.viewPlaylist());
     }
@@ -304,7 +325,17 @@ public class SmartAudioProviderTest {
     }
 
     @Test
-    public void test_add_toQueue_prev_beg(){
+    public void test_add_toQueue_prev_beg_loop_none(){
+        audio_provider.setLoop(LoopMode.NONE);
+        audio_provider.setPlaylist(new Playlist(test_data));
+        audio_provider.addToQueue(test_queue);
+        audio_provider.moveToPrev();
+        Assert.assertEquals(test_data.get(0), audio_provider.getAudio());
+    }
+
+    @Test
+    public void test_add_toQueue_prev_beg_loop_all(){
+        audio_provider.setLoop(LoopMode.ALL);
         audio_provider.setPlaylist(new Playlist(test_data));
         audio_provider.addToQueue(test_queue);
         audio_provider.moveToPrev();

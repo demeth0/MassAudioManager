@@ -13,7 +13,7 @@ class HashMapDatabase(context: Context,vararg contentProviders: DatabaseContentP
     class DuplicateEntriesException : Exception("Entry already added to the collection, duplicate ?")
 
     // Database content
-    private val fileAudioMetadata = HashMap<String, Metadata.FileAudioMetadata>()
+    private val fileAudioMetadata = HashMap<String, Metadata>()
     private val audioEntries = HashMap<String, Audio>()
 
     private var providers: Array<out DatabaseContentProvider> = contentProviders
@@ -30,7 +30,7 @@ class HashMapDatabase(context: Context,vararg contentProviders: DatabaseContentP
     private fun saveMetadata(audio: Audio, metadata: Metadata){
         when(audio.type){
             AudioType.LOCAL -> {
-                fileAudioMetadata[audio.path] = metadata as Metadata.FileAudioMetadata
+                fileAudioMetadata[audio.path] = metadata
             }
             else -> {}
         }

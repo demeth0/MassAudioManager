@@ -28,7 +28,7 @@ interface AudioPlayer {
     /**
      * @return The progress of the audio (1.0 mean finished).
      */
-    fun progress(): Double
+    fun progress(): Int
 
     /**
      * @return The duration of the audio in seconds.

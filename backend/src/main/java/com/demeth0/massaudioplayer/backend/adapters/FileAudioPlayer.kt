@@ -61,12 +61,12 @@ class FileAudioPlayer(private val eventManager: EventManager, private val databa
         mp.seekTo((progress * duration()).toInt())
     }
 
-    override fun progress(): Double {
+    override fun progress(): Int {
         // return 0 if unavailable
         return if(timestampAccessOk)
-            mp.currentPosition.toDouble()
+            mp.currentPosition
         else
-            0.0
+            0
     }
 
     override fun duration(): Int {

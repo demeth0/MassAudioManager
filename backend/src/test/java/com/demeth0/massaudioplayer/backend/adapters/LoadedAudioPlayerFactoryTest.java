@@ -37,7 +37,7 @@ public class LoadedAudioPlayerFactoryTest {
         }
 
         @Override
-        public double progress() {
+        public int progress() {
             return 0;
         }
 
